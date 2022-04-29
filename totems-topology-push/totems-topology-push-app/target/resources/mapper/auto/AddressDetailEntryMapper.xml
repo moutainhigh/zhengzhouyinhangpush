@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.AddressDetailEntryMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.AddressDetailEntryEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="detail_id" jdbcType="INTEGER" property="detailId" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="address_name" jdbcType="VARCHAR" property="addressName" />
+    <result column="address_type" jdbcType="VARCHAR" property="addressType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, uuid, detail_id, task_id, address_name, address_type, create_time
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_address_detail_entry
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_address_detail_entry
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByDetailId">
+    DELETE FROM push_address_detail_entry
+    WHERE detail_id = #{detailId,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.abtnetworks.totems.auto.entity.AddressDetailEntryEntity">
+    insert into push_address_detail_entry (id, uuid, detail_id, task_id,
+      address_name, address_type, create_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{detailId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER},
+      #{addressName,jdbcType=VARCHAR}, #{addressType,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.auto.entity.AddressDetailEntryEntity">
+    insert into push_address_detail_entry
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="detailId != null">
+        detail_id,
+      </if>
+      <if test="taskId != null">
+        task_id,
+      </if>
+      <if test="addressName != null">
+        address_name,
+      </if>
+      <if test="addressType != null">
+        address_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="detailId != null">
+        #{detailId,jdbcType=INTEGER},
+      </if>
+      <if test="taskId != null">
+        #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="addressName != null">
+        #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="addressType != null">
+        #{addressType,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.auto.entity.AddressDetailEntryEntity">
+    update push_address_detail_entry
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="detailId != null">
+        detail_id = #{detailId,jdbcType=INTEGER},
+      </if>
+      <if test="taskId != null">
+        task_id = #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="addressName != null">
+        address_name = #{addressName,jdbcType=VARCHAR},
+      </if>
+      <if test="addressType != null">
+        address_type = #{addressType,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.auto.entity.AddressDetailEntryEntity">
+    update push_address_detail_entry
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      detail_id = #{detailId,jdbcType=INTEGER},
+      task_id = #{taskId,jdbcType=INTEGER},
+      address_name = #{addressName,jdbcType=VARCHAR},
+      address_type = #{addressType,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_address_detail_entry
+    <where>
+      <if test="id != null ">
+        AND id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="uuid != null and uuid != ''">
+        AND uuid = #{uuid,jdbcType=VARCHAR}
+      </if>
+      <if test="detailId != null ">
+        AND detail_id = #{detailId,jdbcType=INTEGER}
+      </if>
+      <if test="taskId != null ">
+        AND task_id = #{taskId,jdbcType=INTEGER}
+      </if>
+      <if test="addressName != null and addressName != ''">
+        AND address_name = #{addressName,jdbcType=VARCHAR}
+      </if>
+      <if test="addressType != null and addressType != ''">
+        AND address_type = #{addressType,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        AND create_time = #{createTime,jdbcType=TIMESTAMP}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+  <select id="getByDetailId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_address_detail_entry
+    <where>
+      <if test="detailId != null and detailId != ''">
+        AND detail_id = #{detailId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+
+  <select id="getByTaskId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_address_detail_entry where task_id = #{taskId,jdbcType=INTEGER}
+  </select>
+
+</mapper>

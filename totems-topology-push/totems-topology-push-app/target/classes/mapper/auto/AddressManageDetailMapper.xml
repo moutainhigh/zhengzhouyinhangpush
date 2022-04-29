@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.AddressManageDetailMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.AddressManageDetailEntity" >
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+        <result column="task_id" jdbcType="INTEGER" property="taskId" />
+        <result column="address_name" jdbcType="VARCHAR" property="addressName" />
+        <result column="scenes_uuid" jdbcType="VARCHAR" property="scenesUuid" />
+        <result column="address_level" jdbcType="INTEGER" property="addressLevel" />
+        <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="address_del" jdbcType="VARCHAR" property="addressDel" />
+        <result column="address_add" jdbcType="VARCHAR" property="addressAdd" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="push_id" jdbcType="VARCHAR" property="pushId" />
+        <result column="address_type" jdbcType="VARCHAR" property="addressType" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        uuid,
+        task_id,
+        address_name,
+        scenes_uuid,
+        address_level,
+        parent_id,
+        status,
+        address_del,
+        address_add,
+        create_time,
+        push_id,
+        address_type
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="com.abtnetworks.totems.auto.entity.AddressManageDetailEntity">
+        INSERT INTO push_address_manage_detail (
+            uuid,
+            task_id,
+            address_name,
+            scenes_uuid,
+            address_level,
+            parent_id,
+            status,
+            address_del,
+            address_add,
+            create_time,
+            push_id,
+            address_type
+        )
+        VALUES(
+            #{uuid,jdbcType=VARCHAR},
+            #{taskId,jdbcType=INTEGER},
+            #{addressName,jdbcType=VARCHAR},
+            #{scenesUuid,jdbcType=VARCHAR},
+            #{addressLevel,jdbcType=INTEGER},
+            #{parentId,jdbcType=INTEGER},
+            #{status,jdbcType=INTEGER},
+            #{addressDel,jdbcType=VARCHAR},
+            #{addressAdd,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP},
+            #{pushId,jdbcType=VARCHAR},
+            #{addressType,jdbcType=VARCHAR}
+            )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM push_address_manage_detail
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByTaskId">
+        DELETE FROM push_address_manage_detail
+        WHERE task_id = #{taskId,jdbcType=INTEGER}
+    </delete>
+
+    <delete id="deleteByParentId">
+        DELETE FROM push_address_manage_detail
+        WHERE parent_id = #{parentId,jdbcType=INTEGER}
+    </delete>
+
+    <update id="update">
+        UPDATE push_address_manage_detail
+        SET
+            uuid = #{uuid,jdbcType=VARCHAR},
+            task_id = #{taskId,jdbcType=INTEGER},
+            address_name = #{addressName,jdbcType=VARCHAR},
+            scenes_uuid = #{scenesUuid,jdbcType=VARCHAR},
+            address_level = #{addressLevel,jdbcType=INTEGER},
+            parent_id = #{parentId,jdbcType=INTEGER},
+            status = #{status,jdbcType=INTEGER},
+            address_del = #{addressDel,jdbcType=VARCHAR},
+            address_add = #{addressAdd,jdbcType=VARCHAR},
+            push_Id = #{pushId,jdbcType=VARCHAR},
+            address_type = #{addressType,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP}
+        WHERE `id` = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.auto.entity.AddressManageDetailEntity">
+        update push_address_manage_detail
+        <set>
+            <if test="uuid != null">
+                uuid = #{uuid,jdbcType=VARCHAR},
+            </if>
+            <if test="taskId != null ">
+                task_id = #{taskId,jdbcType=INTEGER},
+            </if>
+            <if test="addressName != null ">
+                address_name = #{addressName,jdbcType=VARCHAR},
+            </if>
+            <if test="scenesUuid != null ">
+                scenes_uuid = #{scenesUuid,jdbcType=VARCHAR},
+            </if>
+            <if test="addressLevel != null ">
+                address_level = #{addressLevel,jdbcType=INTEGER},
+            </if>
+            <if test="parentId != null ">
+                parent_id = #{parentId,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="addressDel != null ">
+                address_del = #{addressDel,jdbcType=VARCHAR},
+            </if>
+            <if test="addressAdd != null ">
+                address_add = #{addressAdd,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="pushId != null ">
+                push_id = #{pushId,jdbcType=VARCHAR},
+            </if>
+            <if test="addressType != null ">
+                address_type = #{addressType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateDetailScenes" parameterType="com.abtnetworks.totems.auto.dto.AddressUpdateScenesDTO">
+        UPDATE push_address_manage_detail
+        SET
+        scenes_uuid = #{scenesUuid,jdbcType=VARCHAR},
+        push_id = '', status = '0'
+        WHERE id in
+        <foreach collection="idList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_address_manage_detail
+        WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getByTaskId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_address_manage_detail
+        WHERE task_id = #{taskId,jdbcType=INTEGER}
+    </select>
+
+    <select id="getByParentId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_address_manage_detail
+        <where>
+            <if test="parentId != null and parentId != ''">
+                AND parent_id = #{parentId,jdbcType=INTEGER}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_address_manage_detail
+        <where>
+            <if test="id != null ">
+                AND id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid,jdbcType=VARCHAR}
+            </if>
+            <if test="taskId != null ">
+                AND task_id = #{taskId,jdbcType=INTEGER}
+            </if>
+            <if test="addressName != null and addressName != ''">
+                AND address_name = #{addressName,jdbcType=VARCHAR}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid,jdbcType=VARCHAR}
+            </if>
+            <if test="addressLevel != null and addressLevel != ''">
+                AND address_level = #{addressLevel,jdbcType=INTEGER}
+            </if>
+            <if test="parentId != null ">
+                AND parent_id = #{parentId,jdbcType=INTEGER}
+            </if>
+            <if test="status != null ">
+                AND status = #{status,jdbcType=INTEGER}
+            </if>
+            <if test="addressDel != null and addressDel != ''">
+                AND address_del = #{addressDel,jdbcType=VARCHAR}
+            </if>
+            <if test="addressAdd != null and addressAdd != ''">
+                AND address_add = #{addressAdd,jdbcType=VARCHAR}
+            </if>
+            <if test="createTime != null">
+                AND create_time = #{createTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="pushId != null and pushId != ''">
+                AND push_id = #{pushId,jdbcType=VARCHAR}
+            </if>
+
+            <if test="addressType != null and addressType != ''">
+                AND address_type = #{addressType,jdbcType=VARCHAR},
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM push_address_manage_detail
+    </select>
+
+    <select id="findAddressByName" resultMap="BaseResultMap">
+        SELECT
+            <include refid="Base_Column_List" />
+        FROM
+            push_address_manage_detail
+        where 1=1
+            <if test="addressName != null and addressName != ''">
+                and  address_name like concat('%', #{addressName}, '%')
+            </if>
+            <if test="addressType != null and addressType != ''">
+                AND address_type = #{addressType,jdbcType=VARCHAR}
+            </if>
+        GROUP BY address_name
+    </select>
+
+    <select id="getAddressByName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM
+        push_address_manage_detail
+        where 1=1
+        <if test="addressName != null and addressName != ''">
+            and  address_name = #{addressName}
+        </if>
+        <if test="addressType != null and addressType != ''">
+            AND address_type = #{addressType,jdbcType=VARCHAR}
+        </if>
+        GROUP BY address_name
+    </select>
+
+    <update id="updateByTaskId" parameterType="com.abtnetworks.totems.auto.entity.AddressManageDetailEntity">
+        UPDATE
+            push_address_manage_detail
+        SET
+            scenes_uuid = #{scenesUuid,jdbcType=VARCHAR}
+        WHERE
+            task_id = #{taskId,jdbcType=INTEGER}
+    </update>
+
+</mapper>

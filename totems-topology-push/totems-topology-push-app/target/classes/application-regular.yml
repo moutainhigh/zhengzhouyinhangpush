@@ -1,0 +1,21 @@
+HillStone:
+  nat:
+    ###山石nat正则下发回显匹配自己的id
+    command-match-id: rule\sID=(?<id>\d*)\s.*
+  security:
+    # 山石安全策略下发回显匹配自己的id
+    command-match-id: id\s+(?<id>\d*)\s\S\D
+  close-command: "exit\n"
+
+FortV5:
+  ###飞塔V5.0正则下发回显匹配自己的id
+  command-match-id: edit\s+((?!0)(?<id>\d+))
+
+Cisco:
+  command-match-id: (?<id>\d*)\s+(permit|deny)
+  match-standby: this.*?host.*?:.*?(?<obj1>.*?)-.*
+
+H3CV5:
+  command-match-id: \-rule\-+(?<id>\d*)]
+
+

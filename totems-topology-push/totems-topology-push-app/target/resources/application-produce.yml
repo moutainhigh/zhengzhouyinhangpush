@@ -1,0 +1,209 @@
+service_connection_url: 127.0.0.1
+
+app:
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        first:
+          #监控统计拦截的filters
+          filters: stat
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          #基本属性
+          url: jdbc:mysql://${service_connection_url}:33060/topology?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false
+          username: totems
+          password: ENC(0e5SUw7+wnZlpQudTpUIm3snSqHWrDNoJzHdsu11SI/Bvl83wD32iLc+58bk5X7o)
+          #配置初始化大小/最小/最大
+          initial-size: 1
+          min-idle: 1
+          max-active: 20
+          #获取连接等待超时时间
+          max-wait: 60000
+          #间隔多久进行一次检测，检测需要关闭的空闲连接
+          time-between-eviction-runs-millis: 60000
+          #一个连接在池中最小生存的时间
+          min-evictable-idle-time-millis: 300000
+          validation-query: SELECT 'x'
+          test-while-idle: true
+          test-on-borrow: false
+          test-on-return: false
+          #打开PSCache，并指定每个连接上PSCache的大小。oracle设为true，mysql设为false。分库分表较多推荐设置为false
+          pool-prepared-statements: false
+          max-pool-prepared-statement-per-connection-size: 20
+
+spring:
+    thymeleaf:
+            prefix: classpath:/templates/
+            check-template-location: true
+            suffix: .html
+            encoding: UTF-8
+            mode: LEGACYHTML5
+            cache: false
+    aop:
+      auto: true
+      proxy-target-class: true
+    servlet:
+          multipart:
+            max-file-size:10Mb
+            max-request-size:100Mb
+    kafka:
+      bootstrap-servers: ${server.local-ip}:9092
+      consumer:
+        group-id: pushGroup
+      producer:
+        value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        key-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+        buffer-memory: 20MB
+        properties.max.request.size: 20971520
+    activemq:
+      broker-url: tcp://localhost:61616
+      user: admin
+      password: ENC(8m0eV8ewqtUMBh/dfka77ei5t9qFALHTd8/+1bVlZRCxZJQdfoKaxY4lWidWDyTo)
+      dbRestoreQueue: dbRestoreQueue
+    data:
+      mongodb:
+        host: ${service_connection_url}
+        password: ENC(0e5SUw7+wnZlpQudTpUIm3snSqHWrDNoJzHdsu11SI/Bvl83wD32iLc+58bk5X7o)
+        database: totems
+        username: totems
+        port: 27017
+        maxConnectionIdleTime: 60000
+        maxConnectionLifeTime: 0
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: org.abtnetworks.totems.recommend
+  mapper-locations: classpath:mapper/*.xml
+
+
+#pagehelper
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+    params: count=countSql
+    returnPageInfo: check
+
+logging:
+  level:
+    com.abtnetworks.totems: INFO
+
+swagger:
+  show: true
+
+topology:
+  risk-server-prefix: http://${service_connection_url}:8086/
+  layer-server-prefix: http://${service_connection_url}:8889/
+  push-server-prefix: http://${service_connection_url}:8088/
+  topology-server-prefix: http://${service_connection_url}:54211/
+  policy-server-prefix: http://${service_connection_url}:8890/topology-policy/
+  risk-prefix: http://127.0.0.1:8086/risk/
+  vmsdn-server-prefix: http://${service_connection_url}:8085/
+  whale-server-prefix: http://${service_connection_url}:54201/v0/
+
+resourceHandler: /downloadFile/**
+resourceLocation: file:${server.root.basedir}/service/push/resources/templates/
+resourceExcelFileDir: ${server.root.basedir}/service/push/resources/templates/
+resourceExcelFileName: 主机服务信息列表.xls
+#importHostExcelFileName: 策略仿真Excel导入模板.xlsx
+importHostExcelFileName: 策略建议模板.xls
+importWhiteListFileName: 白名单模板.xls
+importSecurityExcelFile: 策略生成模板.xls
+importFiveNatExcelFile: F5策略生成模板.xlsm
+
+
+importRoutingOrderFileName: 路由封堵模板.xls
+importPolicyOrderFileName: 策略封堵模板.xls
+importCredentialExcelFile: 凭据批量生成模板.xls
+importAutoRecommendExcelFile: 自动开通模板.xls
+importPortectNetworkExcelFile: 防护网段模板.xls
+
+virtual-directory:
+  handler: /downloadVirtualDirectoryFile/
+  fileDir: ${server.root.basedir}/service/push/resources/virtual-directory/
+  location: file:${virtual-directory.fileDir}
+
+translation-directory:
+  handler:  /downloadTranslationDirectoryFile/
+  fileDir:  ${server.root.basedir}/attachment/pushPolicyConvert/
+  location: file:${translation-directory.fileDir}
+
+python-directory:
+  handler: /downloadFile/**
+  fileDir: ${server.root.basedir}/service/push/resources/python/
+  location: file:${virtual-directory.fileDir}/service/push/resources/python/
+
+push:
+  download-file: ${server.root.basedir}/attachment
+  work:
+    name: 总部
+    ip: 127.0.0.1
+  whale: true
+  internet:
+    dnsIp: 114.114.114.114
+  sshj:
+    deviceIp: -.-.-.-
+  generateObjRollbackCommandLine: false
+  recommend:
+    check-policy-max: 10
+  client:
+    size:
+      col: 4096
+      row: 4096
+      wp: 16384
+      hp: 16384
+  # 自动开通发送邮件管理员账号，多个请用,隔开，例123@qq.com,124@qq.com
+  manage-email:
+  token: 9470fb40-e182-4391-bb98-222790532652
+  project-ip: https://192.168.215.173
+  open-acl: false
+  reverse-acl: false
+  reuse-src-port: false
+  #开启工单范围还原成子网
+  open-convert-address: false
+
+# 管理平台API请求url配置
+management-platform-url:
+  # 飞塔管理平台
+  fortinet:
+    common-url: /jsonrpc
+    common-path: pm/config/adom/
+    login: /sys/login/user
+    create-IPV4-address: /obj/firewall/address
+    create-IPV6-address: /obj/firewall/address6
+    get-package-name: pm/pkg/adom/
+    create-service-object: /obj/firewall/service/custom
+    create-time-object:  /obj/firewall/schedule/onetime
+    create-policy: /pkg/
+    delete-policy: /pkg/
+    install: securityconsole/install/package
+
+  nsfocus:
+    create-IPV4-address-network: /object/networks/network
+    create-IPV4-address-node: /object/networks/node
+    create-IPV4-address-ippool: /object/networks/ippool
+    create-IPV6-address-network: /object/networks/network_v6
+    create-IPV6-address-node: /object/networks/node_v6
+    create-IPV6-address-ippool: /object/networks/ippool_v6
+    create-address-url: /object/networks/url
+    create-address-group: /object/networks/group
+    create-service: /object/service/custom
+    create-policy: /policy/security
+    create-snat: /policy/nat/snat
+    create-dnat: /policy/nat/dnat
+    url-common: /api/v1
+
+show-state-commandline:
+  cisco: show failover | in host
+  huawei: display hrp state
+  juniper-srx: show chassis cluster status
+  juniper-ssg: get nsrp
+  topsec: ha show status
+  dptech: show hotbackup state
+  hillstone: show ha group 0
+  fortinet: diagnose sys ha status
+
+# 自动开通内网互访ip为any时，用以下配置去查询域信息
+inside-to-inside:
+  any-find-zone-info: 192.168.0.0/16,10.0.0.0/8
+

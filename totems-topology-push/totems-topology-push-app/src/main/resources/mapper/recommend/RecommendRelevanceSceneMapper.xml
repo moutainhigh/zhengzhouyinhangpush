@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.RecommendRelevanceSceneMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.RecommendRelevanceSceneEntity">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="TASK_ID" jdbcType="VARCHAR" property="taskId" />
+    <result column="NAME" jdbcType="VARCHAR" property="name" />
+    <result column="SRC_IP" jdbcType="VARCHAR" property="srcIp" />
+    <result column="DST_IP" jdbcType="VARCHAR" property="dstIp" />
+    <result column="ip_type" jdbcType="INTEGER" property="ipType"/>
+    <result column="SERVICE_LIST" jdbcType="VARCHAR" property="serviceList" />
+    <result column="ADDITION_INFO" jdbcType="VARCHAR" property="additionInfo" />
+    <result column="BRANCH_LEVEL" jdbcType="VARCHAR" property="branchLevel"/>
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  <!-- 基本列 -->
+  <sql id="Base_Column_List">
+    ID,TASK_ID,NAME,SRC_IP,DST_IP,IP_TYPE,SERVICE_LIST,ADDITION_INFO,BRANCH_LEVEL,CREATE_USER,CREATE_TIME,UPDATE_TIME
+  </sql>
+  
+  <!-- 单个插入 -->
+  <insert id="add" parameterType="com.abtnetworks.totems.recommend.entity.RecommendRelevanceSceneEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_recommend_relevance_scene
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="taskId != null">
+        TASK_ID,
+      </if>
+      <if test="name != null">
+        NAME,
+      </if>
+      <if test="srcIp != null">
+        SRC_IP,
+      </if>
+      <if test="dstIp != null">
+        DST_IP,
+      </if>
+      <if test="ipType != null">
+        IP_TYPE,
+      </if>
+      <if test="serviceList != null">
+        SERVICE_LIST,
+      </if>
+      <if test="additionInfo != null">
+        ADDITION_INFO,
+      </if>
+      <if test="branchLevel != null">
+        BRANCH_LEVEL,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="taskId != null">
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        #{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="serviceList != null">
+        #{serviceList,jdbcType=VARCHAR},
+      </if>
+      <if test="additionInfo != null">
+        #{additionInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="branchLevel != null">
+        #{branchLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 单个更新 -->
+  <update id="update" parameterType="com.abtnetworks.totems.recommend.entity.RecommendRelevanceSceneEntity">
+    update push_recommend_relevance_scene
+    <set>
+      <if test="taskId != null">
+        TASK_ID=#{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        NAME=#{name,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        SRC_IP=#{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        DST_IP=#{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        IP_TYPE=#{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="serviceList != null">
+        SERVICE_LIST=#{serviceList,jdbcType=VARCHAR},
+      </if>
+      <if test="additionInfo != null">
+        ADDITION_INFO=#{additionInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="branchLevel != null">
+        BRANCH_LEVEL=#{branchLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER=#{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME=#{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <!-- 查询所有 -->
+  <select id="queryList" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.recommend.entity.RecommendRelevanceSceneEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_relevance_scene
+    WHERE 1 = 1
+    <if test="taskId != null">
+      AND TASK_ID=#{taskId,jdbcType=VARCHAR}
+    </if>
+    <if test="name != null">
+      AND NAME=#{name,jdbcType=VARCHAR}
+    </if>
+    <if test="srcIp != null">
+      AND SRC_IP=#{srcIp,jdbcType=VARCHAR}
+    </if>
+    <if test="dstIp != null">
+      AND DST_IP=#{dstIp,jdbcType=VARCHAR}
+    </if>
+    <if test="ipType != null">
+      AND IP_TYPE=#{ipType,jdbcType=INTEGER}
+    </if>
+    <if test="serviceList != null">
+      AND SERVICE_LIST=#{serviceList,jdbcType=VARCHAR}
+    </if>
+    <if test="additionInfo != null">
+      AND ADDITION_INFO=#{additionInfo,jdbcType=VARCHAR}
+    </if>
+    <if test="branchLevel != null">
+      AND BRANCH_LEVEL=#{branchLevel,jdbcType=VARCHAR}
+    </if>
+    <if test="createUser != null">
+      AND CREATE_USER=#{createUser,jdbcType=VARCHAR}
+    </if>
+    <if test="createTime != null">
+      AND CREATE_TIME=#{createTime,jdbcType=TIMESTAMP}
+    </if>
+  </select>
+
+  <!-- 单个集合 -->
+  <select id="selectScene" parameterType="java.util.Map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM push_recommend_relevance_scene
+    <where>
+      1=1
+      <if test="branchLevel != null ">
+        and  branch_level  like #{branchLevel}
+      </if>
+      <if test="name != null">
+        and name like "%"#{name,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="deviceUuid !=null and deviceUuid != ''">
+        /*匹配设备模糊找到uuid，如果后期uuid扩展成64位就需要单独加字段*/
+        and addition_info like "%"#{deviceUuid, jdbcType=VARCHAR}"%"
+      </if>
+      <if test="taskIds != null and taskIds != '' ">
+        and id  not in
+        <foreach item="item" index="index" collection="taskIds.split(',')" open="(" separator="," close=")">
+          ${item}
+        </foreach>
+      </if>
+    </where>
+    ORDER BY CREATE_TIME DESC
+  </select>
+
+  <!-- 单个查询 -->
+  <select id="selectSceneById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM push_recommend_relevance_scene
+    where ID = #{id,jdbcType=BIGINT}
+  </select>
+
+  <!-- 删除 -->
+  <delete id="deleteSceneById" parameterType="java.lang.String" >
+    delete from push_recommend_relevance_scene
+    where ID in
+    <foreach item="id" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 删除 -->
+  <select id="selectSceneByIds" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    FROM push_recommend_relevance_scene
+    where ID in
+    <foreach item="id" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+</mapper>

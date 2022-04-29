@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.mapping.dao.mysql.PushAutoMappingSceneRuleMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+    <result column="rule_type" jdbcType="VARCHAR" property="ruleType" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uuid, rule_name,rule_type, src_ip, dst_ip,
+    create_user, create_time, update_user, update_time,description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_scene_rule
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_scene_rule
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    insert into push_scene_rule (id, uuid, rule_name, rule_type, src_ip, dst_ip,
+    create_user, create_time, update_user, update_time,description)
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR},#{ruleName,jdbcType=VARCHAR},
+      #{ruleType,jdbcType=VARCHAR},#{srcIp,jdbcType=VARCHAR},
+      #{dstIp,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},#{description,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    insert into push_scene_rule
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="ruleName != null">
+        rule_name,
+      </if>
+      <if test="ruleType != null">
+        rule_type,
+      </if>
+      <if test="srcIp != null">
+        src_ip,
+      </if>
+      <if test="dstIp != null">
+        dst_ip,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null">
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null">
+        #{ruleType,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    update push_scene_rule
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleName != null">
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null">
+        rule_type = #{ruleType,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        dst_ip = #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    update push_scene_rule
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      rule_type = #{ruleType,jdbcType=VARCHAR},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      src_ip = #{srcIp,jdbcType=VARCHAR},
+      dst_ip = #{dstIp,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByEntity" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingSceneRuleEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_scene_rule
+    <where>
+      1=1
+      <if test="srcIp != null">
+        AND src_ip=#{srcIp,jdbcType=VARCHAR}
+      </if>
+      <if test="id != null">
+        AND id = #{id,jdbcType=INTEGER}
+      </if>
+      <if test="dstIp != null">
+        AND dst_ip=#{dstIp,jdbcType=VARCHAR}
+      </if>
+      <if test="ruleType != null">
+        AND rule_type=#{ruleType,jdbcType=VARCHAR}
+      </if>
+      <if test="ruleName != null">
+        AND rule_name like "%"#{ruleName,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="description != null">
+        AND description=#{description,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+
+  <select id="selectAll" resultMap="BaseResultMap" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_scene_rule
+    order by id DESC
+  </select>
+
+  <delete id="deleteIdList" >
+    delete from push_scene_rule
+    where id in
+    <foreach collection="idList" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+</mapper>

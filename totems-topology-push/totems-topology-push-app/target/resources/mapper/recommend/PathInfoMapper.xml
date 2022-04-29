@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.PathInfoMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.PathInfoEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="service" jdbcType="VARCHAR" property="service" />
+    <result column="path_status" jdbcType="INTEGER" property="pathStatus" />
+    <result column="analyze_status" jdbcType="INTEGER" property="analyzeStatus" />
+    <result column="advice_status" jdbcType="INTEGER" property="adviceStatus" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="risk_status" jdbcType="INTEGER" property="riskStatus" />
+    <result column="cmd_status" jdbcType="INTEGER" property="cmdStatus" />
+    <result column="push_status" jdbcType="INTEGER" property="pushStatus" />
+    <result column="gather_status" jdbcType="INTEGER" property="gatherStatus" />
+    <result column="access_analyze_status" jdbcType="INTEGER" property="accessAnalyzeStatus" />
+    <result column="verify_status" jdbcType="INTEGER" property="verifyStatus" />
+    <result column="src_node_uuid" jdbcType="VARCHAR" property="srcNodeUuid" />
+    <result column="dst_node_uuid" jdbcType="VARCHAR" property="dstNodeUuid" />
+    <result column="src_node_device" jdbcType="VARCHAR" property="srcNodeDevice" />
+    <result column="dst_node_device" jdbcType="VARCHAR" property="dstNodeDevice" />
+    <result column="enable_path" jdbcType="INTEGER" property="enablePath" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, task_id, src_ip, dst_ip, service, path_status, analyze_status, advice_status, 
+    check_status, risk_status, cmd_status, push_status, gather_status, access_analyze_status, 
+    verify_status, src_node_uuid, dst_node_uuid, src_node_device, dst_node_device, enable_path
+  </sql>
+
+  <!-- 根据任务id获取路径信息列表 -->
+  <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_path_info
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 根据任务id获取路径信息列表 -->
+  <select id="selectById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_path_info
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据任务idList获取路径信息列表 -->
+  <select id="selectByIdList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_path_info
+    where task_id in
+
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+        #{item}
+    </foreach>
+  </select>
+
+
+  <!-- 根据任务id删除路径信息 -->
+  <delete id="deleteByTaskId" parameterType="java.lang.Integer">
+    delete from push_path_info
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据任务id删除路径信息 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_path_info
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <!-- 插入路径信息数据 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.PathInfoEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_path_info
+    (task_id, src_ip,
+      dst_ip, service, path_status, 
+      analyze_status, advice_status, check_status, 
+      risk_status, cmd_status, push_status, 
+      gather_status, access_analyze_status, verify_status,
+      src_node_uuid, dst_node_uuid, src_node_device,
+      dst_node_device, enable_path)
+    values (#{taskId,jdbcType=INTEGER}, #{srcIp,jdbcType=VARCHAR},
+      #{dstIp,jdbcType=VARCHAR}, #{service,jdbcType=VARCHAR}, #{pathStatus,jdbcType=INTEGER},
+      #{analyzeStatus,jdbcType=INTEGER}, #{adviceStatus,jdbcType=INTEGER}, #{checkStatus,jdbcType=INTEGER},
+      #{riskStatus,jdbcType=INTEGER}, #{cmdStatus,jdbcType=INTEGER}, #{pushStatus,jdbcType=INTEGER},
+      #{gatherStatus,jdbcType=INTEGER}, #{accessAnalyzeStatus,jdbcType=INTEGER}, #{verifyStatus,jdbcType=INTEGER},
+      #{srcNodeUuid,jdbcType=VARCHAR},#{dstNodeUuid,jdbcType=VARCHAR},#{srcNodeDevice,jdbcType=VARCHAR},
+      #{dstNodeDevice,jdbcType=VARCHAR}, #{enablePath,jdbcType=INTEGER})
+  </insert>
+
+  <!-- 更新路径信息状态 -->
+  <update id="updateStatusById" parameterType="com.abtnetworks.totems.recommend.entity.PathInfoEntity">
+    update push_path_info
+    <set>
+      <if test="pathStatus != null">
+        path_status = #{pathStatus,jdbcType=INTEGER},
+      </if>
+      <if test="analyzeStatus != null">
+        analyze_status = #{analyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="adviceStatus != null">
+        advice_status = #{adviceStatus,jdbcType=INTEGER},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="riskStatus != null">
+        risk_status = #{riskStatus,jdbcType=INTEGER},
+      </if>
+      <if test="cmdStatus != null">
+        cmd_status = #{cmdStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="gatherStatus != null">
+        gather_status = #{gatherStatus,jdbcType=INTEGER},
+      </if>
+      <if test="accessAnalyzeStatus != null">
+        access_analyze_status = #{accessAnalyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        verify_status = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 更新路径信息状态 -->
+  <update id="updateStatusByPathInfoId" parameterType="java.util.Map">
+    update push_path_info
+    <set>
+      <if test="pathStatus != null">
+        path_status = #{pathStatus,jdbcType=INTEGER},
+      </if>
+      <if test="analyzeStatus != null">
+        analyze_status = #{analyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="adviceStatus != null">
+        advice_status = #{adviceStatus,jdbcType=INTEGER},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="riskStatus != null">
+        risk_status = #{riskStatus,jdbcType=INTEGER},
+      </if>
+      <if test="cmdStatus != null">
+        cmd_status = #{cmdStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="gatherStatus != null">
+        gather_status = #{gatherStatus,jdbcType=INTEGER},
+      </if>
+      <if test="accessAnalyzeStatus != null">
+        access_analyze_status = #{accessAnalyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        verify_status = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <!-- 更新路径信息状态 -->
+  <update id="updateStatusByTaskId" parameterType="java.util.Map">
+    update push_path_info
+    <set>
+      <if test="pathStatus != null">
+        path_status = #{pathStatus,jdbcType=INTEGER},
+      </if>
+      <if test="analyzeStatus != null">
+        analyze_status = #{analyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="adviceStatus != null">
+        advice_status = #{adviceStatus,jdbcType=INTEGER},
+      </if>
+      <if test="checkStatus != null">
+        check_status = #{checkStatus,jdbcType=INTEGER},
+      </if>
+      <if test="riskStatus != null">
+        risk_status = #{riskStatus,jdbcType=INTEGER},
+      </if>
+      <if test="cmdStatus != null">
+        cmd_status = #{cmdStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="gatherStatus != null">
+        gather_status = #{gatherStatus,jdbcType=INTEGER},
+      </if>
+      <if test="accessAnalyzeStatus != null">
+        access_analyze_status = #{accessAnalyzeStatus,jdbcType=INTEGER},
+      </if>
+      <if test="verifyStatus != null">
+        verify_status = #{verifyStatus,jdbcType=INTEGER},
+      </if>
+    </set>
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 更新路径信息数据 -->
+  <update id="update" parameterType="com.abtnetworks.totems.recommend.entity.PathInfoEntity">
+  update push_path_info
+  set task_id = #{taskId,jdbcType=INTEGER},
+      src_ip = #{srcIp,jdbcType=VARCHAR},
+      dst_ip = #{dstIp,jdbcType=VARCHAR},
+      service = #{service,jdbcType=VARCHAR},
+      path_status = #{pathStatus,jdbcType=INTEGER},
+      analyze_status = #{analyzeStatus,jdbcType=INTEGER},
+      advice_status = #{adviceStatus,jdbcType=INTEGER},
+      check_status = #{checkStatus,jdbcType=INTEGER},
+      risk_status = #{riskStatus,jdbcType=INTEGER},
+      cmd_status = #{cmdStatus,jdbcType=INTEGER},
+      push_status = #{pushStatus,jdbcType=INTEGER},
+      gather_status = #{gatherStatus,jdbcType=INTEGER},
+      access_analyze_status = #{accessAnalyzeStatus,jdbcType=INTEGER},
+      verify_status = #{verifyStatus,jdbcType=INTEGER}
+  where id = #{id,jdbcType=INTEGER}
+</update>
+  
+  <!-- 设置路径有效或者无效 -->
+  <update id="enablePath" parameterType="java.util.Map">
+    update push_path_info
+    set enable_path = #{enablePath,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!--批量添加策略开通任务-->
+  <insert id="addPathInfoList" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+      insert into push_path_info
+      (task_id, src_ip, dst_ip, service, path_status,
+      analyze_status, advice_status, check_status,
+      risk_status, cmd_status, push_status,
+      gather_status, access_analyze_status, verify_status,
+      src_node_uuid, dst_node_uuid, src_node_device,
+      dst_node_device, enable_path)
+      values
+      <foreach collection="list" item="entity" index="index" separator=",">
+          (
+          #{entity.taskId}, #{entity.srcIp},
+          #{entity.dstIp}, #{entity.service}, #{entity.pathStatus},
+          #{entity.analyzeStatus}, #{entity.adviceStatus}, #{entity.checkStatus},
+          #{entity.riskStatus}, #{entity.cmdStatus}, #{entity.pushStatus},
+          #{entity.gatherStatus}, #{entity.accessAnalyzeStatus}, #{entity.verifyStatus},
+          #{entity.srcNodeUuid}, #{entity.dstNodeUuid}, #{entity.srcNodeDevice},
+          #{entity.dstNodeDevice}, #{entity.enablePath}
+          )
+      </foreach>
+  </insert>
+  
+</mapper>

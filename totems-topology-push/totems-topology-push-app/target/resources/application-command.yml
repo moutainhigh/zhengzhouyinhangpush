@@ -1,0 +1,84 @@
+device-model:
+  model-list:
+    -
+      model-number: USG6000
+      pre-command: system-view
+      pre-vsys-command: |
+                        system-view
+                        switch vsys <vsys-name>
+      post-command: |
+                    quit
+                    return
+# ----------------------------最外层命令行 end-----------------------------------------
+# ----------------------------地址 start-----------------------------------------
+      address-command:
+        ipv4-host: |
+                    ip address-set <address-name> type object
+                    address 0 <ipv4-host> 0
+                    quit
+        ipv4-mask: |
+                    ip address-set <address-name> type object
+                    address 0 <ipv4-host> mask <mask>
+                    quit
+        ipv4-range: |
+                    ip address-set <address-name> type object
+                    address 0 range <ipv4-host> <ipv4-host>
+                    quit
+        address-group: |
+                        ip address-set <address-group-name> type group
+                        (address <index> address-set <address-name>
+                        )+
+                        quit
+      service-command:
+        tcp-port-range: |
+                        ip service-set <service-name> type object
+                        (service 0 protocol tcp destination-port [<port>|<port-start> to <port-end>]
+                        )+quit
+        udp-port-range: |
+                        ip service-set <service-name> type object
+                        (service 0 protocol udp destination-port [<port>|<port-start> to <port-end>]
+                        )+quit
+        service-group: |
+                        ip service-set <service-group-name> type group
+                        (service <index> service-set <service-name>
+                        )+quit
+      time-command:
+        absolute-range: |
+                        time-range <time-name>
+                        absolute-range <time-from> to <time-to>
+        absolute-time-format: HH:mm:ss YYYY/MM/dd
+      security-policy-command: |
+                                security-policy
+                                rule name <policy-name>
+                                (description <description>
+                                )?(source-zone <src-zone-name>
+                                )*(destination-zone <dst-zone-name>
+                                )*(source-address address-set <src-address-name>
+                                )*(destination-address address-set <dst-address-name>
+                                )*(service <service-name>
+                                )*(time-range <time-name>
+                                )?action <action>
+                                quit
+      router-command:
+        ipv4-create: ip route-static <ipv4-host> 32 NULL0
+        ipv6-create: ipv6 route-static <ipv6-host> 128 NULL0
+        ipv4-delete: undo ip route-static <ipv4-host> 32 NULL0
+        ipv6-delete: undo ipv6 route-static <ipv6-host> 128 NULL0
+
+
+    -
+      model-number: H3C SecPath V5
+      router-command: &h3c-router
+        ipv4-create: ip route-static <ipv4-host> 32 NULL0
+        ipv6-create: ipv6 route-static <ipv6-host> 128 NULL0
+        ipv4-delete: undo ip route-static <ipv4-host> 32 NULL0
+        ipv6-delete: undo ipv6 route-static <ipv6-host> 128 NULL0
+    -
+      model-number: H3C SecPath V7
+      router-command: *h3c-router
+    -
+      model-number:
+
+
+
+

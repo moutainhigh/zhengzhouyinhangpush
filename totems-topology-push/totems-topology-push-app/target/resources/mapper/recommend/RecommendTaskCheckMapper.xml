@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.RecommendTaskCheckMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.RecommendTaskCheckEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="order_number" jdbcType="VARCHAR" property="orderNumber" />
+    <result column="task_id" jdbcType="VARCHAR" property="taskId" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="batch_type" jdbcType="INTEGER" property="batchType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, order_number, task_id, status, file_name, create_time, user_name, batch_type
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_recommend_task_check
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_recommend_task_check
+    where status = #{status,jdbcType=INTEGER}
+  </select>
+  <select id="selectByStatusAndBatchType" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_recommend_task_check
+    where status = #{status,jdbcType=INTEGER}
+    and batch_type = #{batchType, jdbcType=INTEGER}
+  </select>
+  <select id="selectByOrder" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_recommend_task_check
+    where order_number = #{orderNumber,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_recommend_task_check
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskCheckEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_recommend_task_check (id, order_number, task_id, 
+      status, file_name, create_time)
+    values (#{id,jdbcType=INTEGER}, #{orderNumber,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, 
+      #{status,jdbcType=INTEGER}, #{fileName, jdbcType=VARCHAR}, #{createTime, jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskCheckEntity">
+    insert into push_recommend_task_check
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orderNumber != null">
+        order_number,
+      </if>
+      <if test="taskId != null">
+        task_id,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="fileName != null" >
+        file_name,
+      </if>
+      <if test="createTime ！= null" >
+        create_time,
+      </if>
+      <if test="userName != null" >
+        user_name,
+      </if>
+      <if test="batchType != null" >
+        batch_type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="orderNumber != null">
+        #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null">
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        #{userName, jdbcType=VARCHAR},
+      </if>
+      <if test="batchType != null" >
+        #{batchType, jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskCheckEntity">
+    update push_recommend_task_check
+    <set>
+      <if test="orderNumber != null">
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null">
+        task_id = #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="userName != null" >
+        user_name = #{userName, jdbcType=VARCHAR},
+      </if>
+      <if test="batchType != null" >
+        batch_type = #{batchType, jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskCheckEntity">
+    update recommend
+    set order_number = #{orderNumber,jdbcType=VARCHAR},
+      task_id = #{taskId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      file_name = #{fileName, jdbcType=VARCHAR},
+      create_time = #{createTime, jdbcType=TIMESTAMP},
+      user_name = #{userName, jdbcType=VARCHAR},
+      batch_type = #{batchType, jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="searchTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+    select
+    <include refid="Base_Column_List" />
+    from push_recommend_task_check
+    <where>
+      <if test="orderNumber!=null">
+        and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="userName!=null" >
+        and user_name = #{userName, jdbcType=VARCHAR}
+      </if>
+    </where>
+    ORDER BY create_time DESC
+  </select>
+</mapper>

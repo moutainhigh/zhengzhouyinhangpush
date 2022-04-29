@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.abtnetworks</groupId>
+        <artifactId>totems-topology-push</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>totems-topology-push-plugins</artifactId>
+    <packaging>pom</packaging>
+
+    <properties>
+        <main.basedir>${basedir}/../..</main.basedir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.abtnetworks</groupId>
+            <artifactId>totems-topology-push-common</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <modules>
+        <module>totems-topology-push-plugin-anHui</module>
+        <module>totems-topology-push-plugin-anHui-nongxin</module>
+        <module>totems-topology-push-plugin-default</module>
+        <module>totems-topology-push-plugin-dfzq</module>
+        <module>totems-topology-push-plugin-huaFu</module>
+        <module>totems-topology-push-plugin-huaXia</module>
+        <module>totems-topology-push-plugin-jiangyin</module>
+        <module>totems-topology-push-plugin-sdnx</module>
+        <module>totems-topology-push-plugin-tacx</module>
+        <module>totems-topology-push-plugin-taiPing</module>
+        <module>totems-topology-push-plugin-zheShang</module>
+        <module>totems-topology-push-plugin-guangzhouNX</module>
+        <module>totems-topology-push-plugin-huaRui</module>
+        <module>totems-topology-push-plugin-kunshan</module>
+        <module>totems-topology-push-plugin-zhaoshang</module>
+        <module>totems-topology-push-plugin-beinongshang</module>
+        <module>totems-topology-push-plugin-tlzf</module>
+        <module>totems-topology-push-plugin-shenzhenzq</module>
+        <module>totems-topology-push-plugin-foshan</module>
+        <module>totems-topology-push-plugin-jiaoyin</module>
+        <module>totems-topology-push-plugin-qixiangju</module>
+        <module>totems-topology-push-plugin-zhaoshangZQ</module>
+        <module>totems-topology-push-plugin-hunanDL</module>
+        <module>totems-topology-push-plugin-PDShyinhe</module>
+        <module>totems-topology-push-plugin-zhengzhouyinhang</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>sapling-snapshots</id>
+            <url>http://192.168.215.115:8081/nexus/content/groups/sapling/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>sapling-snapshots</id>
+            <url>http://192.168.215.115:8081/nexus/content/groups/sapling/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sapling-snapshot</id>
+            <name>sapling Porject Snapshot</name>
+            <url>http://192.168.215.115:8081/nexus/content/repositories/snapshots/</url>
+            <uniqueVersion>true</uniqueVersion>
+        </snapshotRepository>
+        <repository>
+            <id>sapling-release</id>
+            <name>sapling Porject Release</name>
+            <url>http://192.168.215.115:8081/nexus/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
+
+
+</project>

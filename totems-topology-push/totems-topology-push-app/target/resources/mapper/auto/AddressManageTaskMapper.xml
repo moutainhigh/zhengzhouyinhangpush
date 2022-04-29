@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.AddressManageTaskMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.AddressManageTaskEntity" >
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+        <result column="address_name" jdbcType="VARCHAR" property="addressName" />
+        <result column="scenes_uuid" jdbcType="VARCHAR" property="scenesUuid" />
+        <result column="scenes_name" jdbcType="VARCHAR" property="scenesName" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        uuid,
+        address_name,
+        scenes_uuid,
+        scenes_name,
+        user_name,
+        description,
+        create_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id" parameterType="com.abtnetworks.totems.auto.entity.AddressManageTaskEntity">
+        INSERT INTO push_address_manage_task (
+        uuid,
+        address_name,
+        scenes_uuid,
+        scenes_name,
+        user_name,
+        description,
+        create_time
+        )
+        VALUES(
+            #{uuid,jdbcType=VARCHAR},
+            #{addressName,jdbcType=VARCHAR},
+            #{scenesUuid,jdbcType=VARCHAR},
+            #{scenesName,jdbcType=VARCHAR},
+            #{userName,jdbcType=VARCHAR},
+            #{description,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}
+            )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM push_address_manage_task
+        WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <update id="update">
+        UPDATE push_address_manage_task
+        SET
+            uuid = #{uuid,jdbcType=VARCHAR},
+            address_name = #{addressName,jdbcType=VARCHAR},
+            scenes_uuid = #{scenesUuid,jdbcType=VARCHAR},
+            user_name = #{userName,jdbcType=VARCHAR},
+            description = #{description,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP}
+        WHERE id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateScenes" parameterType="com.abtnetworks.totems.auto.dto.AddressUpdateScenesDTO">
+        UPDATE push_address_manage_task
+        SET
+            scenes_uuid = #{scenesUuid,jdbcType=VARCHAR}
+        WHERE id in
+        <foreach collection="idList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_address_manage_task
+        WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getByUuid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_address_manage_task
+        <where>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_address_manage_task
+        <where>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid,jdbcType=VARCHAR}
+            </if>
+            <if test="addressName != null and addressName != ''">
+                AND address_name like concat('%',#{addressName},'%')
+
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid,jdbcType=VARCHAR}
+            </if>
+            <if test="userName != null and userName != ''">
+                AND user_name = #{userName,jdbcType=VARCHAR}
+            </if>
+            <if test="description != null and description != ''">
+                AND description = #{description,jdbcType=VARCHAR}
+            </if>
+
+        </where>
+        order by id DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,4 @@
+topology:
+  whale-host-ip: 192.168.215.12
+  whale-host-port: 54201
+  whale-server-prefix: http://${topology.whale-host-ip}:${topology.whale-host-port}/v0/

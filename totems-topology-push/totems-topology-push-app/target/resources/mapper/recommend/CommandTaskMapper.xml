@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.CommandTaskMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="path_info_id" jdbcType="INTEGER" property="pathInfoId" />
+    <result column="policy_id" jdbcType="INTEGER" property="policyId" />
+    <result column="theme" jdbcType="VARCHAR" property="theme" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="task_type" jdbcType="INTEGER" property="taskType" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="push_time" jdbcType="TIMESTAMP" property="pushTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="commandline" jdbcType="VARCHAR" property="commandline" />
+    <result column="push_result" jdbcType="VARCHAR" property="pushResult" />
+  </resultMap>
+  
+  <resultMap id="PushTaskVOResultMap" type="com.abtnetworks.totems.push.vo.PushTaskVO">
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="theme" jdbcType="VARCHAR" property="orderNo" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="task_type" jdbcType="INTEGER" property="orderType" />
+    <result column="task_create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="task_push_time" jdbcType="TIMESTAMP" property="pushTime" />
+    <result column="task_status" jdbcType="INTEGER" property="status" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, task_id, path_info_id, policy_id, theme, user_name, task_type,
+    device_uuid, create_time, push_time, status, commandline,
+    push_result
+  </sql>
+  
+  <sql id="Push_Task_Column_List">
+    task_id, theme, user_name, task_type,MAX(create_time) as task_create_time, MAX(push_time) as task_push_time, MAX(status) as task_status
+  </sql>
+
+  <!-- 根据策略id查询命令行生成任务 -->
+  <select id="selectByPolicyId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where policy_id = #{policyId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据任务id查询命令行生成任务 -->
+  <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 根据路径信息id查询命令行生成任务 -->
+  <select id="selectByPathInfoId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 删除命令行下发任务 -->
+  <delete id="deleteByPolicyId" parameterType="java.lang.Integer">
+    delete from push_command_task
+    where policy_id = #{policyId,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 删除命令行下发任务 -->
+  <delete id="deleteByTaskId" parameterType="java.lang.Integer">
+    delete from push_command_task
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 添加命令行下发任务 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_command_task
+      (task_id, path_info_id, policy_id, theme, user_name,
+      task_type, device_uuid, create_time,
+      push_time, status, commandline,
+      push_result)
+    values
+      (#{taskId,jdbcType=INTEGER}, #{pathInfoId,jdbcType=INTEGER}, #{policyId,jdbcType=INTEGER}, #{theme,jdbcType=VARCHAR}, #{userName, jdbcType=VARCHAR},
+       #{taskType,jdbcType=INTEGER}, #{deviceUuid,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+       #{pushTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{commandline,jdbcType=VARCHAR},
+       #{pushResult,jdbcType=VARCHAR})
+  </insert>
+
+  <!-- 更新命令行下发结果 -->
+  <update id="updateDevicePushResultByTaskId" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    update push_command_task
+    set status = #{status,jdbcType=INTEGER},
+        push_result = #{pushResult,jdbcType=VARCHAR}
+    where task_id = #{taskId,jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 更新命令行下发结果 -->
+  <update id="updateDevicePushResultByPathInfoId" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    update push_command_task
+    set status = #{status,jdbcType=INTEGER},
+        push_result = #{pushResult,jdbcType=VARCHAR}
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+      and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+  </update>
+
+  <!-- 更新命令行下发任务 -->
+  <update id="update" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    update push_command_task
+    set task_id = #{taskId,jdbcType=INTEGER},
+      path_info_id= #{pathInfoId,jdbcType=INTEGER},
+      policy_id = #{policyId,jdbcType=INTEGER},
+      theme = #{theme,jdbcType=VARCHAR},
+      task_type = #{taskType,jdbcType=INTEGER},
+      device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      push_time = #{pushTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      commandline = #{commandline,jdbcType=VARCHAR},
+      push_result = #{pushResult,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <!-- 更新命令行下发任务 -->
+  <update id="updateStatus" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    update push_command_task
+    <set>
+      <if test="pushTime!=null">
+        push_time = #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status!=null">
+        status = #{status, jdbcType=INTEGER},
+      </if>
+    </set>
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 根据任务id和设备uuid查询命令行生成任务 -->
+  <select id="selectByTaskIdAndDeviceUuid" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where task_id = #{taskId,jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+  </select>
+  
+  <!-- 根据任务id和设备uuid查询命令行生成任务 -->
+  <select id="selectByPathInfoIdAndDeviceUuid" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+  </select>
+
+  <select id="searchPushTaskList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    <where>
+      <if test="theme!=null">
+        and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="taskType!=null">
+        and task_type = #{taskType, jdbcType=INTEGER}
+      </if>
+      <if test="status!=null">
+        and status = #{status, jdbcType=INTEGER}
+      </if>
+    </where>
+    order by create_time DESC
+  </select>
+  
+  <select id="getPushTaskList" parameterType="java.util.Map" resultMap="PushTaskVOResultMap">
+    select
+    <include refid="Push_Task_Column_List" />
+    from push_command_task
+    <where>
+      <if test="theme!=null">
+        and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="taskType!=null">
+        and task_type = #{taskType, jdbcType=INTEGER}
+      </if>
+      <if test="status!=null">
+        and status = #{status, jdbcType=INTEGER}
+      </if>
+    </where>
+    group by task_id
+    order by task_create_time DESC
+  </select>
+  
+  <select id="getTaskCommandLine" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task
+    where task_id=#{taskId, jdbcType=INTEGER}
+  </select>
+
+  <!-- 更新命令行下发任务 -->
+  <update id="updateSelective" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEntity">
+    update push_command_task
+    <set>
+      <if test="taskId != null">
+        task_id = #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="pathInfoId != null">
+        path_info_id= #{pathInfoId,jdbcType=INTEGER},
+      </if>
+      <if test="policyId != null">
+        policy_id = #{policyId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        theme = #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null">
+        task_type = #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="deviceUuid != null">
+      device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pushTime != null">
+        push_time = #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="commandline != null">
+        commandline = #{commandline,jdbcType=VARCHAR},
+      </if>
+      <if test="pushResult != null">
+        push_result = #{pushResult,jdbcType=VARCHAR}
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,23 @@
+package com.abtnetworks.totems.common.commandline.dnat;
+
+import com.abtnetworks.totems.common.annotation.CustomCli;
+import com.abtnetworks.totems.common.commandline.PolicyGenerator;
+import com.abtnetworks.totems.common.commandline.nat.FortinetNat;
+import com.abtnetworks.totems.common.commandline.nat.FortinetNatV5ForZSZQ;
+import com.abtnetworks.totems.common.dto.CmdDTO;
+import com.abtnetworks.totems.common.enums.DeviceModelNumberEnum;
+import com.abtnetworks.totems.common.enums.PolicyEnum;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+@CustomCli(value = DeviceModelNumberEnum.FORTINET_V5, type = PolicyEnum.DNAT)
+public class DnatFortinetV5ForZSZQ implements PolicyGenerator {
+    @Autowired
+    FortinetNatV5ForZSZQ fortinetNatV5ForZSZQ;
+
+    @Override
+    public String generate(CmdDTO cmdDTO) {
+        return fortinetNatV5ForZSZQ.generate(cmdDTO);
+    }
+}

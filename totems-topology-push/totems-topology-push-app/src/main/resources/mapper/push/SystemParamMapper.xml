@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.SystemParamMapper">
+
+    <select id="findEmailParam" resultType="com.abtnetworks.totems.push.dto.MailServerConfDTO">
+        select max(case topo_key when  'senderEmail' then topo_val else '' end) as userName,
+        max(case topo_key when  'serverPwd' then topo_val else '' end) as `password`,
+        max(case topo_key when  'smtpName' then topo_val else '' end) as smtpName,
+        max(case topo_key when  'port' then topo_val else 25 end) as `port`,
+        max(case topo_key when  'mailSsl' then topo_val else '' end) as mailSsl
+        from topo_config
+        where topo_group = #{groupName}
+        group by topo_group
+    </select>
+
+
+</mapper>

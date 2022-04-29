@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.abtnetworks:totems-topology-push-common:1.8.6-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/totems-topology-push/totems-topology-push-common/pom.xml!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/totems-topology-push/totems-topology-push-common/totems-topology-push-common-1.8.6-SNAPSHOT-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/totems-topology-push/totems-topology-push-common/totems-topology-push-common-1.8.6-SNAPSHOT-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

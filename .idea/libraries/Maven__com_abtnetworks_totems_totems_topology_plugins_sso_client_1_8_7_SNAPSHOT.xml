@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.abtnetworks.totems:totems-topology-plugins-sso-client:1.8.7-SNAPSHOT">
+    <CLASSES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems/totems-topology-plugins-sso-client/1.8.7-SNAPSHOT/totems-topology-plugins-sso-client-1.8.7-20220323.091756-323.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems/totems-topology-plugins-sso-client/1.8.7-SNAPSHOT/totems-topology-plugins-sso-client-1.8.7-20220323.091756-323-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems/totems-topology-plugins-sso-client/1.8.7-SNAPSHOT/totems-topology-plugins-sso-client-1.8.7-20220323.091756-323-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

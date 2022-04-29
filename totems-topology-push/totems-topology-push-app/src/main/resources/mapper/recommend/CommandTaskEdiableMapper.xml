@@ -1,0 +1,639 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.CommandTaskEdiableMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="theme" jdbcType="VARCHAR" property="theme" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="edit_user_name" jdbcType="VARCHAR" property="editUserName" />
+    <result column="task_type" jdbcType="INTEGER" property="taskType" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="push_time" jdbcType="TIMESTAMP" property="pushTime" />
+    <result column="modified_time" jdbcType="TIMESTAMP" property="modifiedTime" />
+    <result column="auto_push" jdbcType="INTEGER" property="autoPush" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="push_result" jdbcType="VARCHAR" property="pushResult" />
+    <result column="commandline" jdbcType="VARCHAR" property="commandline" />
+    <result column="commandline_revert" jdbcType="VARCHAR" property="commandlineRevert" />
+    <result column="commandline_echo" jdbcType="VARCHAR" property="commandlineEcho" />
+    <result column="commandline_revert_echo" jdbcType="VARCHAR" property="commandlineRevertEcho" />
+    <result column="push_status" jdbcType="INTEGER" property="pushStatus" />
+    <result column="revert_status" jdbcType="INTEGER" property="revertStatus" />
+    <result column="push_schedule" jdbcType="TIMESTAMP" property="pushSchedule" />
+    <result column="revert_time" jdbcType="TIMESTAMP" property="revertTime" />
+    <result column="edit_revert_user_name" jdbcType="VARCHAR" property="editRevertUserName" />
+    <result column="revert_modified_time" jdbcType="TIMESTAMP" property="revertModifiedTime" />
+    <result column="branch_level" jdbcType="VARCHAR" property="branchLevel"/>
+    <result column="merge_info" jdbcType="VARCHAR" property="mergeInfo"/>
+    <result column="enable_email" jdbcType="VARCHAR" property="enableEmail" />
+    <result column="receiver_email" jdbcType="VARCHAR" property="receiverEmail" />
+    <result column="move_position" jdbcType="VARCHAR" property="movePosition" />
+    <result column="error_msg" jdbcType="VARCHAR" property="errorMsg" />
+    <result column="match_msg" jdbcType="VARCHAR" property="matchMsg" />
+    <result column="verify_echo" jdbcType="VARCHAR" property="verifyEcho" />
+    <result column="address_add" jdbcType="VARCHAR" property="addressAdd" />
+    <result column="address_del" jdbcType="VARCHAR" property="addressDel" />
+  </resultMap>
+
+  <resultMap id="PushTaskVOResultMap" type="com.abtnetworks.totems.push.vo.PushTaskVO">
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="theme" jdbcType="VARCHAR" property="orderNo" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="task_type" jdbcType="INTEGER" property="orderType" />
+    <result column="task_create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="task_push_time" jdbcType="TIMESTAMP" property="pushTime" />
+    <result column="task_status" jdbcType="INTEGER" property="status" />
+    <result column="push_status" jdbcType="INTEGER" property="pushStatus" />
+    <result column="revert_status" jdbcType="INTEGER" property="revertStatus" />
+    <result column="push_schedule" jdbcType="TIMESTAMP" property="pushSchedule" />
+    <result column="revert_time" jdbcType="TIMESTAMP" property="revertTime" />
+    <result column="enable_email" jdbcType="VARCHAR" property="enableEmail" />
+    <result column="receiver_email" jdbcType="VARCHAR" property="receiverEmail" />
+  </resultMap>
+
+  <resultMap id="PushStatusMap" type="com.abtnetworks.totems.push.dto.PushStatus">
+    <result column="id_count" jdbcType="INTEGER" property="count" />
+    <result column="task_type" jdbcType="INTEGER" property="taskType" />
+    <result column="push_status" jdbcType="INTEGER" property="pushStatus" />
+    <result column="revert_status" jdbcType="INTEGER" property="revertStatus" />
+  </resultMap>
+
+  <resultMap id="CheckRelevancyNatMap" type="com.abtnetworks.totems.push.vo.CheckRelevancyNatOrderVO">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    id, task_id, theme, user_name, edit_user_name, task_type, device_uuid, create_time, 
+    push_time, modified_time, auto_push, status, push_result, commandline, commandline_revert, 
+    commandline_echo, commandline_revert_echo, push_status, revert_status, push_schedule, revert_time,edit_revert_user_name,revert_modified_time,branch_level,merge_info,
+    enable_email,receiver_email,move_position,error_msg,match_msg,verify_echo,address_add,address_del
+  </sql>
+  
+  <sql id="Push_Task_Column_List">
+    task_id, theme, user_name, task_type,MAX(create_time) as task_create_time, MAX(push_time) as task_push_time,
+    MAX(status) as task_status, MAX(push_status) as push_status, MAX(revert_status) as revert_status, push_schedule, revert_time, enable_email, receiver_email
+  </sql>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectPushStuasByTaskIdList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select id, task_id, push_status
+    from push_command_task_editable
+    where task_id in
+    <foreach collection="taskIds" index="index" item="item" open="(" separator="," close=")">
+      <if test="(index % 999) == 998"> NULL) OR task_id in( </if> #{item}
+    </foreach>
+  </select>
+
+  <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByTaskIdList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
+
+  <select id="selectRecommendNatOrderByIds" parameterType="java.lang.String" resultMap="CheckRelevancyNatMap">
+    select
+    c.task_id,c.id
+    from push_command_task_editable c left join push_recommend_task r on c.task_id = r.id
+    where
+    c.task_id in
+    <foreach item="item" index="index" collection="ids.split(',')"  open="(" separator="," close=")">
+      #{item}
+    </foreach>
+    and (r.relevancy_nat is not null or r.relevancy_nat != '')
+
+  </select>
+  <select id="selectByTaskIdAndDeviceUuid" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where task_id = #{taskId,jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByThemeAndTaskType" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where theme = #{theme,jdbcType=VARCHAR}
+    and task_type = #{taskType,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_command_task_editable
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByTaskId" parameterType="java.lang.Integer">
+    delete from push_command_task_editable
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </delete>
+
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_command_task_editable
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_command_task_editable (id, task_id, theme,
+                                            user_name, edit_user_name, task_type,
+                                            device_uuid, create_time, push_time,
+                                            modified_time, auto_push, status,
+                                            push_result, commandline, commandline_revert,
+                                            commandline_echo, commandline_revert_echo, push_status,
+                                            revert_status, push_schedule, revert_time,edit_revert_user_name,revert_modified_time,branch_level,merge_info,enable_email,receiver_email
+      ,move_position,verify_echo,address_add,address_del)
+    values (#{id,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, #{theme,jdbcType=VARCHAR},
+            #{userName,jdbcType=VARCHAR}, #{editUserName,jdbcType=VARCHAR}, #{taskType,jdbcType=INTEGER},
+            #{deviceUuid,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{pushTime,jdbcType=TIMESTAMP},
+            #{modifiedTime,jdbcType=TIMESTAMP}, #{autoPush,jdbcType=INTEGER}, #{status,jdbcType=INTEGER},
+            #{pushResult,jdbcType=VARCHAR}, #{commandline,jdbcType=VARCHAR}, #{commandlineRevert,jdbcType=VARCHAR},
+            #{commandlineEcho,jdbcType=VARCHAR},  #{commandlineRevertEcho,jdbcType=VARCHAR}, #{pushStatus,jdbcType=INTEGER},
+            #{revertStatus,jdbcType=INTEGER}, #{pushSchedule,jdbcType=TIMESTAMP}, #{revertTime, jdbcType=TIMESTAMP},
+            #{editRevertUserName,jdbcType=VARCHAR}, #{revertModifiedTime,jdbcType=TIMESTAMP}, #{branchLevel,jdbcType=VARCHAR},
+            #{mergeInfo,jdbcType=VARCHAR},#{enableEmail,jdbcType=INTEGER}, #{receiverEmail,jdbcType=VARCHAR}
+             ,#{movePosition,jdbcType=VARCHAR},#{verifyEcho,jdbcType=VARCHAR},#{addressAdd,jdbcType=VARCHAR},#{addressDel,jdbcType=VARCHAR})
+  </insert>
+
+  <insert id="insertList" parameterType="java.util.List">
+    insert into push_command_task_editable (id, task_id, theme,
+    user_name, edit_user_name, task_type,
+    device_uuid, create_time, push_time,
+    modified_time, auto_push, status,
+    push_result, commandline, commandline_revert,
+    commandline_echo, commandline_revert_echo, push_status,
+    revert_status, push_schedule, revert_time,branch_level,merge_info
+    ,move_position,error_msg,match_msg,verify_echo,address_add,address_del)
+    values
+    <foreach collection="list" item="entity" index="index" separator=",">
+      (#{entity.id,jdbcType=INTEGER}, #{entity.taskId,jdbcType=INTEGER}, #{entity.theme,jdbcType=VARCHAR},
+      #{entity.userName,jdbcType=VARCHAR}, #{entity.editUserName,jdbcType=VARCHAR}, #{entity.taskType,jdbcType=INTEGER},
+      #{entity.deviceUuid,jdbcType=VARCHAR}, #{entity.createTime,jdbcType=TIMESTAMP}, #{entity.pushTime,jdbcType=TIMESTAMP},
+      #{entity.modifiedTime,jdbcType=TIMESTAMP}, #{entity.autoPush,jdbcType=INTEGER}, #{entity.status,jdbcType=INTEGER},
+      #{entity.pushResult,jdbcType=VARCHAR}, #{entity.commandline,jdbcType=VARCHAR}, #{entity.commandlineRevert,jdbcType=VARCHAR},
+      #{entity.commandlineEcho,jdbcType=VARCHAR}, #{entity.commandlineRevertEcho,jdbcType=VARCHAR}, #{entity.pushStatus,jdbcType=INTEGER},
+      #{entity.revertStatus,jdbcType=INTEGER}, #{entity.pushSchedule,jdbcType=TIMESTAMP}, #{entity.revertTime, jdbcType=TIMESTAMP},#{entity.branchLevel,jdbcType=VARCHAR},
+      #{entity.mergeInfo,jdbcType=VARCHAR}, #{entity.movePosition,jdbcType=VARCHAR},#{entity.errorMsg,jdbcType=VARCHAR},#{entity.matchMsg,jdbcType=VARCHAR},
+      #{entity.verifyEcho,jdbcType=VARCHAR},#{entity.addressAdd,jdbcType=VARCHAR},#{entity.addressDel,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity">
+    insert into push_command_task_editable
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="taskId != null">
+        task_id,
+      </if>
+      <if test="theme != null">
+        theme,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="editUserName != null">
+        edit_user_name,
+      </if>
+      <if test="taskType != null">
+        task_type,
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="pushTime != null">
+        push_time,
+      </if>
+      <if test="modifiedTime != null">
+        modified_time,
+      </if>
+      <if test="autoPush != null">
+        auto_push,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="pushResult != null">
+        push_result,
+      </if>
+      <if test="commandline != null">
+        commandline,
+      </if>
+      <if test="commandlineRevert != null">
+        commandline_revert,
+      </if>
+      <if test="commandlineEcho != null">
+        commandline_echo,
+      </if>
+      <if test="commandlineRevertEcho != null">
+        commandline_revert_echo,
+      </if>
+      <if test="pushStatus != null">
+         push_status,
+      </if>
+      <if test="revertStatus != null">
+        revert_status,
+      </if>
+      <if test="pushSchedule != null">
+        push_schedule,
+      </if>
+      <if test="revertTime != null">
+        revert_time,
+      </if>
+      <if test="branchLevel != null">
+        branch_level,
+      </if>
+      <if test="enableEmail != null">
+        enable_email,
+      </if>
+      <if test="receiverEmail != null">
+        receiver_email,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="taskId != null">
+        #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="editUserName != null">
+        #{editUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null">
+        #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="deviceUuid != null">
+        #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pushTime != null">
+        #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedTime != null">
+        #{modifiedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="autoPush != null">
+        #{autoPush,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pushResult != null">
+        #{pushResult,jdbcType=VARCHAR},
+      </if>
+      <if test="commandline != null">
+        #{commandline,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineRevert != null">
+        #{commandlineRevert,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineEcho != null">
+        #{commandlineEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="pushSchedule != null">
+        #{pushSchedule,jdbcType=TIMESTAMP},
+      </if>
+      <if test="revertTime != null">
+        #{revertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="branchLevel != null">
+        #{branchLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="enableEmail != null">
+        #{enableEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="receiverEmail != null">
+        #{receiverEmail,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity">
+    update push_command_task_editable
+    <set>
+      <if test="taskId != null">
+        task_id = #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="theme != null">
+        theme = #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="editUserName != null">
+        edit_user_name = #{editUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null">
+        task_type = #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="pushTime != null">
+        push_time = #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="modifiedTime != null">
+        modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="autoPush != null">
+        auto_push = #{autoPush,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="pushResult != null">
+        push_result = #{pushResult,jdbcType=VARCHAR},
+      </if>
+      <if test="commandline != null">
+        commandline = #{commandline,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineRevert != null">
+        commandline_revert = #{commandlineRevert,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineEcho != null">
+        commandline_echo = #{commandlineEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineRevertEcho != null">
+        commandline_revert_echo = #{commandlineRevertEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="revertStatus != null">
+        revert_status = #{revertStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushSchedule != null">
+        push_schedule = #{pushSchedule, jdbcType=TIMESTAMP},
+      </if>
+      <if test="revertTime != null">
+        revert_time = #{revertTime, jdbcType=TIMESTAMP},
+      </if>
+      <if test="editRevertUserName != null">
+        edit_revert_user_name = #{editRevertUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="revertModifiedTime != null">
+        revert_modified_time = #{revertModifiedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="branchLevel != null">
+        branch_level =  #{branchLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeInfo != null">
+        merge_info =  #{mergeInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="enableEmail != null">
+        enable_email =  #{enableEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="receiverEmail != null">
+        receiver_email =  #{receiverEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="movePosition != null and movePosition !='' ">
+        move_position =  #{movePosition,jdbcType=VARCHAR},
+      </if>
+      <if test="errorMsg != null">
+        error_msg =  #{errorMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="matchMsg != null">
+        match_msg =  #{matchMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="verifyEcho != null">
+        verify_echo =  #{verifyEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="addressAdd != null">
+        address_add =  #{addressAdd,jdbcType=VARCHAR},
+      </if>
+      <if test="addressDel != null">
+        address_del =  #{addressDel,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity">
+    update push_command_task_editable
+    set task_id = #{taskId,jdbcType=INTEGER},
+        theme = #{theme,jdbcType=VARCHAR},
+        user_name = #{userName,jdbcType=VARCHAR},
+        edit_user_name = #{editUserName,jdbcType=VARCHAR},
+        task_type = #{taskType,jdbcType=INTEGER},
+        device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        push_time = #{pushTime,jdbcType=TIMESTAMP},
+        modified_time = #{modifiedTime,jdbcType=TIMESTAMP},
+        auto_push = #{autoPush,jdbcType=INTEGER},
+        status = #{status,jdbcType=INTEGER},
+        push_result = #{pushResult,jdbcType=VARCHAR},
+        commandline = #{commandline,jdbcType=VARCHAR},
+        commandline_revert = #{commandlineRevert,jdbcType=VARCHAR},
+        commandline_echo = #{commandlineEcho,jdbcType=VARCHAR},
+        commandline_revert_echo = #{commandlineRevertEcho, jdbcType=VARCHAR},
+        push_status = #{pushStatus,jdbcType=INTEGER},
+        revert_status = #{revertStatus,jdbcType=INTEGER},
+        push_schedule = #{pushSchedule,jdbcType=TIMESTAMP},
+        revert_time = #{revertTime,jdbcType=TIMESTAMP},
+        edit_revert_user_name = #{editRevertUserName,jdbcType=VARCHAR},
+        revert_modified_time = #{revertModifiedTime,jdbcType=TIMESTAMP},
+        branch_level =  #{branchLevel,jdbcType=VARCHAR},
+        merge_info =  #{mergeInfo,jdbcType=VARCHAR},
+        enable_email = #{enableEmail,jdbcType=VARCHAR},
+        receiver_email = #{receiverEmail,jdbcType=VARCHAR},
+        revert_time = #{revertTime,jdbcType=TIMESTAMP},
+        commandline_revert_echo = #{commandlineRevertEcho,jdbcType=VARCHAR},
+        revert_modified_time = #{revertModifiedTime,jdbcType=TIMESTAMP},
+        edit_revert_user_name = #{editRevertUserName,jdbcType=VARCHAR},
+        branch_level = #{branchLevel,jdbcType=VARCHAR},
+        merge_info = #{mergeInfo,jdbcType=VARCHAR},
+        match_msg = #{matchMsg,jdbcType=VARCHAR},
+        error_msg = #{errorMsg,jdbcType=VARCHAR},
+        move_position = #{movePosition,jdbcType=VARCHAR},
+        verify_echo = #{verifyEcho,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <update id="updateForStopTask" parameterType="java.util.Map">
+    update push_command_task_editable
+    <set>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus, jdbcType=INTEGER},
+      </if>
+
+      <if test="revertStatus != null">
+        revert_status = #{revertStatus, jdbcType=INTEGER},
+      </if>
+
+      <if test="pushScheduleInit != null">
+        push_schedule = null,
+      </if>
+
+      <if test="enableEmail != null">
+        enable_email = #{enableEmail,jdbcType=VARCHAR},
+      </if>
+
+      <if test="receiverEmailInit != null">
+        receiver_email = null,
+      </if>
+
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  <select id="getPushTaskList" parameterType="java.util.Map" resultMap="PushTaskVOResultMap">
+    select
+    <include refid="Push_Task_Column_List" />
+    from push_command_task_editable
+    <where>
+       task_id > 0
+      <if test="taskId!=null">
+        and task_id = #{taskId, jdbcType=INTEGER}
+      </if>
+      <if test="theme!=null">
+        and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="taskType!=null">
+        and task_type in
+        <foreach item="item" index="index" collection="taskType.split(',')"  open="(" separator="," close=")">
+          #{item}
+        </foreach>
+
+      </if>
+      <if test="status!=null">
+        and status = #{status, jdbcType=INTEGER}
+      </if>
+      <if test="pushStatus != null">
+        and push_status = #{pushStatus, jdbcType=INTEGER}
+      </if>
+      <if test="revertStatus != null">
+        and revert_status = #{revertStatus, jdbcType=INTEGER}
+      </if>
+      <if test="branchLevel != null ">
+        and branch_level  like #{branchLevel}
+      </if>
+      <if test="userName != null and userName != ''">
+      and user_name = #{userName,jdbcType=VARCHAR}
+      </if>
+    </where>
+    group by task_id
+    order by id DESC
+  </select>
+
+
+
+  <select id="getPushTaskStatusList" resultMap="PushStatusMap" parameterType="java.lang.String">
+   select count(task_id) as id_count, task_type,push_status ,revert_status from (
+                 SELECT task_id, theme, user_name,  push_status, revert_status,task_type, push_schedule, revert_time
+FROM push_command_task_editable
+WHERE task_id > 0
+    <if test="branchLevel != null ">
+    and  branch_level  like #{branchLevel}
+    </if>
+GROUP BY task_id,task_type, push_status,revert_status order by id DESC) tab
+group by task_type, push_status,revert_status
+  </select>
+
+  <select id="getPushTaskStatusListTotal" resultType="java.lang.Integer"  parameterType="java.util.Map">
+    select
+    count(DISTINCT(task_id))
+    from push_command_task_editable
+    <where>
+      task_id > 0
+
+      <if test="taskType!=null">
+        and task_type in
+        <foreach item="item" index="index" collection="taskType.split(',')"  open="(" separator="," close=")">
+          #{item}
+        </foreach>
+
+      </if>
+
+      <if test="branchLevel != null ">
+        and   branch_level  like #{branchLevel}
+
+      </if>
+    </where>
+
+  </select>
+
+  <select id="selectScheduledTask" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where push_status = 0
+    and push_schedule &lt;= CURRENT_TIMESTAMP()
+    order by push_schedule asc
+  </select>
+
+  <select id="selectAllPushList" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where 1=1
+    <if test="pushTime_flag != null ">
+      and push_time is not null
+    </if>
+    <if test="pushSchedule_flag != null ">
+      and push_schedule  is not null
+    </if>
+    <if test="pushSchedule != null ">
+      and push_schedule  = #{pushSchedule,jdbcType=TIMESTAMP}
+    </if>
+    <if test="userName != null ">
+      and user_name like "%"#{userName,jdbcType=VARCHAR}"%"
+    </if>
+    <if test="enableEmail != null ">
+      and enable_email =#{enableEmail,jdbcType=VARCHAR}
+    </if>
+    order by push_time desc
+  </select>
+
+  <select id="selectExecuteTask" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where (push_status in (1,4) or revert_status in (1,4))
+    order by id DESC
+  </select>
+
+  <update id="setPushSchedule" parameterType="com.abtnetworks.totems.recommend.entity.CommandTaskEditableEntity">
+    update push_command_task_editable
+    set push_schedule = #{pushSchedule,jdbcType=TIMESTAMP}, enable_email = #{enableEmail,jdbcType=VARCHAR}, receiver_email = #{receiverEmail,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByTaskIdAndType" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_command_task_editable
+    where task_id = #{taskId,jdbcType=INTEGER} and task_type = #{taskType,jdbcType=INTEGER}
+  </select>
+</mapper>

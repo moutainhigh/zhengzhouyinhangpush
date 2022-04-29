@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.RecommendTaskMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.RecommendTaskEntity">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="theme" jdbcType="VARCHAR" property="theme" />
+        <result column="order_number" jdbcType="VARCHAR" property="orderNumber" />
+        <result column="user_name" jdbcType="VARCHAR" property="userName" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+        <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+        <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+        <result column="service_list" jdbcType="VARCHAR" property="serviceList" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+        <result column="status" jdbcType="INTEGER" property="status" />
+        <result column="task_type" jdbcType="INTEGER" property="taskType" />
+        <result column="addition_info" jdbcType="VARCHAR" property="additionInfo" />
+        <result column="task_start" jdbcType="TIMESTAMP" property="taskStart" />
+        <result column="task_end" jdbcType="TIMESTAMP" property="taskEnd" />
+        <result column="batch_id" jdbcType="INTEGER" property="batchId" />
+        <result column="what_if_case" jdbcType="VARCHAR" property="whatIfCase" />
+        <result column="idle_timeout" jdbcType="INTEGER" property="idleTimeout" />
+        <result column="relevancy_nat" jdbcType="VARCHAR" property="relevancyNat"/>
+        <result column="src_ip_system" jdbcType="VARCHAR" property="srcIpSystem"/>
+        <result column="dst_ip_system" jdbcType="VARCHAR" property="dstIpSystem"/>
+        <result column="branch_level" jdbcType="VARCHAR" property="branchLevel"/>
+        <result column="start_label" jdbcType="VARCHAR" property="startLabel"/>
+        <result column="ip_type" jdbcType="INTEGER" property="ipType"/>
+        <result column="post_src_ip_system" jdbcType="VARCHAR" property="postSrcIpSystem"/>
+        <result column="post_dst_ip_system" jdbcType="VARCHAR" property="postDstIpSystem"/>
+        <result column="label_model" jdbcType="VARCHAR" property="labelModel"/>
+        <result column="post_src_ip" jdbcType="VARCHAR" property="postSrcIp" />
+        <result column="post_dst_ip" jdbcType="VARCHAR" property="postDstIp" />
+        <result column="range_filter" jdbcType="BIT" property="rangeFilter" />
+        <result column="merge_check" jdbcType="BIT" property="mergeCheck" />
+        <result column="before_conflict" jdbcType="BIT" property="beforeConflict" />
+        <result column="weTaskId" jdbcType="INTEGER" property="weTaskId" />
+        <result column="src_address_object_name" jdbcType="VARCHAR" property="srcAddressObjectName" />
+        <result column="dst_address_object_name" jdbcType="VARCHAR" property="dstAddressObjectName" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, theme, order_number, user_name, description, remarks, src_ip, dst_ip, service_list, create_time, start_time,
+        end_time, status, task_type, addition_info, task_start, task_end, batch_id, what_if_case, idle_timeout,relevancy_nat,src_ip_system,dst_ip_system,branch_level,ip_type,post_src_ip_system,post_dst_ip_system,start_label,label_model,post_src_ip,post_dst_ip
+        ,range_filter,merge_check,before_conflict,weTaskId,src_address_object_name,dst_address_object_name
+    </sql>
+
+    <!-- 根据任务id查找任务数据 -->
+    <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <!-- 根据任务id删除任务数据 -->
+    <delete id="deleteByTaskId" parameterType="java.lang.Integer">
+        delete from push_recommend_task
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <!-- 根据任务id删除任务数据 -->
+    <delete id="deleteByTaskList" parameterType="java.util.Map">
+        delete from push_recommend_task
+        where id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <!-- 插入任务数据 -->
+    <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskEntity" useGeneratedKeys="true" keyProperty="id">
+        insert into push_recommend_task (theme, order_number, user_name,
+                                         description, remarks, src_ip, dst_ip,
+                                         service_list, create_time, start_time,
+                                         end_time, status, task_type,
+                                         addition_info, task_start, task_end,
+                                         batch_id, what_if_case, idle_timeout,relevancy_nat,src_ip_system,dst_ip_system,branch_level,ip_type,start_label,label_model,post_src_ip_system,post_dst_ip_system,post_src_ip,post_dst_ip
+                                        ,merge_check,range_filter,before_conflict,weTaskId,src_address_object_name,dst_address_object_name)
+        values (#{theme,jdbcType=VARCHAR}, #{orderNumber,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR},
+                #{description,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR}, #{srcIp,jdbcType=VARCHAR}, #{dstIp,jdbcType=VARCHAR},
+                #{serviceList,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{startTime,jdbcType=TIMESTAMP},
+                #{endTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER}, #{taskType,jdbcType=INTEGER},
+                #{additionInfo,jdbcType=VARCHAR}, #{taskStart, jdbcType=TIMESTAMP}, #{taskEnd, jdbcType=TIMESTAMP},
+                #{batchId, jdbcType=INTEGER}, #{whatIfCase, jdbcType=VARCHAR}, #{idleTimeout, jdbcType=INTEGER},
+                #{relevancyNat, jdbcType=VARCHAR},#{srcIpSystem, jdbcType=VARCHAR},#{dstIpSystem, jdbcType=VARCHAR}, #{branchLevel,jdbcType=VARCHAR},#{ipType, jdbcType=INTEGER}, #{startLabel,jdbcType=VARCHAR}
+                 ,#{labelModel, jdbcType=VARCHAR},#{postSrcIpSystem, jdbcType=VARCHAR},#{postDstIpSystem, jdbcType=VARCHAR},#{postSrcIp,jdbcType=VARCHAR},#{postDstIp,jdbcType=VARCHAR}
+                ,#{mergeCheck, jdbcType=BIT},#{rangeFilter,jdbcType=BIT},#{beforeConflict,jdbcType=BIT},#{weTaskId,jdbcType=INTEGER},
+                #{srcAddressObjectName,jdbcType=VARCHAR}, #{dstAddressObjectName,jdbcType=VARCHAR})
+    </insert>
+
+    <!-- 清空云策略任务ID -->
+    <update id="updateWeTaskId" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskEntity">
+        update push_recommend_task set weTaskId = #{weTaskId,jdbcType=INTEGER} where id = #{id,jdbcType=INTEGER}
+    </update>
+
+
+    <!-- 更新策略开通任务数据 -->
+    <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskEntity">
+        update push_recommend_task
+        <set>
+            <if test="theme != null">
+                theme = #{theme,jdbcType=VARCHAR},
+            </if>
+            <if test="userName != null and  userName != ''">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="srcIp != null">
+                src_ip = #{srcIp,jdbcType=VARCHAR},
+            </if>
+            <if test="dstIp != null">
+                dst_ip = #{dstIp,jdbcType=VARCHAR},
+            </if>
+            <if test="serviceList != null">
+                service_list = #{serviceList,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
+            </if>
+            <if test="taskType != null">
+                task_type = #{taskType,jdbcType=INTEGER},
+            </if>
+            <if test="additionInfo != null">
+                addition_info = #{additionInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="taskStart != null">
+                task_start = #{taskStart, jdbcType=TIMESTAMP},
+            </if>
+            <if test="taskEnd != null" >
+                task_end = #{taskEnd, jdbcType=TIMESTAMP},
+            </if>
+            <if test="batchId != null" >
+                batch_id = #{batchId, jdbcType=INTEGER},
+            </if>
+            <if test="whatIfCase != null" >
+                what_if_case = #{whatIfCase, jdbcType=VARCHAR},
+            </if>
+            <if test="idleTimeout != null" >
+                idle_timeout = #{idleTimeout, jdbcType=INTEGER},
+            </if>
+            <if test="relevancyNat != null" >
+              relevancy_nat = #{relevancyNat, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIpSystem != null" >
+                src_ip_system = #{srcIpSystem, jdbcType=VARCHAR}
+            </if>
+            <if test="dstIpSystem != null" >
+                dst_ip_system = #{dstIpSystem, jdbcType=VARCHAR}
+            </if>
+            <if test="branchLevel != null">
+                branch_level =  #{branchLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="ipType != null" >
+                ip_type = #{ipType, jdbcType=INTEGER},
+            </if>
+            <if test="startLabel != null and startLabel != ''" >
+                start_label = #{startLabel, jdbcType=VARCHAR},
+            </if>
+            <if test="labelModel != null and labelModel != ''" >
+                label_model = #{labelModel, jdbcType=VARCHAR},
+            </if>
+            <if test="postSrcIpSystem != null" >
+            post_src_ip_system = #{postSrcIpSystem, jdbcType=VARCHAR},
+            </if>
+            <if test="postDstIpSystem != null" >
+            post_dst_ip_system = #{postDstIpSystem, jdbcType=VARCHAR},
+            </if>
+            <if test="postSrcIp != null">
+                post_src_ip = #{postSrcIp,jdbcType=VARCHAR},
+            </if>
+            <if test="postDstIp != null">
+                post_dst_ip = #{postDstIp,jdbcType=VARCHAR}
+            </if>
+            <if test="weTaskId != null">
+                weTaskId = #{weTaskId,jdbcType=INTEGER}
+            </if>
+            <if test="srcAddressObjectName != null">
+                src_address_object_name = #{srcAddressObjectName,jdbcType=VARCHAR},
+            </if>
+            <if test="dstAddressObjectName != null">
+                dst_address_object_name = #{dstAddressObjectName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateByTaskList" parameterType="java.util.Map">
+        update push_recommend_task
+        set status = 0
+        where id in
+        <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <!-- 更新策略开通任务数据 -->
+    <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.recommend.entity.RecommendTaskEntity">
+        update push_recommend_task
+        set theme = #{theme,jdbcType=VARCHAR},
+            user_name = #{userName,jdbcType=VARCHAR},
+            description = #{description,jdbcType=VARCHAR},
+            remarks = #{remarks,jdbcType=VARCHAR},
+            src_ip = #{srcIp,jdbcType=VARCHAR},
+            dst_ip = #{dstIp,jdbcType=VARCHAR},
+            service_list = #{serviceList,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            start_time = #{startTime,jdbcType=TIMESTAMP},
+            end_time = #{endTime,jdbcType=TIMESTAMP},
+            status = #{status,jdbcType=INTEGER},
+            task_type = #{taskType,jdbcType=INTEGER},
+            addition_info = #{additionInfo,jdbcType=VARCHAR},
+            task_start = #{taskStart, jdbcType=TIMESTAMP},
+            task_end = #{taskEnd, jdbcType=TIMESTAMP},
+            batch_id = #{batchId, jdbcType=INTEGER},
+            what_if_case = #{whatIfCase, jdbcType=VARCHAR},
+
+            idle_timeout = #{idleTimeout, jdbcType=INTEGER},
+            relevancy_nat = #{relevancyNat, jdbcType=VARCHAR},
+            src_ip_system = #{srcIpSystem, jdbcType=VARCHAR},
+            dst_ip_system = #{dstIpSystem, jdbcType=VARCHAR},
+             branch_level =  #{branchLevel,jdbcType=VARCHAR},
+             ip_type = #{ipType, jdbcType=INTEGER},
+              start_label = #{startLabel, jdbcType=VARCHAR},
+              label_model = #{labelModel, jdbcType=VARCHAR},
+              post_src_ip_system = #{postSrcIpSystem, jdbcType=VARCHAR},
+            post_dst_ip_system = #{postDstIpSystem, jdbcType=VARCHAR},
+            post_src_ip = #{postSrcIp,jdbcType=VARCHAR},
+            post_dst_ip = #{postDstIp,jdbcType=VARCHAR},
+            weTaskId = #{weTaskId,jdbcType=INTEGER},
+            merge_check = #{mergeCheck,jdbcType=BIT},
+            before_conflict = #{beforeConflict,jdbcType=BIT},
+            src_address_object_name = #{srcAddressObjectName,jdbcType=VARCHAR},
+            dst_address_object_name = #{dstAddressObjectName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!-- 搜索任务 -->
+    <select id="searchTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="userName!=null" >
+                and user_name like #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="protocol!=null">
+                and service_list like "%"#{protocol,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="status!=null">
+                <choose >
+                    <when test="status!=null and status == 0">
+                        and status in (0,10)
+                    </when>
+                    <otherwise>
+                        and status = #{status,jdbcType=INTEGER}
+                    </otherwise>
+                </choose>
+            </if>
+
+            <choose >
+                <when test="taskType!=null">
+                    and task_type = #{taskType,jdbcType=INTEGER}
+                </when>
+                <otherwise>
+                    <if test="maxTaskType != null and minTaskType != null">
+                        and task_type &gt;= #{minTaskType,jdbcType=INTEGER} and task_type &lt;= #{maxTaskType, jdbcType=INTEGER}
+                    </if>
+                </otherwise>
+            </choose>
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="branchLevel != null ">
+                and branch_level  like  #{branchLevel}
+            </if>
+            <if test="deviceUuid!=null and deviceUuid != ''">
+                /*匹配设备模糊找到uuid，如果后期uuid扩展成64位就需要单独加字段*/
+                and addition_info like "%"#{deviceUuid, jdbcType=VARCHAR}"%"
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 搜索策略开通任务 -->
+    <select id="searchRecommendTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+            <if test="batchId!=null">
+                and batch_id = #{batchId,jdbcType=INTEGER}
+            </if>
+            <if test="id!=null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="userName!=null" >
+                and user_name like #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="protocol!=null">
+                and service_list like "%"#{protocol,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="startTime !=null">
+                and create_time &gt; #{startTime}
+            </if>
+            <if test="startTime !=null">
+                and create_time &lt;= #{endTime}
+            </if>
+            <choose >
+                <when test="status!=null">
+                    and status = #{status,jdbcType=INTEGER}
+                </when>
+                <otherwise>
+                    <if test="min != null and max != null">
+                        and status &gt;= #{min,jdbcType=INTEGER} and status &lt;= #{max, jdbcType=INTEGER}
+                    </if>
+                </otherwise>
+            </choose>
+
+            <choose >
+                <when test="taskType !=null">
+                    and task_type in (#{taskType})
+                </when>
+                <otherwise>
+                    and task_type in (1,8,14,15,16)
+                </otherwise>
+            </choose>
+
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+
+            <if test="branchLevel != null ">
+                and branch_level  like #{branchLevel}
+            </if>
+
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="searchRecommendTaskWithServiceAny" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+            <if test="batchId!=null">
+                and batch_id = #{batchId,jdbcType=INTEGER}
+            </if>
+            <if test="id!=null">
+                and id = #{id,jdbcType=INTEGER}
+            </if>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="userName!=null" >
+                and user_name like #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="branchLevel != null ">
+                and branch_level  like #{branchLevel}
+
+            </if>
+            <choose >
+                <when test="status!=null">
+                    and status = #{status,jdbcType=INTEGER}
+                </when>
+                <otherwise>
+                    <if test="min != null and max != null">
+                        and status &gt;= #{min,jdbcType=INTEGER} and status &lt;= #{max, jdbcType=INTEGER}
+                    </if>
+                </otherwise>
+            </choose>
+            <choose >
+                <when test="taskType !=null">
+                    and task_type in (#{taskType})
+                </when>
+                <otherwise>
+                    and task_type in (1,8,14,15,16)
+                </otherwise>
+            </choose>
+            and ISNULL(service_list)
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!--批量添加策略开通任务-->
+    <insert id="addRecommendTaskList" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into push_recommend_task
+        (
+        theme,  order_number, user_name, description, remarks, src_ip,
+        dst_ip, service_list, create_time, start_time,  end_time,
+        status, task_type, addition_info, task_start, task_end,
+        batch_id, what_if_case, idle_timeout, relevancy_nat,src_ip_system,dst_ip_system,branch_level,ip_type,start_label,label_model,post_src_ip_system,post_dst_ip_system
+        ,merge_check,range_filter,before_conflict,post_src_ip,post_dst_ip,weTaskId,src_address_object_name,dst_address_object_name
+        )
+        values
+        <foreach collection="list" item="entity" index="index" separator=",">
+            (
+            #{entity.theme}, #{entity.orderNumber}, #{entity.userName},#{entity.description},#{entity.remarks}, #{entity.srcIp},
+            #{entity.dstIp}, #{entity.serviceList}, #{entity.createTime}, #{entity.startTime},   #{entity.endTime},
+            #{entity.status}, #{entity.taskType}, #{entity.additionInfo}, #{entity.taskStart}, #{entity.taskEnd},
+            #{entity.batchId}, #{entity.whatIfCase}, #{entity.idleTimeout}, #{entity.relevancyNat}, #{entity.srcIpSystem}, #{entity.dstIpSystem}
+            ,#{entity.branchLevel},#{entity.ipType}, #{entity.startLabel, jdbcType=VARCHAR}
+            , #{entity.labelModel, jdbcType=VARCHAR},#{entity.postSrcIpSystem},#{entity.postDstIpSystem}
+            ,#{entity.mergeCheck},#{entity.rangeFilter},#{entity.beforeConflict},#{entity.postSrcIp},#{entity.postDstIp},#{entity.weTaskId},
+            #{entity.srcAddressObjectName,jdbcType=VARCHAR}, #{entity.dstAddressObjectName,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <!-- 搜索策略开通任务 -->
+    <select id="searchNatTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+             1=1
+            <if test="batchId!=null">
+                and batch_id = #{batchId,jdbcType=INTEGER}
+            </if>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="branchLevel != null ">
+                and  branch_level  like #{branchLevel}
+            </if>
+            <if test="userName!=null" >
+                and user_name = #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="protocol!=null">
+                and service_list like "%"#{protocol,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="status!=null">
+                <choose >
+                    <when test="status!=null and status == 0">
+                        and status in (0,10)
+                    </when>
+                    <otherwise>
+                        and status = #{status,jdbcType=INTEGER}
+                    </otherwise>
+                </choose>
+            </if>
+
+            <choose >
+                <when test="taskType!=null">
+                    and task_type in (#{taskType})
+                </when>
+                <otherwise>
+                    <if test="taskType==null">
+                        and (task_type = 5 or task_type = 6 or task_type = 7 or task_type = 9 or task_type =20)
+                    </if>
+                </otherwise>
+            </choose>
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="deviceUuid!=null and deviceUuid != ''">
+            /*匹配设备模糊找到uuid，如果后期uuid扩展成64位就需要单独加字段*/
+                and addition_info like "%"#{deviceUuid, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="taskIds != null and taskIds != '' ">
+                and id  not in
+                <foreach item="item" index="index" collection="taskIds.split(',')" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+           <if test="id !=null and id != '' ">
+               and id = #{id}
+           </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 搜索带时间查询任务 -->
+    <select id="searchPolicyTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="userName!=null" >
+                and user_name like #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="startTime !=null">
+                and create_time &gt; #{startTime}
+            </if>
+            <if test="endTime !=null">
+                and create_time &lt;= #{endTime}
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="protocol!=null">
+                and service_list like "%"#{protocol,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="status!=null">
+                <choose >
+                    <when test="status!=null and status == 0">
+                        and status in (0,10)
+                    </when>
+                    <otherwise>
+                        and status = #{status,jdbcType=INTEGER}
+                    </otherwise>
+                </choose>
+            </if>
+
+            <choose >
+                <when test="taskType!=null">
+                    and task_type = #{taskType,jdbcType=INTEGER}
+                </when>
+                <otherwise>
+                    <if test="maxTaskType != null and minTaskType != null">
+                        and task_type &gt;= #{minTaskType,jdbcType=INTEGER} and status &lt;= #{maxTaskType, jdbcType=INTEGER}
+                    </if>
+                </otherwise>
+            </choose>
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="branchLevel != null ">
+                and branch_level  like  #{branchLevel}
+
+            </if>
+            <if test="deviceUuid!=null and deviceUuid != ''">
+                /*匹配设备模糊找到uuid，如果后期uuid扩展成64位就需要单独加字段*/
+                and addition_info like "%"#{deviceUuid, jdbcType=VARCHAR}"%"
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 搜索带时间查询任务 -->
+    <select id="searchNatPolicyTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        <where>
+            1=1
+            <if test="batchId!=null">
+                and batch_id = #{batchId,jdbcType=INTEGER}
+            </if>
+            <if test="theme!=null">
+                and theme like "%"#{theme,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderNumber!=null">
+                and order_number like "%"#{orderNumber,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="branchLevel != null ">
+                and  branch_level  like #{branchLevel}
+            </if>
+            <if test="userName!=null" >
+                and user_name = #{userName, jdbcType=VARCHAR}
+            </if>
+            <if test="srcIp!=null">
+                and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="dstIp!=null">
+                and dst_ip like "%"#{dstIp,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="startTime !=null">
+                and create_time &gt; #{startTime}
+            </if>
+            <if test="endTime !=null">
+                and create_time &lt;= #{endTime}
+            </if>
+            <if test="dstPort!=null">
+                and service_list like "%"#{dstPort,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="protocol!=null">
+                and service_list like "%"#{protocol,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="status!=null">
+                <choose >
+                    <when test="status!=null and status == 0">
+                        and status in (0,10)
+                    </when>
+                    <otherwise>
+                        and status = #{status,jdbcType=INTEGER}
+                    </otherwise>
+                </choose>
+            </if>
+
+            <choose >
+                <when test="taskType!=null">
+                    and task_type in (#{taskType})
+                </when>
+                <otherwise>
+                    <if test="taskType==null">
+                        and (task_type = 5 or task_type = 6 or task_type = 7 or task_type = 9)
+                    </if>
+                </otherwise>
+            </choose>
+
+
+            <if test="description!=null">
+                and description like "%"#{description, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="remarks!=null">
+                and remarks like "%"#{remarks, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="deviceUuid!=null and deviceUuid != ''">
+                /*匹配设备模糊找到uuid，如果后期uuid扩展成64位就需要单独加字段*/
+                and addition_info like "%"#{deviceUuid, jdbcType=VARCHAR}"%"
+            </if>
+            <if test="taskIds != null and taskIds != '' ">
+                and id  not in
+                <foreach item="item" index="index" collection="taskIds.split(',')" open="(" separator="," close=")">
+                    ${item}
+                </foreach>
+            </if>
+            <if test="id !=null and id != '' ">
+                and id = #{id}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 查找策略开通执行中任务 -->
+    <select id="selectExecuteRecommendTask" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        where status in (1,2,21)
+        order by id DESC
+    </select>
+
+    <!-- 根据任务id查找任务数据 -->
+    <select id="getById" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from push_recommend_task
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+</mapper>

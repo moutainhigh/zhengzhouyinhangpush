@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalTeamBranchMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalTeamBranchEntity" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="branch_uuid" property="branchUuid" />
+        <result column="need_audit_flag" property="needAuditFlag" />
+        <result column="branch_code" property="branchCode" />
+        <result column="branch_name" property="branchName" />
+        <result column="branch_ip" property="branchIp" />
+        <result column="branch_remarks" property="branchRemarks" />
+        <result column="handle_status" property="handleStatus" />
+        <result column="callback_handle_status" property="callbackHandleStatus" />
+        <result column="handle_time" property="handleTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `center_uuid`,
+        `branch_uuid`,
+        `need_audit_flag`,
+        `branch_code`,
+        `branch_name`,
+        `branch_ip`,
+        `branch_remarks`,
+        `handle_status`,
+        `callback_handle_status`,
+        `handle_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_team_branch (
+            `center_uuid`,
+            `branch_uuid`,
+            `need_audit_flag`,
+            `branch_code`,
+            `branch_name`,
+            `branch_ip`,
+            `branch_remarks`,
+            `handle_status`,
+            `callback_handle_status`,
+            `handle_time`
+        )
+        VALUES(
+            #{centerUuid},
+            #{branchUuid},
+            #{needAuditFlag},
+            #{branchCode},
+            #{branchName},
+            #{branchIp},
+            #{branchRemarks},
+            #{handleStatus},
+            #{callbackHandleStatus},
+            #{handleTime}
+        )
+    </insert>
+
+    <insert id="bulkInsert">
+        INSERT INTO disposal_team_branch (
+            `center_uuid`,
+            `branch_uuid`,
+            `need_audit_flag`,
+            `branch_code`,
+            `branch_name`,
+            `branch_ip`,
+            `branch_remarks`,
+            `handle_status`,
+            `callback_handle_status`
+        )
+        VALUES
+        <foreach collection="list" item="tmp" separator="," >
+        (
+            #{centerUuid},
+            #{tmp.branchUuid},
+            #{tmp.needAuditFlag},
+            #{tmp.branchCode},
+            #{tmp.branchName},
+            #{tmp.branchIp},
+            #{tmp.branchRemarks},
+            #{tmp.handleStatus},
+            #{tmp.callbackHandleStatus}
+        )
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_team_branch
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_team_branch
+        SET
+            id = #{id},
+            center_uuid = #{centerUuid},
+            branch_uuid = #{branchUuid},
+            need_audit_flag = #{needAuditFlag},
+            branch_code = #{branchCode},
+            branch_name = #{branchName},
+            branch_ip = #{branchIp},
+            branch_remarks = #{branchRemarks},
+            handle_status = #{handleStatus},
+            callback_handle_status = #{callbackHandleStatus},
+            handle_time = #{handleTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateHandleStatus">
+        UPDATE disposal_team_branch
+        SET
+            handle_status = #{handleStatus},
+            handle_time = NOW()
+        WHERE center_uuid = #{centerUuid} AND branch_name = #{branchName}
+    </update>
+
+    <update id="updateCallbackHandleStatus">
+        UPDATE disposal_team_branch
+        SET
+            callback_handle_status = #{callbackHandleStatus},
+            handle_time = NOW()
+        WHERE center_uuid = #{centerUuid} AND branch_name = #{branchName}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_team_branch
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="findByCenterUuid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_team_branch
+        <where>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_team_branch
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="branchUuid != null and branchUuid != ''">
+                AND branch_uuid = #{branchUuid}
+            </if>
+            <if test="needAuditFlag != null and needAuditFlag != ''">
+                AND need_audit_flag = #{needAuditFlag}
+            </if>
+            <if test="branchCode != null and branchCode != ''">
+                AND branch_code = #{branchCode}
+            </if>
+            <if test="branchName != null and branchName != ''">
+                AND branch_name = #{branchName}
+            </if>
+            <if test="branchIp != null and branchIp != ''">
+                AND branch_ip = #{branchIp}
+            </if>
+            <if test="branchRemarks != null and branchRemarks != ''">
+                AND branch_remarks = #{branchRemarks}
+            </if>
+            <if test="handleStatus != null and handleStatus != ''">
+                AND handle_status = #{handleStatus}
+            </if>
+            <if test="callbackHandleStatus != null and callbackHandleStatus != ''">
+                AND callback_handle_status = #{callbackHandleStatus}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_team_branch
+    </select>
+
+</mapper>

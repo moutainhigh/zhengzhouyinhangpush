@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.abtnetworks:totems-topology-plugins-log:1.8.6-SNAPSHOT">
+    <CLASSES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-log/1.8.6-SNAPSHOT/totems-topology-plugins-log-1.8.6-20220309.075212-239.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-log/1.8.6-SNAPSHOT/totems-topology-plugins-log-1.8.6-20220309.075212-239-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-log/1.8.6-SNAPSHOT/totems-topology-plugins-log-1.8.6-20220309.075212-239-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

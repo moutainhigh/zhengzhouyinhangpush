@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.PathDetailMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.PathDetailEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="path_info_id" jdbcType="INTEGER" property="pathInfoId" />
+    <result column="analyze_path" jdbcType="VARCHAR" property="analyzePath" />
+    <result column="verify_path" jdbcType="VARCHAR" property="verifyPath" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, path_info_id, analyze_path, verify_path
+  </sql>
+
+  <!-- 根据路径信息id获取路径详情数据 -->
+  <select id="selectByPathInfoId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_path_detail
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据路径信息id删除路径详情数据 -->
+  <delete id="deleteByPathInfoId" parameterType="java.lang.Integer">
+    delete from push_path_detail
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据路径信息id删除路径详情数据 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_path_detail
+    where path_info_id in (select id
+    from push_path_info
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>)
+  </delete>
+
+  <!-- 插入路径详细信息数据 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.PathDetailEntity">
+    insert into push_path_detail (path_info_id, analyze_path,
+      verify_path)
+    values (#{pathInfoId,jdbcType=INTEGER}, #{analyzePath,jdbcType=VARCHAR},
+      #{verifyPath,jdbcType=VARCHAR})
+  </insert>
+
+  <!-- 更新路经验证数据 -->
+  <update id="updateVerifyPath" parameterType="java.util.Map">
+    update push_path_detail
+    set verify_path = #{verifyPath,jdbcType=VARCHAR}
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 跟新路径详细信息数据 -->
+  <update id="update" parameterType="com.abtnetworks.totems.recommend.entity.PathDetailEntity">
+    update push_path_detail
+    set path_info_id = #{pathInfoId,jdbcType=INTEGER},
+      analyze_path = #{analyzePath,jdbcType=VARCHAR},
+      verify_path = #{verifyPath,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

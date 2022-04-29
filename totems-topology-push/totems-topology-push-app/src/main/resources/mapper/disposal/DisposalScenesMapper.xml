@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalScenesMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalScenesEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="name" property="name" />
+        <result column="remarks" property="remarks" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="deviceJson" property="deviceJson" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `name`,
+        `remarks`,
+        `create_user`,
+        `create_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_scenes (
+            `uuid`,
+            `name`,
+            `remarks`,
+            `create_user`,
+            `create_time`
+        )
+        VALUES(
+            #{uuid},
+            #{name},
+            #{remarks},
+            #{createUser},
+            #{createTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_scenes
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_scenes
+        SET
+            id = #{id},
+            uuid = #{uuid},
+            name = #{name},
+            remarks = #{remarks},
+            create_user = #{createUser},
+            create_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_scenes
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getByNameNotId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_scenes
+        WHERE  name = #{name}
+        <if test="id != null">
+            and id <![CDATA[ <> ]]> #{id}
+        </if>
+        limit 0,1
+    </select>
+
+    <select id="getByScenesName" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_scenes
+        WHERE name = #{name}
+    </select>
+
+    <select id="getByUUId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_scenes
+        WHERE `uuid` = #{uuid}
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_scenes
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="name != null and name != ''">
+                AND name = #{name}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND remarks = #{remarks}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                AND create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        s.`id`, s.`uuid`, s.`name`, s.`remarks`, s.`create_user`, s.`create_time`,
+        GROUP_CONCAT(sn.device_name) AS deviceJson
+        FROM disposal_scenes s
+        LEFT JOIN disposal_scenes_node sn ON sn.scenes_uuid = s.uuid
+        <where>
+            <if test="uuid != null and uuid != ''">
+                AND s.uuid = #{uuid}
+            </if>
+            <if test="name != null and name != ''">
+                AND s.name LIKE concat('%', #{name}, '%')
+            </if>
+        </where>
+        GROUP BY s.uuid
+        order by s.id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_scenes
+    </select>
+
+</mapper>

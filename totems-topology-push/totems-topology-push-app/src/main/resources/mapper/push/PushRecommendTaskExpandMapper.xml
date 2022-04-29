@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.PushRecommendTaskExpandMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.push.entity.PushRecommendTaskExpandEntity">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="TASK_ID" jdbcType="INTEGER" property="taskId" />
+    <result column="DEVICE_UUID" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="DEVICE_NAME" jdbcType="VARCHAR" property="deviceName" />
+    <result column="SCENE_UUID" jdbcType="VARCHAR" property="sceneUuid" />
+    <result column="SCENE_NAME" jdbcType="VARCHAR" property="sceneName" />
+    <result column="POOL_INFO" jdbcType="VARCHAR" property="poolInfo" />
+    <result column="SNAT_TYPE" jdbcType="INTEGER" property="snatType" />
+    <result column="SNAT_POOL_INFO" jdbcType="VARCHAR" property="snatPoolInfo" />
+    <result column="HTTP_PROFILE" jdbcType="VARCHAR" property="httpProfile" />
+    <result column="SSL_PROFILE" jdbcType="VARCHAR" property="sslProfile" />
+    <result column="TASK_TYPE" jdbcType="INTEGER" property="taskType" />
+    <result column="MARK" jdbcType="VARCHAR" property="mark" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="STATIC_ROUTING_INFO" jdbcType="VARCHAR" property="staticRoutingInfo" />
+  </resultMap>
+  
+  <!-- 基本列 -->
+  <sql id="Base_Column_List">
+    ID,TASK_ID,DEVICE_UUID,DEVICE_NAME,SCENE_UUID,SCENE_NAME,POOL_INFO,SNAT_TYPE,SNAT_POOL_INFO,HTTP_PROFILE,SSL_PROFILE,TASK_TYPE,MARK,CREATE_USER,CREATE_TIME,UPDATE_TIME,STATIC_ROUTING_INFO
+  </sql>
+  
+  <!-- 单个插入 -->
+  <insert id="add" parameterType="com.abtnetworks.totems.push.entity.PushRecommendTaskExpandEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_recommend_task_expand
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="taskId != null">
+        TASK_ID,
+      </if>
+      <if test="deviceUuid != null">
+        DEVICE_UUID,
+      </if>
+      <if test="deviceName != null">
+        DEVICE_NAME,
+      </if>
+      <if test="sceneUuid != null">
+        SCENE_UUID,
+      </if>
+      <if test="sceneName != null">
+        SCENE_NAME,
+      </if>
+      <if test="poolInfo != null">
+        POOL_INFO,
+      </if>
+      <if test="snatType != null">
+        SNAT_TYPE,
+      </if>
+      <if test="snatPoolInfo != null">
+        SNAT_POOL_INFO,
+      </if>
+      <if test="httpProfile != null">
+        HTTP_PROFILE,
+      </if>
+      <if test="sslProfile != null">
+        SSL_PROFILE,
+      </if>
+      <if test="taskType != null">
+        TASK_TYPE,
+      </if>
+      <if test="mark != null">
+        MARK,
+      </if>
+      <if test="createUser != null">
+        CREATE_USER,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+      <if test="staticRoutingInfo != null">
+        STATIC_ROUTING_INFO,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="taskId != null">
+        #{taskId,jdbcType=INTEGER},
+      </if>
+      <if test="deviceUuid != null">
+        #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneUuid != null">
+        #{sceneUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneName != null">
+        #{sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="poolInfo != null">
+        #{poolInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="snatType != null">
+        #{snatType,jdbcType=INTEGER},
+      </if>
+      <if test="snatPoolInfo != null">
+        #{snatPoolInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="httpProfile != null">
+        #{httpProfile,jdbcType=VARCHAR},
+      </if>
+      <if test="sslProfile != null">
+        #{sslProfile,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null">
+        #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="mark != null">
+        #{mark,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="staticRoutingInfo != null">
+        #{staticRoutingInfo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 单个更新 -->
+  <update id="update" parameterType="com.abtnetworks.totems.push.entity.PushRecommendTaskExpandEntity">
+    update push_recommend_task_expand
+    <set>
+      <if test="deviceUuid != null">
+        DEVICE_UUID=#{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        DEVICE_NAME=#{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneUuid != null">
+        SCENE_UUID=#{sceneUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneName != null">
+        SCENE_NAME=#{sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="poolInfo != null">
+        POOL_INFO=#{poolInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="snatType != null">
+        SNAT_TYPE=#{snatType,jdbcType=INTEGER},
+      </if>
+      <if test="snatPoolInfo != null">
+        SNAT_POOL_INFO=#{snatPoolInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="httpProfile != null">
+        HTTP_PROFILE=#{httpProfile,jdbcType=VARCHAR},
+      </if>
+      <if test="sslProfile != null">
+        SSL_PROFILE=#{sslProfile,jdbcType=VARCHAR},
+      </if>
+      <if test="taskType != null">
+        TASK_TYPE=#{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="mark != null">
+        MARK=#{mark,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME=#{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="staticRoutingInfo != null">
+        STATIC_ROUTING_INFO=#{staticRoutingInfo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from push_recommend_task_expand
+    where id in
+    <foreach item="id" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 删除 -->
+  <delete id="deleteByTaskId" parameterType="java.lang.String" >
+    delete from push_recommend_task_expand
+    where task_id in
+    <foreach item="taskId" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+      #{taskId}
+    </foreach>
+  </delete>
+  
+  <!-- 查询所有 -->
+  <select id="queryList" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.push.entity.PushRecommendTaskExpandEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_task_expand
+    <where>
+      <if test="taskId != null">
+        AND TASK_ID=#{taskId,jdbcType=INTEGER}
+      </if>
+      <if test="deviceUuid != null">
+        AND DEVICE_UUID=#{deviceUuid,jdbcType=VARCHAR}
+      </if>
+      <if test="deviceName != null">
+        AND DEVICE_NAME=#{deviceName,jdbcType=VARCHAR}
+      </if>
+      <if test="sceneUuid != null">
+        AND SCENE_UUID=#{sceneUuid,jdbcType=VARCHAR}
+      </if>
+      <if test="sceneName != null">
+        AND SCENE_NAME=#{sceneName,jdbcType=VARCHAR}
+      </if>
+      <if test="taskType != null">
+        AND TASK_TYPE=#{taskType,jdbcType=INTEGER}
+      </if>
+      <if test="createUser != null">
+        AND CREATE_USER=#{createUser,jdbcType=VARCHAR}
+      </if>
+      <if test="createTime != null">
+        AND CREATE_TIME=#{createTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="updateTime != null">
+        AND UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="staticRoutingInfo != null">
+        AND STATIC_ROUTING_INFO=#{staticRoutingInfo,jdbcType=VARCHAR},
+      </if>
+    </where>
+    order by id DESC
+  </select>
+  
+
+  <!-- 单个查询 -->
+  <select id="getByEntity" parameterType="com.abtnetworks.totems.push.entity.PushRecommendTaskExpandEntity" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_task_expand
+    <where>
+      <if test="id != null" >
+        AND ID = #{id,jdbcType=BIGINT}
+      </if>
+      <if test="taskId != null" >
+        AND TASK_ID = #{taskId,jdbcType=INTEGER}
+      </if>
+    </where>
+  </select>
+
+  <!-- 单个查询 -->
+  <select id="getByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_task_expand
+       where TASK_ID = #{taskId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 获取taskId集合 -->
+  <select id="getTaskIdByIds" parameterType="java.lang.String" resultType="java.lang.Integer">
+    SELECT TASK_ID
+    FROM push_recommend_task_expand
+    where id in
+    <foreach item="id" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+</mapper>

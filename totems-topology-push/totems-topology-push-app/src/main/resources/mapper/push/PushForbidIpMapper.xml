@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.PushForbidIpMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.push.entity.PushForbidIpEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="serial_number" jdbcType="VARCHAR" property="serialNumber" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="enable_status" jdbcType="VARCHAR" property="enableStatus" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uuid, serial_number, src_ip, status, enable_status, create_user, create_date, update_user, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_forbid_ip
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_forbid_ip
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.abtnetworks.totems.push.entity.PushForbidIpEntity">
+    insert into push_forbid_ip (id, uuid, serial_number, 
+      src_ip, status,enable_status, create_user,
+      create_date, update_user, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{serialNumber,jdbcType=VARCHAR}, 
+      #{srcIp,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{enableStatus,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR},
+      #{createDate,jdbcType=TIMESTAMP}, #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.push.entity.PushForbidIpEntity">
+    insert into push_forbid_ip
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="serialNumber != null">
+        serial_number,
+      </if>
+      <if test="srcIp != null">
+        src_ip,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="enableStatus != null">
+        enable_status,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null">
+        #{serialNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="enableStatus != null">
+        #{enableStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.push.entity.PushForbidIpEntity">
+    update push_forbid_ip
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="serialNumber != null">
+        serial_number = #{serialNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="enableStatus != null">
+        enable_status = #{enableStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.push.entity.PushForbidIpEntity">
+    update push_forbid_ip
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      serial_number = #{serialNumber,jdbcType=VARCHAR},
+      src_ip = #{srcIp,jdbcType=VARCHAR},
+      status = #{status,jdbcType=INTEGER},
+      enable_status = #{enableStatus,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    from push_forbid_ip
+    <where>
+      <if test="srcIp!=null and srcIp!='' ">
+        and src_ip like "%"#{srcIp,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="serialNumber!=null and serialNumber !='' ">
+        and serial_number like "%"#{serialNumber,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="status != null ">
+        and status =#{status, jdbcType=INTEGER}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+  <select id="getByUuid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_forbid_ip
+    where uuid = #{uuid}
+  </select>
+
+  <update id="updateStatusByUuid">
+    update push_forbid_ip
+    set status = #{status}
+    where uuid = #{uuid}
+  </update>
+
+  <select id="findSerialNumber" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    from push_forbid_ip where serial_number like #{serialNumber,jdbcType=VARCHAR}"%"
+  </select>
+
+</mapper>

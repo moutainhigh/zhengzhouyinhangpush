@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.mapping.dao.mysql.PushAutoMappingTaskMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="theme" jdbcType="VARCHAR" property="theme" />
+    <result column="rule_type" jdbcType="VARCHAR" property="ruleType" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="is_appoint_post_src_ip" jdbcType="INTEGER" property="isAppointPostSrcIp" />
+    <result column="appoint_post_src_ip" jdbcType="VARCHAR" property="appointPostSrcIp" />
+    <result column="src_ip_system" jdbcType="VARCHAR" property="srcIpSystem" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="dst_ip_system" jdbcType="VARCHAR" property="dstIpSystem" />
+    <result column="service_list" jdbcType="VARCHAR" property="serviceList" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="task_type" jdbcType="INTEGER" property="taskType" />
+    <result column="addition_info" jdbcType="VARCHAR" property="additionInfo" />
+    <result column="recommend_task_id" jdbcType="INTEGER" property="recommendTaskId" />
+    <result column="idle_timeout" jdbcType="INTEGER" property="idleTimeout" />
+    <result column="relevancy_nat" jdbcType="VARCHAR" property="relevancyNat" />
+    <result column="relevancy_route" jdbcType="VARCHAR" property="relevancyRoute" />
+    <result column="ip_type" jdbcType="INTEGER" property="ipType" />
+    <result column="post_src_ip" jdbcType="VARCHAR" property="postSrcIp" />
+    <result column="post_dst_ip" jdbcType="VARCHAR" property="postDstIp" />
+    <result column="merge_check" jdbcType="INTEGER" property="mergeCheck" />
+    <result column="range_filter" jdbcType="INTEGER" property="rangeFilter" />
+    <result column="before_conflict" jdbcType="INTEGER" property="beforeConflict" />
+    <result column="error_msg" jdbcType="VARCHAR" property="errorMsg" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uuid, theme, rule_type, user_name, src_ip, is_appoint_post_src_ip, appoint_post_src_ip, 
+    src_ip_system, dst_ip, dst_ip_system, service_list, start_time, end_time, status, 
+    task_type, addition_info, recommend_task_id, idle_timeout, relevancy_nat, relevancy_route, 
+    ip_type, post_src_ip, post_dst_ip, merge_check, range_filter, before_conflict, error_msg, 
+    create_user, create_time, update_user, update_time,description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_auto_mapping_task
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_auto_mapping_task
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    insert into push_auto_mapping_task (id, uuid, theme, 
+      rule_type, user_name, src_ip, 
+      is_appoint_post_src_ip, appoint_post_src_ip, src_ip_system, 
+      dst_ip, dst_ip_system, service_list, 
+      start_time, end_time, status, 
+      task_type, addition_info, recommend_task_id, 
+      idle_timeout, relevancy_nat, relevancy_route, 
+      ip_type, post_src_ip, post_dst_ip, 
+      merge_check, range_filter, before_conflict, 
+      error_msg, create_user, create_time, 
+      update_user, update_time,description)
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{theme,jdbcType=VARCHAR},
+      #{ruleType,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{srcIp,jdbcType=VARCHAR}, 
+      #{isAppointPostSrcIp,jdbcType=INTEGER}, #{appointPostSrcIp,jdbcType=VARCHAR}, #{srcIpSystem,jdbcType=VARCHAR},
+      #{dstIp,jdbcType=VARCHAR}, #{dstIpSystem,jdbcType=VARCHAR}, #{serviceList,jdbcType=VARCHAR}, 
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{status,jdbcType=INTEGER},
+      #{taskType,jdbcType=INTEGER}, #{additionInfo,jdbcType=VARCHAR}, #{recommendTaskId,jdbcType=INTEGER},
+      #{idleTimeout,jdbcType=INTEGER}, #{relevancyNat,jdbcType=VARCHAR}, #{relevancyRoute,jdbcType=VARCHAR},
+      #{ipType,jdbcType=INTEGER}, #{postSrcIp,jdbcType=VARCHAR}, #{postDstIp,jdbcType=VARCHAR},
+      #{mergeCheck,jdbcType=INTEGER}, #{rangeFilter,jdbcType=INTEGER}, #{beforeConflict,jdbcType=INTEGER},
+      #{errorMsg,jdbcType=VARCHAR}, #{createUser,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, #{description,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    insert into push_auto_mapping_task
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="theme != null">
+        theme,
+      </if>
+      <if test="ruleType != null">
+        rule_type,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="srcIp != null">
+        src_ip,
+      </if>
+      <if test="isAppointPostSrcIp != null">
+        is_appoint_post_src_ip,
+      </if>
+      <if test="appointPostSrcIp != null">
+        appoint_post_src_ip,
+      </if>
+      <if test="srcIpSystem != null">
+        src_ip_system,
+      </if>
+      <if test="dstIp != null">
+        dst_ip,
+      </if>
+      <if test="dstIpSystem != null">
+        dst_ip_system,
+      </if>
+      <if test="serviceList != null">
+        service_list,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="taskType != null">
+        task_type,
+      </if>
+      <if test="additionInfo != null">
+        addition_info,
+      </if>
+      <if test="recommendTaskId != null">
+        recommend_task_id,
+      </if>
+      <if test="idleTimeout != null">
+        idle_timeout,
+      </if>
+      <if test="relevancyNat != null">
+        relevancy_nat,
+      </if>
+      <if test="relevancyRoute != null">
+        relevancy_route,
+      </if>
+      <if test="ipType != null">
+        ip_type,
+      </if>
+      <if test="postSrcIp != null">
+        post_src_ip,
+      </if>
+      <if test="postDstIp != null">
+        post_dst_ip,
+      </if>
+      <if test="mergeCheck != null">
+        merge_check,
+      </if>
+      <if test="rangeFilter != null">
+        range_filter,
+      </if>
+      <if test="beforeConflict != null">
+        before_conflict,
+      </if>
+      <if test="errorMsg != null">
+        error_msg,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="theme != null">
+        #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null">
+        #{ruleType,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="isAppointPostSrcIp != null">
+        #{isAppointPostSrcIp,jdbcType=INTEGER},
+      </if>
+      <if test="appointPostSrcIp != null">
+        #{appointPostSrcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIpSystem != null">
+        #{srcIpSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIpSystem != null">
+        #{dstIpSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceList != null">
+        #{serviceList,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="taskType != null">
+        #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="additionInfo != null">
+        #{additionInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="recommendTaskId != null">
+        #{recommendTaskId,jdbcType=INTEGER},
+      </if>
+      <if test="idleTimeout != null">
+        #{idleTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="relevancyNat != null">
+        #{relevancyNat,jdbcType=VARCHAR},
+      </if>
+      <if test="relevancyRoute != null">
+        #{relevancyRoute,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        #{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="postSrcIp != null">
+        #{postSrcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="postDstIp != null">
+        #{postDstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeCheck != null">
+        #{mergeCheck,jdbcType=INTEGER},
+      </if>
+      <if test="rangeFilter != null">
+        #{rangeFilter,jdbcType=INTEGER},
+      </if>
+      <if test="beforeConflict != null">
+        #{beforeConflict,jdbcType=INTEGER},
+      </if>
+      <if test="errorMsg != null">
+        #{errorMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    update push_auto_mapping_task
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="theme != null">
+        theme = #{theme,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleType != null">
+        rule_type = #{ruleType,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIp != null">
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="isAppointPostSrcIp != null">
+        is_appoint_post_src_ip = #{isAppointPostSrcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="appointPostSrcIp != null">
+        appoint_post_src_ip = #{appointPostSrcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="srcIpSystem != null">
+        src_ip_system = #{srcIpSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        dst_ip = #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIpSystem != null">
+        dst_ip_system = #{dstIpSystem,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceList != null">
+        service_list = #{serviceList,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null">
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="taskType != null">
+        task_type = #{taskType,jdbcType=INTEGER},
+      </if>
+      <if test="additionInfo != null">
+        addition_info = #{additionInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="recommendTaskId != null">
+        recommend_task_id = #{recommendTaskId,jdbcType=INTEGER},
+      </if>
+      <if test="idleTimeout != null">
+        idle_timeout = #{idleTimeout,jdbcType=INTEGER},
+      </if>
+      <if test="relevancyNat != null">
+        relevancy_nat = #{relevancyNat,jdbcType=VARCHAR},
+      </if>
+      <if test="relevancyRoute != null">
+        relevancy_route = #{relevancyRoute,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        ip_type = #{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="postSrcIp != null">
+        post_src_ip = #{postSrcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="postDstIp != null">
+        post_dst_ip = #{postDstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="mergeCheck != null">
+        merge_check = #{mergeCheck,jdbcType=INTEGER},
+      </if>
+      <if test="rangeFilter != null">
+        range_filter = #{rangeFilter,jdbcType=INTEGER},
+      </if>
+      <if test="beforeConflict != null">
+        before_conflict = #{beforeConflict,jdbcType=INTEGER},
+      </if>
+      <if test="errorMsg != null">
+        error_msg = #{errorMsg,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    update push_auto_mapping_task
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      theme = #{theme,jdbcType=VARCHAR},
+      rule_type = #{ruleType,jdbcType=VARCHAR},
+      user_name = #{userName,jdbcType=VARCHAR},
+      src_ip = #{srcIp,jdbcType=VARCHAR},
+      is_appoint_post_src_ip = #{isAppointPostSrcIp,jdbcType=INTEGER},
+      appoint_post_src_ip = #{appointPostSrcIp,jdbcType=VARCHAR},
+      src_ip_system = #{srcIpSystem,jdbcType=VARCHAR},
+      dst_ip = #{dstIp,jdbcType=VARCHAR},
+      dst_ip_system = #{dstIpSystem,jdbcType=VARCHAR},
+      service_list = #{serviceList,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      task_type = #{taskType,jdbcType=INTEGER},
+      addition_info = #{additionInfo,jdbcType=VARCHAR},
+      recommend_task_id = #{recommendTaskId,jdbcType=INTEGER},
+      idle_timeout = #{idleTimeout,jdbcType=INTEGER},
+      relevancy_nat = #{relevancyNat,jdbcType=VARCHAR},
+      relevancy_route = #{relevancyRoute,jdbcType=VARCHAR},
+      ip_type = #{ipType,jdbcType=INTEGER},
+      post_src_ip = #{postSrcIp,jdbcType=VARCHAR},
+      post_dst_ip = #{postDstIp,jdbcType=VARCHAR},
+      merge_check = #{mergeCheck,jdbcType=INTEGER},
+      range_filter = #{rangeFilter,jdbcType=INTEGER},
+      before_conflict = #{beforeConflict,jdbcType=INTEGER},
+      error_msg = #{errorMsg,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByEntity" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingTaskEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_auto_mapping_task
+    <where>
+      1=1
+      <if test="theme != null">
+        AND theme like "%"#{theme,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="srcIp != null">
+        AND src_ip=#{srcIp,jdbcType=VARCHAR}
+      </if>
+      <if test="dstIp != null">
+        AND dst_ip=#{dstIp,jdbcType=VARCHAR}
+      </if>
+      <if test="description != null">
+        AND description=#{description,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+  <delete id="deleteIdList" >
+    delete from push_auto_mapping_task
+    where id in
+    <foreach collection="idList" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <select id="getByUuid" resultMap="BaseResultMap" parameterType="java.lang.String">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_auto_mapping_task where uuid = #{uuid,jdbcType=VARCHAR}
+  </select>
+</mapper>

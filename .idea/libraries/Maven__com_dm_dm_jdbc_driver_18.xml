@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.dm:dm-jdbc-driver:18">
+    <CLASSES>
+      <root url="jar:///software/maven_repository/com/dm/dm-jdbc-driver/18/dm-jdbc-driver-18.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar:///software/maven_repository/com/dm/dm-jdbc-driver/18/dm-jdbc-driver-18-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar:///software/maven_repository/com/dm/dm-jdbc-driver/18/dm-jdbc-driver-18-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

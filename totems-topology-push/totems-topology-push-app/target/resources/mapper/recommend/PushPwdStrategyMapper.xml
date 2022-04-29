@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.PushPwdStrategyMapper">
+    <resultMap id="TopoSubnetMap" type="com.abtnetworks.totems.push.entity.PushPwdStrategyEntity" >
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="pwd_cannot_users" jdbcType="VARCHAR" property="pwdCannotUsers" />
+        <result column="npwd_cannot_opwd" jdbcType="VARCHAR" property="npwdCannotOpwd" />
+        <result column="pwd_default_min_length_type" jdbcType="VARCHAR" property="pwdDefaultMinLengthType" />
+        <result column="pwd_default_min_length" jdbcType="INTEGER" property="pwdDefaultMinLength" />
+        <result column="pwd_days_type" jdbcType="INTEGER" property="pwdDaysType" />
+        <result column="pwd_reset_days" jdbcType="INTEGER" property="pwdResetDays" />
+        <result column="pwd_overdue_days" jdbcType="INTEGER" property="pwdOverdueDays" />
+        <result column="pwd_modify_initial" jdbcType="VARCHAR" property="pwdModifyInitial" />
+        <result column="pwd_contain_type" jdbcType="VARCHAR" property="pwdContainType" />
+        <result column="pwd_contain_mum" jdbcType="VARCHAR" property="pwdContainMum" />
+        <result column="pwd_contain_letter" jdbcType="VARCHAR" property="pwdContainLetter" />
+        <result column="pwd_contain_spel_char" jdbcType="VARCHAR" property="pwdContainSpelChar"/>
+        <result column="pwd_fail_num" jdbcType="INTEGER" property="pwdFailNum" />
+        <result column="pwd_lock_time" jdbcType="INTEGER" property="pwdLockTime"/>
+        <result column="pwd_enable" jdbcType="VARCHAR" property="pwdEnable"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="ip_white_list" jdbcType="VARCHAR" property="ipWhiteList"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       id, pwd_cannot_users, npwd_cannot_opwd,pwd_default_min_length_type,pwd_default_min_length,
+       pwd_days_type,pwd_reset_days,pwd_overdue_days,pwd_modify_initial,pwd_contain_type,
+       pwd_contain_mum,pwd_contain_letter,pwd_contain_spel_char,pwd_fail_num,pwd_lock_time,pwd_enable,
+       create_time,create_by,ip_white_list
+    </sql>
+
+    <select id="fingPwdStrategy"  resultMap="TopoSubnetMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM  ums_pass_settin
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insert" parameterType="com.abtnetworks.totems.push.entity.PushPwdStrategyEntity">
+        insert into ums_pass_settin
+        (pwd_cannot_users, npwd_cannot_opwd,pwd_default_min_length_type,pwd_default_min_length,
+        pwd_days_type,pwd_reset_days,pwd_overdue_days,pwd_modify_initial,pwd_contain_type,
+        pwd_contain_mum,pwd_contain_letter,pwd_contain_spel_char,pwd_fail_num,pwd_lock_time,pwd_enable,
+        create_time,create_by)
+        values (#{pwdCannotUsers,jdbcType=VARCHAR}, #{npwdCannotOpwd,jdbcType=VARCHAR},#{pwdDefaultMinLengthType,jdbcType=VARCHAR},#{pwdDefaultMinLength,jdbcType=INTEGER},
+                #{pwdDaysType,jdbcType=VARCHAR}, #{pwdResetDays,jdbcType=INTEGER}, #{pwdOverdueDays,jdbcType=INTEGER}, #{pwdModifyInitial,jdbcType=VARCHAR},#{pwdContainType,jdbcType=VARCHAR},
+                #{pwdContainMum,jdbcType=VARCHAR}, #{pwdContainLetter,jdbcType=VARCHAR}, #{pwdContainSpelChar,jdbcType=VARCHAR},
+                #{pwdFailNum,jdbcType=INTEGER}, #{pwdLockTime,jdbcType=INTEGER}, #{pwdEnable,jdbcType=VARCHAR},#{ipWhiteList,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR})
+    </insert>
+
+
+    <update id="upadtePushDeviceById" parameterType="com.abtnetworks.totems.push.entity.PushPwdStrategyEntity">
+        update  ums_pass_settin
+        set pwd_cannot_users = #{pwdCannotUsers,jdbcType=VARCHAR},
+            npwd_cannot_opwd = #{npwdCannotOpwd,jdbcType=VARCHAR},
+            pwd_default_min_length_type = #{pwdDefaultMinLengthType,jdbcType=VARCHAR},
+            pwd_days_type = #{pwdDaysType,jdbcType=VARCHAR},
+            pwd_default_min_length = #{pwdDefaultMinLength,jdbcType=INTEGER},
+            pwd_reset_days = #{pwdResetDays,jdbcType=INTEGER},
+            pwd_overdue_days = #{pwdOverdueDays,jdbcType=INTEGER},
+            pwd_modify_initial = #{pwdModifyInitial,jdbcType=VARCHAR},
+            pwd_contain_type = #{pwdContainType,jdbcType=VARCHAR},
+            pwd_contain_mum = #{pwdContainMum,jdbcType=VARCHAR},
+            pwd_contain_letter = #{pwdContainLetter,jdbcType=VARCHAR},
+            pwd_contain_spel_char = #{pwdContainSpelChar,jdbcType=VARCHAR},
+            pwd_fail_num = #{pwdFailNum,jdbcType=INTEGER},
+            pwd_lock_time = #{pwdLockTime,jdbcType=INTEGER},
+            pwd_enable = #{pwdEnable,jdbcType=VARCHAR},
+            ip_white_list = #{ipWhiteList,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            create_by = #{createBy,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deletPushDeviceById" >
+        DELETE FROM ums_pass_settin WHERE id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="fingCmdbDeviceById"  resultMap="TopoSubnetMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM  ums_pass_settin
+        WHERE id = #{id,jdbcType=INTEGER}
+    </select>
+</mapper>

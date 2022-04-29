@@ -1,0 +1,318 @@
+{
+  "groups": [
+    {
+      "name": "app.datasource.first",
+      "type": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties",
+      "sourceType": "com.abtnetworks.totems.common.config.MySqlDataSourceConfig",
+      "sourceMethod": "firstDataSourceProperties()"
+    },
+    {
+      "name": "app.datasource.first",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.abtnetworks.totems.common.config.MySqlDataSourceConfig",
+      "sourceMethod": "firstDataSource()"
+    },
+    {
+      "name": "app.datasource.first.xa",
+      "type": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties",
+      "sourceMethod": "getXa()"
+    },
+    {
+      "name": "app.datasource.second",
+      "type": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties",
+      "sourceType": "com.abtnetworks.totems.common.config.ClickHouseDataSourceConfig",
+      "sourceMethod": "secondDataSourceProperties()"
+    },
+    {
+      "name": "app.datasource.second",
+      "type": "javax.sql.DataSource",
+      "sourceType": "com.abtnetworks.totems.common.config.ClickHouseDataSourceConfig",
+      "sourceMethod": "secondDataSource()"
+    },
+    {
+      "name": "app.datasource.second.xa",
+      "type": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties",
+      "sourceMethod": "getXa()"
+    },
+    {
+      "name": "device-model",
+      "type": "com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties",
+      "sourceType": "com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties"
+    },
+    {
+      "name": "manufacturer",
+      "type": "com.abtnetworks.totems.common.config.CollectionConfig",
+      "sourceType": "com.abtnetworks.totems.common.config.CollectionConfig"
+    },
+    {
+      "name": "protocol",
+      "type": "com.abtnetworks.totems.common.config.ProtocolMapConfig",
+      "sourceType": "com.abtnetworks.totems.common.config.ProtocolMapConfig"
+    },
+    {
+      "name": "vendor",
+      "type": "com.abtnetworks.totems.common.config.DeviceConfig",
+      "sourceType": "com.abtnetworks.totems.common.config.DeviceConfig"
+    }
+  ],
+  "properties": [
+    {
+      "name": "app.datasource.first.continue-on-error",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.data",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.data-password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.data-username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.driver-class-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.generate-unique-name",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.initialization-mode",
+      "type": "org.springframework.boot.jdbc.DataSourceInitializationMode",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.jndi-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.platform",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.schema",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.schema-password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.schema-username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.separator",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.sql-script-encoding",
+      "type": "java.nio.charset.Charset",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.type",
+      "type": "java.lang.Class<? extends javax.sql.DataSource>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.url",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.first.xa.data-source-class-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa"
+    },
+    {
+      "name": "app.datasource.first.xa.properties",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa"
+    },
+    {
+      "name": "app.datasource.second.continue-on-error",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.data",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.data-password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.data-username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.driver-class-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.generate-unique-name",
+      "type": "java.lang.Boolean",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.initialization-mode",
+      "type": "org.springframework.boot.jdbc.DataSourceInitializationMode",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.jndi-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.platform",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.schema",
+      "type": "java.util.List<java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.schema-password",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.schema-username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.separator",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.sql-script-encoding",
+      "type": "java.nio.charset.Charset",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.type",
+      "type": "java.lang.Class<? extends javax.sql.DataSource>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.url",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.username",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties"
+    },
+    {
+      "name": "app.datasource.second.xa.data-source-class-name",
+      "type": "java.lang.String",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa"
+    },
+    {
+      "name": "app.datasource.second.xa.properties",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "org.springframework.boot.autoconfigure.jdbc.DataSourceProperties$Xa"
+    },
+    {
+      "name": "device-model.model-list",
+      "type": "java.util.List<com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties$CommandTemplate>",
+      "sourceType": "com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties"
+    },
+    {
+      "name": "device-model.model-map",
+      "type": "java.util.Map<java.lang.String,com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties$CommandTemplate>",
+      "sourceType": "com.abtnetworks.totems.common.commandline2.constant.DeviceModelProperties"
+    },
+    {
+      "name": "manufacturer.map",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "com.abtnetworks.totems.common.config.CollectionConfig"
+    },
+    {
+      "name": "protocol.num-map",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "com.abtnetworks.totems.common.config.ProtocolMapConfig"
+    },
+    {
+      "name": "protocol.str-map",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "com.abtnetworks.totems.common.config.ProtocolMapConfig"
+    },
+    {
+      "name": "vendor.vendor-nat-generator-map",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "com.abtnetworks.totems.common.config.DeviceConfig"
+    },
+    {
+      "name": "vendor.vendor-nat-procedure-map",
+      "type": "java.util.Map<java.lang.String,java.util.List<java.lang.String>>",
+      "sourceType": "com.abtnetworks.totems.common.config.DeviceConfig"
+    },
+    {
+      "name": "vendor.vendor-security-generator-map",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "sourceType": "com.abtnetworks.totems.common.config.DeviceConfig"
+    },
+    {
+      "name": "vendor.vendor-security-procedure-map",
+      "type": "java.util.Map<java.lang.String,java.util.List<java.lang.String>>",
+      "sourceType": "com.abtnetworks.totems.common.config.DeviceConfig"
+    }
+  ],
+  "hints": []
+}

@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.PushForbidCommandLineMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.push.entity.PushForbidCommandLineEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="forbid_ip_uuid" jdbcType="VARCHAR" property="forbidIpUuid" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="command_type" jdbcType="VARCHAR" property="commandType" />
+    <result column="policy_name" jdbcType="VARCHAR" property="policyName" />
+    <result column="src_object_name" jdbcType="VARCHAR" property="srcObjectName" />
+    <result column="commandline" jdbcType="VARCHAR" property="commandline" />
+    <result column="commandline_revert" jdbcType="VARCHAR" property="commandlineRevert" />
+    <result column="commandline_echo" jdbcType="VARCHAR" property="commandlineEcho" />
+    <result column="push_status" jdbcType="INTEGER" property="pushStatus" />
+    <result column="push_time" jdbcType="TIMESTAMP" property="pushTime" />
+    <result column="revert_status" jdbcType="TINYINT" property="revertStatus" />
+    <result column="revert_time" jdbcType="TIMESTAMP" property="revertTime" />
+    <result column="commandline_revert_echo" jdbcType="VARCHAR" property="commandlineRevertEcho" />
+    <result column="revert_modified_time" jdbcType="TIMESTAMP" property="revertModifiedTime" />
+    <result column="edit_revert_user_name" jdbcType="VARCHAR" property="editRevertUserName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, src_ip, forbid_ip_uuid, device_uuid, command_type, policy_name, src_object_name, commandline, commandline_revert, commandline_echo, push_status,
+    push_time, revert_status, revert_time, commandline_revert_echo, revert_modified_time, 
+    edit_revert_user_name
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_forbid_command_line
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_forbid_command_line
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.push.entity.PushForbidCommandLineEntity">
+    insert into push_forbid_command_line (id, src_ip, forbid_ip_uuid, device_uuid,command_type, policy_name, src_object_name,
+      commandline, commandline_revert, commandline_echo, 
+      push_status, push_time, revert_status, 
+      revert_time, commandline_revert_echo, revert_modified_time, 
+      edit_revert_user_name)
+    values (#{id,jdbcType=INTEGER}, #{srcIp,jdbcType=VARCHAR}, #{forbidIpUuid,jdbcType=VARCHAR}, #{deviceUuid,jdbcType=VARCHAR},#{commandType},
+      #{policyName,jdbcType=VARCHAR},#{srcObjectName,jdbcType=VARCHAR},
+      #{commandline,jdbcType=VARCHAR}, #{commandlineRevert,jdbcType=VARCHAR}, #{commandlineEcho,jdbcType=VARCHAR}, 
+      #{pushStatus,jdbcType=INTEGER}, #{pushTime,jdbcType=TIMESTAMP}, #{revertStatus,jdbcType=TINYINT},
+      #{revertTime,jdbcType=TIMESTAMP}, #{commandlineRevertEcho,jdbcType=VARCHAR}, #{revertModifiedTime,jdbcType=TIMESTAMP}, 
+      #{editRevertUserName,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.push.entity.PushForbidCommandLineEntity">
+    insert into push_forbid_command_line
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="srcIp != null">
+        src_ip,
+      </if>
+      <if test="forbidIpUuid != null">
+        forbid_ip_uuid,
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid,
+      </if>
+      <if test="commandType != null">
+        command_type,
+      </if>
+      <if test="policyName != null">
+        policy_name,
+      </if>
+      <if test="srcObjectName != null">
+        src_object_name,
+      </if>
+      <if test="commandline != null">
+        commandline,
+      </if>
+      <if test="commandlineRevert != null">
+        commandline_revert,
+      </if>
+      <if test="commandlineEcho != null">
+        commandline_echo,
+      </if>
+      <if test="pushStatus != null">
+        push_status,
+      </if>
+      <if test="pushTime != null">
+        push_time,
+      </if>
+      <if test="revertStatus != null">
+        revert_status,
+      </if>
+      <if test="revertTime != null">
+        revert_time,
+      </if>
+      <if test="commandlineRevertEcho != null">
+        commandline_revert_echo,
+      </if>
+      <if test="revertModifiedTime != null">
+        revert_modified_time,
+      </if>
+      <if test="editRevertUserName != null">
+        edit_revert_user_name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="srcIp != null">
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="forbidIpUuid != null">
+        #{forbidIpUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="commandType != null">
+        #{commandType},
+      </if>
+      <if test="policyName != null">
+        #{policyName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcObjectName != null">
+        #{srcObjectName,jdbcType=VARCHAR},
+      </if>
+      <if test="commandline != null">
+        #{commandline,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineRevert != null">
+        #{commandlineRevert,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineEcho != null">
+        #{commandlineEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="pushStatus != null">
+        #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushTime != null">
+        #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="revertStatus != null">
+        #{revertStatus,jdbcType=TINYINT},
+      </if>
+      <if test="revertTime != null">
+        #{revertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commandlineRevertEcho != null">
+        #{commandlineRevertEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="revertModifiedTime != null">
+        #{revertModifiedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editRevertUserName != null">
+        #{editRevertUserName,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.push.entity.PushForbidCommandLineEntity">
+    update push_forbid_command_line
+    <set>
+      <if test="srcIp != null">
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="forbidIpUuid != null">
+        forbid_ip_uuid = #{forbidIpUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="commandType != null">
+        command_type = #{commandType},
+      </if>
+      <if test="policyName != null">
+        policy_name = #{policyName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcObjectName != null">
+        src_object_name = #{srcObjectName,jdbcType=VARCHAR},
+      </if>
+      <if test="commandline != null">
+        commandline = #{commandline,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineRevert != null">
+        commandline_revert = #{commandlineRevert,jdbcType=VARCHAR},
+      </if>
+      <if test="commandlineEcho != null">
+        commandline_echo = #{commandlineEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="pushStatus != null">
+        push_status = #{pushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="pushTime != null">
+        push_time = #{pushTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="revertStatus != null">
+        revert_status = #{revertStatus,jdbcType=TINYINT},
+      </if>
+      <if test="revertTime != null">
+        revert_time = #{revertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="commandlineRevertEcho != null">
+        commandline_revert_echo = #{commandlineRevertEcho,jdbcType=VARCHAR},
+      </if>
+      <if test="revertModifiedTime != null">
+        revert_modified_time = #{revertModifiedTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editRevertUserName != null">
+        edit_revert_user_name = #{editRevertUserName,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.push.entity.PushForbidCommandLineEntity">
+    update push_forbid_command_line
+    set src_ip = #{srcIp,jdbcType=VARCHAR},
+      forbid_ip_uuid = #{forbidIpUuid,jdbcType=VARCHAR},
+      device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      command_type = #{commandType},
+      policy_name = #{policyName,jdbcType=VARCHAR},
+      src_object_name = #{srcObjectName,jdbcType=VARCHAR},
+      commandline = #{commandline,jdbcType=VARCHAR},
+      commandline_revert = #{commandlineRevert,jdbcType=VARCHAR},
+      commandline_echo = #{commandlineEcho,jdbcType=VARCHAR},
+      push_status = #{pushStatus,jdbcType=INTEGER},
+      push_time = #{pushTime,jdbcType=TIMESTAMP},
+      revert_status = #{revertStatus,jdbcType=TINYINT},
+      revert_time = #{revertTime,jdbcType=TIMESTAMP},
+      commandline_revert_echo = #{commandlineRevertEcho,jdbcType=VARCHAR},
+      revert_modified_time = #{revertModifiedTime,jdbcType=TIMESTAMP},
+      edit_revert_user_name = #{editRevertUserName,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="getLastSuccessByUuid" resultMap="BaseResultMap">
+    select id, push_time, policy_name, src_object_name from push_forbid_command_line  a
+    where id = (select max(id) from  push_forbid_command_line where forbid_ip_uuid = #{forBidUuid} and device_uuid = #{deviceUuid} and push_status=#{pushStatus})
+  </select>
+
+  <select id="getLastListByUuid" resultType="com.abtnetworks.totems.push.dto.ForbidCommandLineDTO">
+    select a.id, src_ip as srcIp,
+        forbid_ip_uuid as forbidIpUuid,
+        a.device_uuid as deviceUuid,
+        b.ip as deviceIp,
+        b.type as deviceType,
+        b.device_name as deviceName,
+        b.vendor_name as vendorName,
+        b.vendor_id as vendorId,
+        b.model_number as modelNumber,
+        policy_name as policyName,
+        src_object_name as srcObjectName,
+        commandline as commandline,
+        commandline_echo as commandlineEcho,
+        push_status as pushStatus,
+        push_time as pushTime
+      from push_forbid_command_line a
+      left join topo_node b on a.device_uuid = b.uuid
+      where a.forbid_ip_uuid=#{forBidUuid}
+      and a.id  in(
+      select max(id) from push_forbid_command_line where forbid_ip_uuid=#{forBidUuid}
+      group by device_uuid
+      )
+  </select>
+
+  <select id="getWaitSendRecordByUuid" resultMap="BaseResultMap">
+    select
+        <include refid="Base_Column_List" />
+      from push_forbid_command_line
+      where forbid_ip_uuid=#{forBidUuid}
+      and id  in(
+      select max(id) from push_forbid_command_line where forbid_ip_uuid=#{forBidUuid}
+      group by device_uuid
+    )
+  </select>
+</mapper>

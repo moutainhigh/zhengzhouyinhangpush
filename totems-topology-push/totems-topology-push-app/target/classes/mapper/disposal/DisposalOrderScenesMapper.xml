@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalOrderScenesMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalOrderScenesEntity" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="scenes_uuid" property="scenesUuid" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.abtnetworks.totems.disposal.dto.DisposalNodeCredentialDTO" >
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="device_manager_ip" property="deviceManagerIp" />
+        <result column="device_type" property="deviceType" />
+        <result column="device_name" property="deviceName" />
+        <result column="credential_uuid" property="credentialUuid" />
+        <result column="push_credential_uuid" property="pushCredentialUuid" />
+        <result column="controller_id" property="controllerId"/>
+        <result column="port_number" property="port" />
+        <result column="vendor_name" property="vendorName" />
+        <result column="vendor_id" property="vendorId" />
+        <result column="credential_name" property="credentialName" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="enable_user_name" property="enableUserName" />
+        <result column="enable_password" property="enablePassword" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `center_uuid`,
+        `scenes_uuid`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_order_scenes (
+            `center_uuid`,
+            `scenes_uuid`
+        )
+        VALUES(
+            #{centerUuid},
+            #{scenesUuid}
+        )
+    </insert>
+
+    <insert id="bulkInsert">
+        INSERT INTO disposal_order_scenes (
+            `center_uuid`,
+            `scenes_uuid`
+        )
+        VALUES
+        <foreach collection="scenesUuidArray" item="scenesUuid" separator="," >
+        (
+            #{centerUuid},
+            #{scenesUuid}
+        )
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_order_scenes
+        WHERE `id` = #{id}
+    </delete>
+
+    <delete id="deleteByCenterUuid">
+        DELETE FROM disposal_order_scenes
+        WHERE `center_uuid` = #{centerUuid}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_order_scenes
+        SET
+            id = #{id},
+            center_uuid = #{centerUuid},
+            scenes_uuid = #{scenesUuid}
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_order_scenes
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getByCenterUuid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_order_scenes
+        <where>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_order_scenes
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_order_scenes
+        <where>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="findOrderScenesNodeCredentialDtoList" resultMap="DtoResultMap">
+        SELECT
+            sn.`device_uuid`,
+            n.`ip` AS device_manager_ip,
+            n.`type` AS device_type,
+            n.`device_name`,
+            n.`credential_uuid`,
+            n.`controller_id`,
+            n.`port_number`,
+            n.`vendor_name`,
+            n.`vendor_id`,
+            c.`name` AS credential_name,
+            c.`login_name` AS username,
+            c.`login_password` AS password,
+            c.`enable_user_name`,
+            c.`enable_password`
+        FROM disposal_order_scenes os
+        LEFT JOIN disposal_scenes s ON s.uuid = os.scenes_uuid
+        LEFT JOIN disposal_scenes_node sn ON sn.scenes_uuid = os.scenes_uuid
+        LEFT JOIN topo_node n ON sn.device_uuid = n.uuid
+        INNER JOIN topo_credential c ON n.credential_uuid = c.uuid
+        <where>
+            <if test="centerUuidArray != null and centerUuidArray.length > 0">
+                AND os.center_uuid IN
+                <foreach collection="centerUuidArray" item="centerUuid" open="(" separator="," close=")">
+                    #{centerUuid}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY sn.device_uuid, n.credential_uuid
+        order by os.id DESC
+    </select>
+
+    <select id="findNodeCredentialDtoList" resultMap="DtoResultMap">
+        SELECT
+            n.`uuid` AS device_uuid,
+            n.`ip` AS device_manager_ip,
+            n.`type` AS device_type,
+            n.`device_name`,
+            n.`credential_uuid`,
+            n.`push_credential_uuid`,
+            n.`controller_id`,
+            n.`port_number`,
+            n.`vendor_name`,
+            n.`vendor_id`,
+            c.`name` AS credential_name,
+            c.`login_name` AS username,
+            c.`login_password` AS password,
+            c.`enable_user_name`,
+            c.`enable_password`
+        FROM topo_node n
+        INNER JOIN topo_credential c ON n.credential_uuid = c.uuid
+        <where>
+            <if test="deviceUuidArray != null and deviceUuidArray.length > 0">
+                AND n.uuid IN
+                <foreach collection="deviceUuidArray" item="deviceUuid" open="(" separator="," close=")">
+                    #{deviceUuid}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY n.uuid, n.credential_uuid
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_order_scenes
+    </select>
+
+</mapper>

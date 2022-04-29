@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.abtnetworks</groupId>
+    <artifactId>totems-topology-push-plugins</artifactId>
+    <version>1.8.6-SNAPSHOT</version>
+  </parent>
+  <groupId>com.abtnetworks</groupId>
+  <artifactId>totems-topology-push-plugin-cli</artifactId>
+  <version>1.8.6-SNAPSHOT</version>
+  <name>totems-topology-push-plugin-gddw</name>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <distributionManagement>
+    <repository>
+      <id>sapling-release</id>
+      <name>sapling Porject Release</name>
+      <url>http://192.168.215.115:8081/nexus/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>sapling-snapshot</id>
+      <name>sapling Porject Snapshot</name>
+      <url>http://192.168.215.115:8081/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <properties>
+    <main.basedir>${basedir}/../../..</main.basedir>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.abtnetworks</groupId>
+      <artifactId>totems-topology-push-common</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+  </dependencies>
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>sapling-snapshots</id>
+      <url>http://192.168.215.115:8081/nexus/content/groups/sapling/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>sapling-snapshots</id>
+      <url>http://192.168.215.115:8081/nexus/content/groups/sapling/</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

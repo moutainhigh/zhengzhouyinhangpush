@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.PushRecommendTaskHistoryMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="import_date" jdbcType="TIMESTAMP" property="importDate" />
+    <result column="import_user" jdbcType="VARCHAR" property="importUser" />
+    <result column="import_detail" jdbcType="VARCHAR" property="importDetail" />
+    <result column="import_status" jdbcType="INTEGER" property="importStatus" />
+    <result column="file_url" jdbcType="VARCHAR" property="fileUrl" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, file_name, import_date, import_user, import_status, file_url,import_detail, remark
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_recommend_task_history
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_recommend_task_history
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    insert into push_recommend_task_history (id, file_name, import_date, 
+      import_user, import_status, file_url, 
+      remark, import_detail)
+    values (#{id,jdbcType=INTEGER}, #{fileName,jdbcType=VARCHAR}, #{importDate,jdbcType=TIMESTAMP}, 
+      #{importUser,jdbcType=VARCHAR}, #{importStatus,jdbcType=INTEGER}, #{fileUrl,jdbcType=VARCHAR},
+      #{remark,jdbcType=VARCHAR}, #{importDetail,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    insert into push_recommend_task_history
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="fileName != null">
+        file_name,
+      </if>
+      <if test="importDate != null">
+        import_date,
+      </if>
+      <if test="importUser != null">
+        import_user,
+      </if>
+      <if test="importStatus != null">
+        import_status,
+      </if>
+      <if test="fileUrl != null">
+        file_url,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+      <if test="importDetail != null">
+        import_detail,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="fileName != null">
+        #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="importDate != null">
+        #{importDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="importUser != null">
+        #{importUser,jdbcType=VARCHAR},
+      </if>
+      <if test="importStatus != null">
+        #{importStatus,jdbcType=INTEGER},
+      </if>
+      <if test="fileUrl != null">
+        #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="importDetail != null">
+        #{importDetail,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    update push_recommend_task_history
+    <set>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="importDate != null">
+        import_date = #{importDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="importUser != null">
+        import_user = #{importUser,jdbcType=VARCHAR},
+      </if>
+      <if test="importStatus != null">
+        import_status = #{importStatus,jdbcType=INTEGER},
+      </if>
+      <if test="fileUrl != null">
+        file_url = #{fileUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="importDetail != null">
+        import_detail = #{importDetail,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    update push_recommend_task_history
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      import_date = #{importDate,jdbcType=TIMESTAMP},
+      import_user = #{importUser,jdbcType=VARCHAR},
+      import_status = #{importStatus,jdbcType=INTEGER},
+      file_url = #{fileUrl,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      import_detail = #{importDetail,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.recommend.entity.PushRecommendTaskHistoryEntity">
+    update push_recommend_task_history
+    set file_name = #{fileName,jdbcType=VARCHAR},
+      import_date = #{importDate,jdbcType=TIMESTAMP},
+      import_user = #{importUser,jdbcType=VARCHAR},
+      import_status = #{importStatus,jdbcType=INTEGER},
+      file_url = #{fileUrl,jdbcType=VARCHAR},
+      import_detail = #{importDetail,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    from push_recommend_task_history
+    <where>
+      <if test="fileName!=null and fileName!='' ">
+        and file_name like "%"#{fileName,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="importStatus != null ">
+        and import_status =#{importStatus, jdbcType=INTEGER}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+</mapper>

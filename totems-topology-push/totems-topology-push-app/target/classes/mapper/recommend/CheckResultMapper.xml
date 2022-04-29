@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.CheckResultMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.CheckResultEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="policy_id" jdbcType="INTEGER" property="policyId" />
+    <result column="check_result" jdbcType="VARCHAR" property="checkResult" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, policy_id, check_result
+  </sql>
+
+  <!-- 根据策略id查询策略检查结果 -->
+  <select id="selectByPolicyId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_policy_check_result
+    where policy_id = #{policyId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据策略id删除策略检查结果 -->
+  <delete id="deleteByPolicyId" parameterType="java.lang.Integer">
+    delete from push_policy_check_result
+    where policy_id = #{policyId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据策略id删除策略检查结果 -->
+  <delete id="deleteByPathInfoIdIds" parameterType="java.lang.Integer">
+    delete from push_policy_check_result
+    where policy_id in(select id
+    from push_recommend_policy
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER})
+  </delete>
+
+  <!-- 根据策略id删除策略检查结果 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_policy_check_result
+    where policy_id in(
+        select id
+        from push_recommend_policy
+        where path_info_id in(
+            select id
+            from push_path_info
+            where task_id in
+                <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+                #{item}
+                </foreach>))
+  </delete>
+
+  <!-- 插入策略检查结果 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.CheckResultEntity">
+    insert into push_policy_check_result (policy_id, check_result)
+    values (#{policyId,jdbcType=INTEGER}, #{checkResult,jdbcType=VARCHAR})
+  </insert>
+
+  <!-- 更新策略检查结果
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.recommend.entity.CheckResultEntity">
+    update push_policy_check_result
+    set policy_id = #{policyId,jdbcType=INTEGER},
+      check_result = #{checkResult,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update> -->
+</mapper>

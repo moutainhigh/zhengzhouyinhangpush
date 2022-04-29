@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.PushZoneLimitConfigMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.PushZoneLimitConfigEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="src_zone" jdbcType="VARCHAR" property="srcZone" />
+    <result column="dst_zone" jdbcType="VARCHAR" property="dstZone" />
+    <result column="device_info" jdbcType="VARCHAR" property="deviceInfo" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uuid, src_zone, dst_zone, device_info
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_zone_limit_config
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_zone_limit_config
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.auto.entity.PushZoneLimitConfigEntity">
+    insert into push_zone_limit_config (id, uuid, src_zone, 
+      dst_zone, device_info)
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{srcZone,jdbcType=VARCHAR}, 
+      #{dstZone,jdbcType=VARCHAR}, #{deviceInfo,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.auto.entity.PushZoneLimitConfigEntity">
+    insert into push_zone_limit_config
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="srcZone != null">
+        src_zone,
+      </if>
+      <if test="dstZone != null">
+        dst_zone,
+      </if>
+      <if test="deviceInfo != null">
+        device_info,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="srcZone != null">
+        #{srcZone,jdbcType=VARCHAR},
+      </if>
+      <if test="dstZone != null">
+        #{dstZone,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceInfo != null">
+        #{deviceInfo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.auto.entity.PushZoneLimitConfigEntity">
+    update push_zone_limit_config
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="srcZone != null">
+        src_zone = #{srcZone,jdbcType=VARCHAR},
+      </if>
+      <if test="dstZone != null">
+        dst_zone = #{dstZone,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceInfo != null">
+        device_info = #{deviceInfo,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.auto.entity.PushZoneLimitConfigEntity">
+    update push_zone_limit_config
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      src_zone = #{srcZone,jdbcType=VARCHAR},
+      dst_zone = #{dstZone,jdbcType=VARCHAR},
+      device_info = #{deviceInfo,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_zone_limit_config
+  </select>
+
+  <select id="findByDeviceUuid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_zone_limit_config where device_info like "%"#{deviceUuid,jdbcType=VARCHAR}"%"
+  </select>
+
+</mapper>

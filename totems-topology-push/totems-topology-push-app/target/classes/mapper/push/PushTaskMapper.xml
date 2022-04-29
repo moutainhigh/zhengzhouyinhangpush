@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.push.dao.mysql.PushTaskMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.push.entity.PushTaskEntity">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <id column="policy_id" jdbcType="INTEGER" property="policyId" />
+        <id column="order_no" jdbcType="VARCHAR" property="orderNo" />
+        <id column="order_type" jdbcType="INTEGER" property="orderType" />
+        <id column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+        <id column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <id column="manage_ip" jdbcType="VARCHAR" property="manageIp" />
+        <id column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <id column="push_time" jdbcType="TIMESTAMP" property="pushTime" />
+        <id column="status" jdbcType="INTEGER" property="status" />
+        <id column="user_name" jdbcType="VARCHAR" property="userName" />
+        <id column="command" jdbcType="VARCHAR" property="command" />
+        <id column="push_result" jdbcType="VARCHAR" property="pushResult" />
+    </resultMap>
+
+    <sql id="BaseColumnList" >
+        id, policy_id, order_no, order_type, device_uuid, device_name, manage_ip, create_time, push_time, status, user_name, command, push_result
+    </sql>
+
+    <select id="getPushTaskList" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task order by create_time desc
+    </select>
+
+    <select id="getPushTaskById" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task where id=#{taskId, jdbcType=INTEGER}
+    </select>
+
+    <select id="getPushTaskListByOrderNo" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task where order_no=#{orderNo, jdbcType=VARCHAR}
+    </select>
+
+    <select id="searchPushTaskListByOrderNo" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task
+        <where>
+            <if test="orderNo!=null">
+                and order_no like "%"#{orderNo,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="orderType!=null">
+                and order_type=#{orderType,jdbcType=INTEGER}
+            </if>
+            <if test="status!=null">
+                and status=#{status, jdbcType=INTEGER}
+            </if>
+        </where>
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="getPushTaskListByStatus" parameterType="java.lang.Integer" resultMap="BaseResultMap" >
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task where status=#{status, jdbcType=INTEGER} order by create_time desc
+    </select>
+
+    <select id="getPushTaskListByOrderTypeAndStatus" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="BaseColumnList" />
+        from topo_push_task where status=#{status, jdbcType=INTEGER} and order_type=#{orderType, jdbcType=INTEGER}
+    </select>
+
+    <update id="updatePushStatus" parameterType="java.util.Map" >
+        update topo_push_task set status=#{status,jdbcType=INTEGER} where id=#{id, jdbcType=INTEGER}
+    </update>
+
+    <update id="updatePushResult" parameterType="java.util.Map" >
+        update topo_push_task set push_result=#{pushResult,jdbcType=VARCHAR} where id=#{id, jdbcType=INTEGER}
+    </update>
+
+    <insert id="addPushTask" parameterType="com.abtnetworks.totems.push.entity.PushTaskEntity" >
+        insert into topo_push_task
+        (order_no, order_type, device_uuid,
+        device_name, manage_ip, create_time,
+        user_name, command, policy_id,
+        status, push_result)
+        values
+        (#{orderNo, jdbcType=VARCHAR}, #{orderType, jdbcType=INTEGER}, #{deviceUuid, jdbcType=VARCHAR},
+        #{deviceName, jdbcType=VARCHAR}, #{manageIp, jdbcType=VARCHAR}, #{createTime, jdbcType=TIMESTAMP},
+        #{userName, jdbcType=VARCHAR}, #{command, jdbcType=VARCHAR}, #{policyId, jdbcType=INTEGER},
+        #{status, jdbcType=INTEGER}, #{pushResult,jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deletePushTask" parameterType="java.lang.Integer">
+        delete from topo_push_task where id=#{id, jdbcType=INTEGER}
+    </delete>
+
+    <update id="updatePushTime" parameterType="com.abtnetworks.totems.push.entity.PushTaskEntity" >
+        update topo_push_task set push_time=#{pushTime, jdbcType=TIMESTAMP} where order_no=#{orderNo, jdbcType=VARCHAR};
+    </update>
+</mapper>

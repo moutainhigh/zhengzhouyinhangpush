@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalOrderCenterMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalOrderCenterEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="order_name" property="orderName" />
+        <result column="order_no" property="orderNo" />
+        <result column="category" property="category" />
+        <result column="type" property="type" />
+        <result column="send_type" property="sendType" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="action" property="action" />
+        <result column="origin" property="origin" />
+        <result column="reason" property="reason" />
+        <result column="source_classification" property="sourceClassification" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `order_name`,
+        `order_no`,
+        `category`,
+        `type`,
+        `send_type`,
+        `src_ip`,
+        `dst_ip`,
+        `service_list`,
+        `routing_ip`,
+        `action`,
+        `origin`,
+        `reason`,
+        `source_classification`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_order_center (
+            `uuid`,
+            `order_name`,
+            `order_no`,
+            `category`,
+            `type`,
+            `send_type`,
+            `src_ip`,
+            `dst_ip`,
+            `service_list`,
+            `routing_ip`,
+            `action`,
+            `origin`,
+            `reason`,
+            `source_classification`
+        )
+        VALUES(
+            #{uuid},
+            #{orderName},
+            #{orderNo},
+            #{category},
+            #{type},
+            #{sendType},
+            #{srcIp},
+            #{dstIp},
+            #{serviceList},
+            #{routingIp},
+            #{action},
+            #{origin},
+            #{reason},
+            #{sourceClassification}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_order_center
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_order_center
+        SET
+            id = #{id},
+            uuid = #{uuid},
+            order_name = #{orderName},
+            order_no = #{orderNo},
+            category = #{category},
+            type = #{type},
+            send_type = #{sendType},
+            src_ip = #{srcIp},
+            dst_ip = #{dstIp},
+            service_list = #{serviceList},
+            routing_ip = #{routingIp},
+            action = #{action},
+            origin = #{origin},
+            reason = #{reason},
+            source_classification = #{sourceClassification}
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateSourceClassificationByUuid">
+        UPDATE disposal_order_center
+        SET
+            source_classification = #{sourceClassification}
+        WHERE `uuid` = #{uuid}
+    </update>
+
+    <update id="updateSendTypeByUuid">
+        UPDATE disposal_order_center
+        SET
+            send_type = #{sendType}
+        WHERE uuid = #{uuid}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_order_center
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getByUuid" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_order_center
+        WHERE uuid = #{uuid}
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_order_center
+        <where>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="orderName != null and orderName != ''">
+                AND order_name LIKE concat('%', #{orderName}, '%')
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no LIKE concat('%', #{orderNo}, '%')
+            </if>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="sendType != null and sendType != ''">
+                AND send_type = #{sendType}
+            </if>
+            <if test="sourceClassification != null">
+                AND source_classification = #{sourceClassification}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="findListAll" resultMap="BaseResultMap">
+        SELECT
+            oc.`id`,
+            oc.`uuid`,
+            oc.`order_name`,
+            oc.`order_no`,
+            oc.`category`,
+            oc.`type`,
+            oc.`send_type`,
+            oc.`src_ip`,
+            oc.`dst_ip`,
+            oc.`service_list`,
+            oc.`routing_ip`,
+            oc.`action`,
+            oc.`origin`,
+            oc.`reason`,
+            oc.`source_classification`
+        FROM disposal_order_center oc
+        INNER JOIN disposal_order o ON o.center_uuid = oc.uuid
+        <where>
+            <if test="category != null">
+                AND oc.category = #{category}
+            </if>
+            <if test="type != null">
+                AND oc.type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_order_center
+    </select>
+
+</mapper>

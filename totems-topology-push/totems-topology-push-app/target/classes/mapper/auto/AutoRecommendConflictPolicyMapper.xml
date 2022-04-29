@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.AutoRecommendConflictPolicyMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.AutoRecommendConflictPolicyEntity">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="autoTaskId" column="auto_task_id" jdbcType="INTEGER"/>
+        <result property="theme" column="theme" jdbcType="VARCHAR"/>
+        <result property="commandline" column="commandline" jdbcType="VARCHAR"/>
+        <result property="deviceUuid" column="device_uuid" jdbcType="VARCHAR"/>
+        <result property="deviceName" column="device_name" jdbcType="VARCHAR"/>
+        <result property="deviceIp" column="device_ip" jdbcType="VARCHAR"/>
+        <result property="number" column="number" jdbcType="VARCHAR"/>
+        <result property="ruleListName" column="rule_list_name" jdbcType="VARCHAR"/>
+        <result property="ruleListUuid" column="rule_list_uuid" jdbcType="VARCHAR"/>
+        <result property="policyUuid" column="policy_uuid" jdbcType="VARCHAR"/>
+        <result property="policyId" column="policy_id" jdbcType="VARCHAR"/>
+        <result property="policyName" column="policy_name" jdbcType="VARCHAR"/>
+        <result property="lineNum" column="line_num" jdbcType="VARCHAR"/>
+        <result property="firstSrcDomain" column="first_src_domain" jdbcType="VARCHAR"/>
+        <result property="srcDomain" column="src_domain" jdbcType="VARCHAR"/>
+        <result property="srcIp" column="src_ip" jdbcType="VARCHAR"/>
+        <result property="excludeSrcIp" column="exclude_src_ip" jdbcType="VARCHAR"/>
+        <result property="firstDstDomain" column="first_dst_domain" jdbcType="VARCHAR"/>
+        <result property="dstDomain" column="dst_domain" jdbcType="VARCHAR"/>
+        <result property="dstIp" column="dst_ip" jdbcType="VARCHAR"/>
+        <result property="excludeDstIp" column="exclude_dst_ip" jdbcType="VARCHAR"/>
+        <result property="port" column="port" jdbcType="VARCHAR"/>
+        <result property="service" column="service" jdbcType="VARCHAR"/>
+        <result property="protocol" column="protocol" jdbcType="VARCHAR"/>
+        <result property="application" column="application" jdbcType="VARCHAR"/>
+        <result property="srcUser" column="src_user" jdbcType="VARCHAR"/>
+        <result property="excludeServices" column="exclude_services" jdbcType="VARCHAR"/>
+        <result property="time" column="time" jdbcType="VARCHAR"/>
+        <result property="idleTimeout" column="idle_timeout" jdbcType="VARCHAR"/>
+        <result property="action" column="action" jdbcType="VARCHAR"/>
+        <result property="isAble" column="is_able" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="policyHit" column="policy_hit" jdbcType="VARCHAR"/>
+        <result property="policyLoose" column="policy_loose" jdbcType="VARCHAR"/>
+        <result property="preSrcIp" column="pre_src_ip" jdbcType="VARCHAR"/>
+        <result property="postSrcIp" column="post_src_ip" jdbcType="VARCHAR"/>
+        <result property="preDstIp" column="pre_dst_ip" jdbcType="VARCHAR"/>
+        <result property="postDstIp" column="post_dst_ip" jdbcType="VARCHAR"/>
+        <result property="preService" column="pre_service" jdbcType="VARCHAR"/>
+        <result property="preExcludeServices" column="pre_exclude_services" jdbcType="VARCHAR"/>
+        <result property="postService" column="post_service" jdbcType="VARCHAR"/>
+        <result property="natType" column="nat_type" jdbcType="VARCHAR"/>
+        <result property="mask" column="mask" jdbcType="VARCHAR"/>
+        <result property="nextStep" column="next_step" jdbcType="VARCHAR"/>
+        <result property="netDoor" column="net_door" jdbcType="VARCHAR"/>
+        <result property="metric" column="metric" jdbcType="VARCHAR"/>
+        <result property="distance" column="distance" jdbcType="VARCHAR"/>
+        <result property="priority" column="priority" jdbcType="VARCHAR"/>
+        <result property="vrf" column="vrf" jdbcType="VARCHAR"/>
+        <result property="weight" column="weight" jdbcType="VARCHAR"/>
+        <result property="policyUseRate" column="policy_use_rate" jdbcType="VARCHAR"/>
+        <result property="vendor" column="vendor" jdbcType="VARCHAR"/>
+        <result property="vendorName" column="vendor_name" jdbcType="VARCHAR"/>
+        <result property="isVsys" column="is_vsys" jdbcType="VARCHAR"/>
+        <result property="vsysName" column="vsys_name" jdbcType="VARCHAR"/>
+        <result property="rootDeviceUuid" column="root_device_uuid" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="createdTime" column="created_time" jdbcType="VARCHAR"/>
+        <result property="lastModifiedTime" column="last_modified_time" jdbcType="VARCHAR"/>
+        <result property="skipCheck" column="skip_check" jdbcType="TINYINT"/>
+        <result property="ruleLog" column="rule_log" jdbcType="VARCHAR"/>
+        <result property="hitCount" column="hit_count" jdbcType="VARCHAR"/>
+        <result property="expireTime" column="expire_time" jdbcType="VARCHAR"/>
+        <result property="deviceShowName" column="device_show_name" jdbcType="VARCHAR"/>
+        <result property="deviceType" column="device_type" jdbcType="VARCHAR"/>
+        <result property="optType" column="opt_type" jdbcType="VARCHAR"/>
+        <result property="establish" column="establish" jdbcType="TINYINT"/>
+        <result property="policyType" column="policy_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,auto_task_id,theme,
+        commandline,device_uuid,device_name,
+        device_ip,number,rule_list_name,
+        rule_list_uuid,policy_uuid,policy_id,
+        policy_name,line_num,first_src_domain,
+        src_domain,src_ip,exclude_src_ip,
+        first_dst_domain,dst_domain,dst_ip,
+        exclude_dst_ip,port,service,
+        protocol,application,src_user,
+        exclude_services,time,idle_timeout,
+        action,is_able,description,
+        policy_hit,policy_loose,pre_src_ip,
+        post_src_ip,pre_dst_ip,post_dst_ip,
+        pre_service,pre_exclude_services,post_service,
+        nat_type,mask,next_step,
+        net_door,metric,distance,
+        priority,vrf,weight,
+        policy_use_rate,vendor,vendor_name,
+        is_vsys,vsys_name,root_device_uuid,
+        remark,created_time,last_modified_time,
+        skip_check,rule_log,hit_count,
+        expire_time,device_show_name,device_type,
+        opt_type,establish,policy_type
+    </sql>
+
+    <select id="queryTaskIdAndUuid" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        from push_recommend_conflict_policy
+        where auto_task_id = #{taskId,jdbcType=VARCHAR}
+        and device_uuid = #{deviceUuid,jdbcType=VARCHAR}
+        and policy_type = #{policyType,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="batchInsert" >
+        insert into push_recommend_conflict_policy (
+            auto_task_id,theme,commandline,device_uuid,device_name,device_ip,
+            number,rule_list_name,rule_list_uuid,policy_uuid,policy_id,
+            policy_name,line_num,first_src_domain,src_domain,src_ip,exclude_src_ip,
+            first_dst_domain,dst_domain,dst_ip,exclude_dst_ip,port,service,
+            protocol,application,src_user,exclude_services,time,idle_timeout,
+            action,is_able,description,policy_hit,policy_loose,pre_src_ip,
+            post_src_ip,pre_dst_ip,post_dst_ip,pre_service,pre_exclude_services,
+            post_service,nat_type,mask,next_step,net_door,metric,distance,priority,
+            vrf,weight,policy_use_rate,vendor,vendor_name,is_vsys,vsys_name,root_device_uuid,
+            remark,created_time,last_modified_time,skip_check,rule_log,hit_count,expire_time,
+            device_show_name,device_type,opt_type,establish,policy_type
+        )
+        values
+        <foreach collection="conflictPolicyList" item="item" separator="," >
+        (
+            #{item.autoTaskId},#{item.theme},#{item.commandline},#{item.deviceUuid},#{item.deviceName},#{item.deviceIp},
+            #{item.number},#{item.ruleListName},#{item.ruleListUuid},#{item.policyUuid},#{item.policyId},
+            #{item.policyName},#{item.lineNum},#{item.firstSrcDomain},#{item.srcDomain},#{item.srcIp},#{item.excludeSrcIp},
+            #{item.firstDstDomain},#{item.dstDomain},#{item.dstIp},#{item.excludeDstIp},#{item.port},#{item.service},
+            #{item.protocol},#{item.application},#{item.srcUser},#{item.excludeServices},#{item.time},#{item.idleTimeout},
+            #{item.action},#{item.isAble},#{item.description},#{item.policyHit},#{item.policyLoose},#{item.preSrcIp},
+            #{item.postSrcIp},#{item.preDstIp},#{item.postDstIp},#{item.preService},#{item.preExcludeServices},
+            #{item.postService},#{item.natType},#{item.mask},#{item.nextStep},#{item.netDoor},#{item.metric},#{item.distance},#{item.priority},
+            #{item.vrf},#{item.weight},#{item.policyUseRate},#{item.vendor},#{item.vendorName},#{item.isVsys},#{item.vsysName},#{item.rootDeviceUuid},
+            #{item.remark},#{item.createdTime},#{item.lastModifiedTime},#{item.skipCheck},#{item.ruleLog},#{item.hitCount},#{item.expireTime},
+            #{item.deviceShowName},#{item.deviceType},#{item.optType},#{item.establish},#{item.policyType}
+        )
+        </foreach>
+    </insert>
+</mapper>

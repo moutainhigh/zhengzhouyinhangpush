@@ -1,0 +1,2669 @@
+package com.abtnetworks.totems.recommend.controller;
+
+import com.abtnetworks.data.totems.log.client.LogClientSimple;
+import com.abtnetworks.data.totems.log.common.enums.BusinessLogType;
+import com.abtnetworks.data.totems.log.common.enums.LogLevel;
+import com.abtnetworks.totems.branch.dto.UserInfoDTO;
+import com.abtnetworks.totems.branch.service.RemoteBranchService;
+import com.abtnetworks.totems.common.BaseController;
+import com.abtnetworks.totems.common.constants.PolicyConstants;
+import com.abtnetworks.totems.common.constants.PushConstants;
+import com.abtnetworks.totems.common.constants.ReturnCode;
+import com.abtnetworks.totems.common.dto.commandline.ServiceDTO;
+import com.abtnetworks.totems.common.entity.NodeEntity;
+import com.abtnetworks.totems.common.enums.NatTypeEnum;
+import com.abtnetworks.totems.common.enums.PolicyCheckTypeEnum;
+import com.abtnetworks.totems.common.ro.ResultRO;
+import com.abtnetworks.totems.common.tools.excel.ExcelParser;
+import com.abtnetworks.totems.common.tools.excel.ImportExcel;
+import com.abtnetworks.totems.common.utils.*;
+import com.abtnetworks.totems.disposal.ReturnT;
+import com.abtnetworks.totems.external.utils.PolicyCheckCommonUtil;
+import com.abtnetworks.totems.external.vo.DeviceDetailRunVO;
+import com.abtnetworks.totems.external.vo.PolicyCheckDetailVO;
+import com.abtnetworks.totems.external.vo.PolicyCheckListVO;
+import com.abtnetworks.totems.external.vo.PolicyDetailVO;
+import com.abtnetworks.totems.generate.task.CmdTaskService;
+import com.abtnetworks.totems.push.service.task.PushTaskService;
+import com.abtnetworks.totems.recommend.dto.task.SimulationTaskDTO;
+import com.abtnetworks.totems.recommend.dto.task.WhatIfNatDTO;
+import com.abtnetworks.totems.recommend.entity.*;
+import com.abtnetworks.totems.recommend.manager.CommandTaskManager;
+import com.abtnetworks.totems.recommend.manager.RecommendTaskManager;
+import com.abtnetworks.totems.recommend.manager.WhaleManager;
+import com.abtnetworks.totems.recommend.service.RecommendTaskHistoryService;
+import com.abtnetworks.totems.recommend.service.WhatIfService;
+import com.abtnetworks.totems.recommend.task.impl.SimulationTaskServiceImpl;
+import com.abtnetworks.totems.recommend.task.impl.VerifyTaskServiceImpl;
+import com.abtnetworks.totems.recommend.utils.ExportExcelUtils;
+import com.abtnetworks.totems.recommend.vo.*;
+import com.abtnetworks.totems.whale.baseapi.ro.WhatIfRO;
+import com.abtnetworks.totems.whale.baseapi.service.IpServiceNameRefClient;
+import com.abtnetworks.totems.whale.policy.ro.DeviceDetailRO;
+import com.abtnetworks.totems.whale.policy.service.WhalePathAnalyzeClient;
+import com.abtnetworks.totems.whale.policyoptimize.ro.RuleCheckResultDataRO;
+import com.abtnetworks.totems.whale.policyoptimize.ro.RuleCheckResultRO;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.*;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.ibatis.annotations.Param;
+import org.apache.log4j.Logger;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+
+@Api(value = "策略开通任务列表")
+@RestController
+@RequestMapping(value = "/recommend/")
+public class PolicyRecommendController extends BaseController {
+
+    private static Logger logger = Logger.getLogger(PolicyRecommendController.class);
+
+    @Value("${push.download-file}")
+    private String dirPath;
+
+    @Autowired
+    private RecommendTaskManager policyRecommendTaskService;
+
+    @Autowired
+    private CommandTaskManager commandTaskManager;
+
+    @Autowired
+    private SimulationTaskServiceImpl recommendTaskManager;
+
+    @Autowired
+    private VerifyTaskServiceImpl verifyTaskManager;
+
+    @Autowired
+    private WhalePathAnalyzeClient client;
+
+    @Autowired
+    private IpServiceNameRefClient ipServiceNameRefClient;
+
+    @Autowired
+    private WhaleManager whaleService;
+
+    @Autowired
+    private WhatIfService whatIfService;
+
+    @Autowired
+    private PushTaskService pushTaskService;
+
+    @Autowired
+    private CmdTaskService cmdTaskService;
+
+    @Autowired
+    private RecommendTaskHistoryService recommendTaskHistoryService;
+
+    @Autowired
+    private ExcelParser excelParser;
+
+    @Value("${resourceHandler}")
+    private String resourceHandler;
+
+    @Value("${importHostExcelFileName}")
+    private String importHostExcelFileName;
+
+    private static final Integer HOUR_SECOND = 60 * 60;
+
+    @Autowired
+    private LogClientSimple logClientSimple;
+
+    @Resource
+    RemoteBranchService remoteBranchService;
+
+
+    @ApiOperation("批量导入任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的Excel文件", required = false, dataType = "String")
+    })
+    @PostMapping("task/import")
+    public JSONObject importPolicyRecommendTaskList(MultipartFile file, Authentication auth) {
+        logger.info("批量添加任务");
+        String status = "-1";
+        String errcode = "";
+        String errmsg = "";
+        UserInfoDTO userInfoDTO = remoteBranchService.findOne(auth.getName());
+        JSONObject jsonObject = new JSONObject();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+        String orderNumber = "";
+        try {
+            int successNum = 0;
+            int failureNum = 0;
+            StringBuilder failureMsg = new StringBuilder();
+            ImportExcel ei = new ImportExcel(file, 0, 0);
+            //模拟nat开通工单在第二页
+            ImportExcel natExcel = new ImportExcel(file, 0, 1);
+
+            List<RecommendTaskEntity> tmpList = new ArrayList<>();
+
+            List<RecommendTaskEntity> natTaskList = new ArrayList<>();
+            List<ExcelRecommendTaskEntity> list = ei.getDataList(ExcelRecommendTaskEntity.class);
+            List<ExcelTaskNatEntity> natExcelList = natExcel.getDataList(ExcelTaskNatEntity.class);
+
+            String msg = checkExcelNatTaskValidation(natExcelList);
+            if (!AliStringUtils.isEmpty(msg)) {
+                errmsg = msg;
+                return returnJSON(status, jsonObject, errcode, errmsg);
+            }
+
+            String whatIfCaseName = String.format("A%s", String.valueOf(System.currentTimeMillis()));
+
+            //模拟NAT开通有数据，既需要进行模拟变更场景设置
+            WhatIfRO whatIf = createWhatIfCaseUuid(natExcelList, natTaskList, whatIfCaseName, auth.getName(),userInfoDTO);
+
+            int index = 0;
+            boolean hasInvalid = false;
+            Set<String> indexSet = new HashSet<>();
+            if (list != null && list.size() > 0) {
+                for (int i = 0; i < list.size(); i++) {
+                    logger.info("Excel value:" + list.get(i).toString());
+                    try {
+                        int rowNum = i + 2;
+                        if (list.get(i) != null
+                                && !AliStringUtils.isEmpty(list.get(i).getSrcIp())
+                                && !AliStringUtils.isEmpty(list.get(i).getDstIp())
+                        ) {
+
+
+                            ExcelRecommendTaskEntity entity = list.get(i);
+
+                            if (entity.isEmpty()) {
+                                logger.error(String.format("跳过空数据第%d行！", rowNum));
+                                continue;
+                            }
+                            int rc = entity.validation();
+                            if (rc != ReturnCode.POLICY_MSG_OK) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行错误！" + ReturnCode.getMsg(rc) + "<br>");
+                                logger.info("数据\n" + entity.toString() + "\n错误！" + ReturnCode.getMsg(rc));
+                                hasInvalid = true;
+                                continue;
+                            }
+
+                            if (indexSet.contains(entity.getId())) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行序号重复。<br>");
+                                logger.error("安全策略模版页第" + rowNum + "行序号重复。");
+                                hasInvalid = true;
+                                continue;
+                            } else {
+                                indexSet.add(entity.getId());
+                            }
+
+                            // 流水号码需要自动生成
+                            String orderNO = "A" + simpleDateFormat.format(new Date()) + String.valueOf(index);
+                            entity.setOrderNO(orderNO);
+
+                            //主题为空，则自动生成一个
+                            if (AliStringUtils.isEmpty(entity.getName())) {
+                                entity.setName(orderNO);
+                            } else {
+                                //将序号和名称拼接起来
+                                if (!AliStringUtils.isEmpty(entity.getId())) {
+                                    String name = String.format("%s_%s", entity.getName(), entity.getId());
+                                    //第一条工单的主题作为批量管理的工单号
+                                    if (AliStringUtils.isEmpty(orderNumber)) {
+                                        orderNumber = entity.getName();
+                                    }
+                                    entity.setName(name);
+                                }
+                            }
+                            //若导入工单申请人为空，则设置申请人为当前登录用户
+                            if (AliStringUtils.isEmpty(entity.getUser())) {
+                                entity.setUser(auth.getName());
+                            }
+
+                            //去掉没用的空格
+                            entity.setName(entity.getName().trim());
+                            if (!InputValueUtils.validOrderName(entity.getName())) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行主题（工单号）不合法，主题（工单号）长度不超过64个字符，只能包括数字，字母和短横线(-)，只能以字母开头！<br>");
+                                hasInvalid = true;
+                                continue;
+                            }
+
+                            RecommendTaskEntity tmpEntity = entity.toTaskEntity();
+                            if(userInfoDTO != null && org.apache.commons.lang3.StringUtils.isNotEmpty(userInfoDTO.getBranchLevel())){
+                                tmpEntity.setBranchLevel(userInfoDTO.getBranchLevel());
+                            }else{
+                                tmpEntity.setBranchLevel("00");
+                            }
+                            if(whatIf != null){
+                                tmpEntity.setWhatIfCase(whatIf.getUuid());
+                            }
+                            logger.info("idle timeout is " + entity.getIdleTimeout());
+                            if (!AliStringUtils.isEmpty(entity.getIdleTimeout())) {
+                                Integer idleTimeout = Integer.valueOf(entity.getIdleTimeout());
+                                tmpEntity.setIdleTimeout(idleTimeout * HOUR_SECOND);
+                            }
+                            tmpList.add(tmpEntity);
+                        } else {
+                            failureMsg.append("安全策略模版页第" + rowNum + "行，源地址，目的地址和服务不能为空！<br>");
+                        }
+                    } catch (Exception ex) {
+                        logger.error("批量开通导入异常", ex);
+                        failureMsg.append(" 策略仿真任务: " + list.get(i).getOrderNO() + " 导入失败：");
+                        failureNum++;
+                    }
+                    index++;
+                }
+            } else {
+                failureMsg.append("导入文件内容为空！");
+            }
+            if (failureNum > 0) {
+                failureMsg.insert(0, " 失败 " + failureNum + "条任务信息 导入信息如下：");
+            }
+
+            if (!hasInvalid && tmpList.size() > 0) {
+
+                RecommendTaskCheckEntity checkEntity = new RecommendTaskCheckEntity();
+                checkEntity.setBatchType(1);
+                Date date = new Date();
+
+                checkEntity.setCreateTime(date);
+                //设置第一条任务的主题为批量管理工单主题
+                checkEntity.setOrderNumber(orderNumber);
+                checkEntity.setUserName(auth.getName());
+                checkEntity.setStatus(0);
+                policyRecommendTaskService.addBatchTask(checkEntity);
+
+                StringBuilder sb = new StringBuilder();
+                JSONArray relevancyNat = new JSONArray();
+                if (natTaskList.size() > 0) {
+
+                    for (RecommendTaskEntity entity : natTaskList) {
+                        entity.setBatchId(checkEntity.getId());
+                    }
+
+                    policyRecommendTaskService.insertRecommendTaskList(natTaskList);
+
+                    for (int i = 0; i < natTaskList.size(); i++) {
+                        sb.append(",");
+                        sb.append(String.valueOf(natTaskList.get(i).getId()));
+
+                        NodeEntity nodeEntity = policyRecommendTaskService.getDeviceByManageIp(natTaskList.get(i).getDeviceIp());
+                        // 拼接relevancyNat
+                        JSONObject tmp = new JSONObject();
+                        tmp.put("index", i+1);
+                        tmp.put("name", natTaskList.get(i).getTheme()+"("+nodeEntity.getDeviceName()+"("+nodeEntity.getIp()+"))");
+                        tmp.put("id", natTaskList.get(i).getId());
+                        tmp.put("taskId", natTaskList.get(i).getId());
+                        tmp.put("type", natTaskList.get(i).getTaskType());
+                        relevancyNat.add(tmp);
+                    }
+
+                    excelParser.createNatCommandTask(natTaskList,auth);
+                }
+
+                successNum = tmpList.size();
+                if (successNum > 0) {
+
+                    //如果relevancyNat不等于空，添加relevancyNat
+                    if(relevancyNat != null && relevancyNat.size() > 0){
+                        for (RecommendTaskEntity entity : tmpList) {
+                            entity.setBatchId(checkEntity.getId());
+                            entity.setRelevancyNat(relevancyNat.toJSONString());
+                        }
+                    }else{
+                        for (RecommendTaskEntity entity : tmpList) {
+                            entity.setBatchId(checkEntity.getId());
+                        }
+                    }
+
+                    policyRecommendTaskService.insertRecommendTaskList(tmpList);
+
+                    for (RecommendTaskEntity entity : tmpList) {
+                        sb.append(",");
+                        sb.append(String.valueOf(entity.getId()));
+                    }
+                }
+
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(0);
+                }
+                String taskIds = sb.toString();
+                Integer batchId = checkEntity.getId();
+
+                checkEntity.setId(batchId);
+                checkEntity.setTaskId(taskIds);
+                policyRecommendTaskService.updateBatchTask(checkEntity);
+            }
+
+
+            String message = String.format("批量导入策略开通数据成功，共计%s条", successNum);
+            logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+            // errmsg = failureMsg.toString().replaceFirst("，","");
+            errmsg = failureMsg.toString();
+            if (AliStringUtils.isEmpty(errmsg)) {
+                status = "0";
+                errmsg = "导入成功" + successNum + "条！";
+            }
+            jsonObject.put("successNum", successNum);
+        } catch (Exception e) {
+            errmsg = "导入失败，请确保文件格式和内容正确！";
+            logger.error("导入任务列表失败：", e);
+
+            String message = String.format("批量导入策略开通数据失败");
+            logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+        }
+
+        return returnJSON(status, jsonObject, errcode, errmsg);
+    }
+
+    @ApiOperation("批量导入任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "file", value = "上传的Excel文件", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "filename", value = "工单号", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "creator", value = "申请人", required = false, dataType = "String")
+    })
+    @PostMapping("task/submit")
+    public JSONObject importPolicyRecommendTaskListAndStart(MultipartFile file, String filename, String creator, Authentication auth) {
+        logger.info("批量添加任务, filename is " + filename);
+        UserInfoDTO userInfoDTO = remoteBranchService.findOne(auth.getName());
+        String status = "-1";
+        String errcode = "";
+        String errmsg = "";
+
+        JSONObject jsonObject = new JSONObject();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+
+        try {
+            int successNum = 0;
+            int failureNum = 0;
+            StringBuilder failureMsg = new StringBuilder();
+
+            //导入工单在第一页
+            ImportExcel ei = new ImportExcel(file, 0, 0);
+            //模拟nat开通工单在第二页
+            ImportExcel natExcel = new ImportExcel(file, 0, 1);
+
+            List<RecommendTaskEntity> tmpList = new ArrayList<>();
+            //超大工单列表
+            List<RecommendTaskEntity> ignoreList = new ArrayList<>();
+            List<RecommendTaskEntity> reduplicatedList = new ArrayList<>();
+            List<RecommendTaskEntity> natTaskList = new ArrayList<>();
+            List<RecommendTaskEntity> redupliatedNatTaskList = new ArrayList<>();
+            List<ExcelRecommendTaskEntity> list = ei.getDataList(ExcelRecommendTaskEntity.class);
+            List<ExcelTaskNatEntity> natExcelList = natExcel.getDataList(ExcelTaskNatEntity.class);
+            Set<String> taskStringSet = new HashSet();
+            Set<String> natTaskStringSet = new HashSet<>();
+
+            //模拟NAT开通有数据，既需要进行模拟变更场景设置
+            WhatIfRO whatIf = null;
+            if (natExcelList != null && natExcelList.size() > 0) {
+
+                //Api提交的工单号由url中filename生成
+                for (ExcelTaskNatEntity excelEntity : natExcelList) {
+                    excelEntity.setTheme(filename);
+                }
+
+                String msg = checkExcelNatTaskValidation(natExcelList);
+                if (!AliStringUtils.isEmpty(msg)) {
+                    errmsg = msg;
+                    return returnJSON(status, jsonObject, errcode, errmsg);
+                }
+
+
+                List<ExcelTaskNatEntity> reduplicateNatList = new ArrayList<>();
+                for (ExcelTaskNatEntity excelEntity : natExcelList) {
+                    String natTaskString = excelEntity.getNatType().trim() + excelEntity.getDeviceIp().trim() + excelEntity.getPreSrcAddress().trim()
+                            + excelEntity.getPostSrcAddress().trim() + excelEntity.getPreDstAddress().trim() + excelEntity.getPostDstAddress().trim()
+                            + excelEntity.getProtocol().trim() + excelEntity.getPrePorts().trim() + excelEntity.getPostPorts().trim()
+                            + excelEntity.getSrcZone().trim() + excelEntity.getDstZone().trim() + excelEntity.getInDevItf()
+                            + excelEntity.getOutDevItf().trim();
+                    if (natTaskStringSet.contains(natTaskString)) {
+                        reduplicateNatList.add(excelEntity);
+                    } else {
+                        natTaskStringSet.add(natTaskString);
+                    }
+
+                }
+                natExcelList.removeAll(reduplicateNatList);
+
+                List<WhatIfNatDTO> whatIfNatDTOList = getWhatIfNatDTOList(natExcelList);
+                whatIf = whatIfService.createWhatIfCase(whatIfNatDTOList, filename, filename);
+                if (whatIf != null && !AliStringUtils.isEmpty(whatIf.getUuid())) {
+                    logger.info(String.format("工单[%s]用户[%s]创建模拟开通环境UUID为:", filename, creator) + whatIf.getUuid());
+                    natTaskList = excelParser.getRecommendTaskEntity(natExcelList, filename, creator,userInfoDTO);
+                    redupliatedNatTaskList = excelParser.getRecommendTaskEntity(reduplicateNatList, filename, creator,userInfoDTO);
+                } else {
+                    logger.error(String.format("工单[%s]用户[%s]创建模拟开通数据失败！", filename, creator) + JSONObject.toJSONString(natExcelList));
+                }
+            }
+
+            int index = 0;
+            boolean hasInvalid = false;
+            Set<String> indexSet = new HashSet<>();
+            if (list != null && list.size() > 0) {
+                for (int i = 0; i < list.size(); i++) {
+                    logger.info("Excel value:" + list.get(i).toString());
+                    try {
+                        int rowNum = i + 2;
+                        if (list.get(i) != null
+                                && !AliStringUtils.isEmpty(list.get(i).getSrcIp())
+                                && !AliStringUtils.isEmpty(list.get(i).getDstIp())
+                        ) {
+
+
+                            ExcelRecommendTaskEntity entity = list.get(i);
+
+                            if (entity.isEmpty()) {
+                                logger.error(String.format("安全策略模版工单[%s]用户[%s]跳过空数据第%d行！", filename, creator, rowNum));
+                                continue;
+                            }
+
+                            int rc = entity.validation();
+                            if (rc != ReturnCode.POLICY_MSG_OK) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行错误！" + ReturnCode.getMsg(rc) + "<br>");
+                                logger.error("数据\n" + entity.toString() + "\n错误！" + ReturnCode.getMsg(rc));
+                                hasInvalid = true;
+                                continue;
+                            }
+
+                            if (indexSet.contains(entity.getId())) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行序号重复。<br>");
+                                logger.error("安全策略模版页第" + rowNum + "行序号重复。");
+                                hasInvalid = true;
+                                continue;
+                            } else {
+                                indexSet.add(entity.getId());
+                            }
+
+                            // 流水号码需要自动生成
+                            String orderNO = "A" + simpleDateFormat.format(new Date()) + String.valueOf(index);
+                            entity.setOrderNO(orderNO);
+
+                            //主题为空使用传参过来的工单号，而不使用模板中的
+                            entity.setName(filename + "-" + entity.getId());
+
+                            //则设置申请人为当前登录用户
+                            entity.setUser(creator);
+
+                            //去掉没用的空格
+                            entity.setName(entity.getName().trim());
+                            if (!InputValueUtils.validOrderName(entity.getName())) {
+                                failureMsg.append("安全策略模版页第" + rowNum + "行主题（工单号）不合法，主题（工单号）长度不超过64个字符，只能包括数字，字母和短横线(-)，只能以字母开头！<br>");
+                                hasInvalid = true;
+                                continue;
+                            }
+
+                            RecommendTaskEntity tmpEntity = entity.toTaskEntity();
+                            if(whatIf != null && !AliStringUtils.isEmpty(whatIf.getUuid())){
+                                tmpEntity.setWhatIfCase(whatIf.getUuid());
+                                tmpEntity.setDeviceWhatifs(whatIf.getDeviceWhatifs());
+                            }
+                            if (!AliStringUtils.isEmpty(entity.getIdleTimeout())) {
+                                Integer idleTimeout = Integer.valueOf(entity.getIdleTimeout());
+                                tmpEntity.setIdleTimeout(idleTimeout * HOUR_SECOND);
+                            }
+                            if(userInfoDTO != null && org.apache.commons.lang3.StringUtils.isNotEmpty(userInfoDTO.getBranchLevel())){
+                                tmpEntity.setBranchLevel(userInfoDTO.getBranchLevel());
+                            }else{
+                                tmpEntity.setBranchLevel("00");
+                            }
+                            String taskString = entity.getSrcIp().trim() + entity.getDstIp().trim() + entity.getService().trim() + entity.getTimeRange().trim();
+                            if (taskStringSet.contains(taskString)) {
+                                reduplicatedList.add(tmpEntity);
+                            } else if (entity.isIgnore()) {
+                                taskStringSet.add(taskString);
+                                ignoreList.add(tmpEntity);
+                            } else {
+                                taskStringSet.add(taskString);
+                                tmpList.add(tmpEntity);
+                            }
+                        } else {
+                            failureMsg.append("安全策略模版页第" + rowNum + "行，源地址，目的地址和服务不能为空！<br>");
+                        }
+                    } catch (Exception ex) {
+                        logger.error("批量开通导入异常", ex);
+                        failureMsg.append(" 策略仿真任务: " + list.get(i).getOrderNO() + " 导入失败：");
+                        failureNum++;
+                    }
+                    index++;
+                }
+            }
+
+            if ((list == null || list.size() == 0) && (natExcelList == null || natExcelList.size() == 0)) {
+                failureMsg.append("导入文件内容为空！");
+            }
+
+            if (failureNum > 0) {
+                failureMsg.insert(0, " 失败 " + failureNum + "条任务信息 导入信息如下：");
+            }
+
+
+            if (!hasInvalid) {
+                JSONArray relevancyNat = new JSONArray();
+
+                if (natTaskList.size() > 0) {
+                    policyRecommendTaskService.insertRecommendTaskList(natTaskList);
+
+                    for (int i = 0; i < natTaskList.size(); i++) {
+
+                        NodeEntity nodeEntity = policyRecommendTaskService.getDeviceByManageIp(natTaskList.get(i).getDeviceIp());
+                        // 拼接relevancyNat
+                        JSONObject tmp = new JSONObject();
+                        tmp.put("index", i+1);
+                        tmp.put("name", natTaskList.get(i).getTheme()+"("+nodeEntity.getDeviceName()+"("+nodeEntity.getIp()+"))");
+                        tmp.put("id", natTaskList.get(i).getId());
+                        tmp.put("taskId", natTaskList.get(i).getId());
+                        tmp.put("type", natTaskList.get(i).getTaskType());
+                        relevancyNat.add(tmp);
+                    }
+
+                    excelParser.createNatCommandTask(natTaskList,auth);
+                }
+
+                successNum = tmpList.size();
+                if (successNum > 0) {
+                    //如果relevancyNat不等于空，添加relevancyNat
+                    if(relevancyNat != null && relevancyNat.size() > 0){
+                        for (RecommendTaskEntity entity : tmpList) {
+                            entity.setRelevancyNat(relevancyNat.toJSONString());
+                        }
+                    }
+
+                    policyRecommendTaskService.insertRecommendTaskList(tmpList);
+                    //添加工单完成才开始工单
+                    List<SimulationTaskDTO> taskDtoList = new ArrayList<>();
+                    for (RecommendTaskEntity taskEntity : tmpList) {
+                        SimulationTaskDTO taskDTO = new SimulationTaskDTO();
+                        BeanUtils.copyProperties(taskEntity, taskDTO);
+                        if (taskEntity.getWhatIfCase() != null) {
+                            //2个类中，名字不一样，需要手动赋值
+                            taskDTO.setWhatIfCaseUuid(taskEntity.getWhatIfCase());
+                        }
+                        //设置服务对象
+                        if (taskEntity.getServiceList() == null) {
+                            taskDTO.setServiceList(null);
+                        } else {
+                            JSONArray array = JSONArray.parseArray(taskEntity.getServiceList());
+                            List<ServiceDTO> serviceList = array.toJavaList(ServiceDTO.class);
+                            taskDTO.setServiceList(serviceList);
+                        }
+
+                        taskDtoList.add(taskDTO);
+                        policyRecommendTaskService.updateTaskStatus(taskDTO.getId(), PolicyConstants.POLICY_INT_STATUS_SIMULATION_QUEUE);
+                    }
+
+                    recommendTaskManager.addSimulationTaskList(taskDtoList,auth);
+                }
+
+                //添加忽略工单到list
+                if (ignoreList.size() > 0) {
+                    policyRecommendTaskService.insertRecommendTaskList(ignoreList);
+                }
+
+                if (reduplicatedList.size() > 0) {
+                    policyRecommendTaskService.insertRecommendTaskList(reduplicatedList);
+                }
+
+                if (redupliatedNatTaskList.size() > 0) {
+                    policyRecommendTaskService.insertRecommendTaskList(redupliatedNatTaskList);
+                }
+            }
+
+            // errmsg = failureMsg.toString().replaceFirst("，","");
+            errmsg = failureMsg.toString();
+            //errmsg为空表示没有错误
+            if (AliStringUtils.isEmpty(errmsg)) {
+                StringBuilder ignoreString = new StringBuilder();
+                if (ignoreList.size() > 0) {
+                    for (RecommendTaskEntity recommendTaskEntity : ignoreList) {
+                        ignoreString.append(",");
+                        ignoreString.append(String.format("超范围工单%s已被忽略", recommendTaskEntity.getTheme()));
+                    }
+                }
+
+                if (reduplicatedList.size() > 0) {
+                    for (RecommendTaskEntity recommendTaskEntity : reduplicatedList) {
+                        ignoreString.append(",");
+                        ignoreString.append(String.format("重复工单%s已被忽略", recommendTaskEntity.getTheme()));
+                    }
+                }
+
+                if (redupliatedNatTaskList.size() > 0) {
+                    for (RecommendTaskEntity recommendTaskEntity : redupliatedNatTaskList) {
+                        ignoreString.append(",");
+                        ignoreString.append(String.format("重复NAT工单%s已被忽略", recommendTaskEntity.getTheme()));
+                    }
+                }
+                if (ignoreString.length() > 0) {
+                    ignoreString.deleteCharAt(0);
+                }
+
+
+                errmsg = "导入成功" + successNum + "条！" + ignoreString.toString();
+
+                //有正常工单，设置状态为0，供API记录工单导入结果使用，并返回相关工单ID
+//                if(successNum > 0) {
+                status = "0";
+
+                //返回结果
+                StringBuilder sb = new StringBuilder();
+                for (RecommendTaskEntity entity : tmpList) {
+                    sb.append(",");
+                    sb.append(entity.getId());
+                }
+
+                //加上新增nat策略的工单号
+                for (RecommendTaskEntity entity : natTaskList) {
+                    sb.append(",");
+                    sb.append(entity.getId());
+                }
+
+                for (RecommendTaskEntity entity : ignoreList) {
+                    sb.append(",");
+                    sb.append(entity.getId());
+                }
+
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(0);
+                }
+                jsonObject.put("successNum", successNum);
+                jsonObject.put("taskList", sb.toString());
+//                }
+
+                String message = String.format("通过API批量导入策略开通数据成功,共%s条", successNum);
+                logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+            }
+
+        } catch (Exception e) {
+            errmsg = "导入失败，请确保文件格式和内容正确！";
+            logger.error("导入任务列表失败：", e);
+
+            String message = String.format("通过API批量导入策略开通数据失败");
+            logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+        }
+
+        return returnJSON(status, jsonObject, errcode, errmsg);
+    }
+
+    @ApiOperation("下载导入Excel任务模板")
+    @PostMapping("task/downloadTemplate")
+    public JSONObject downloadHostTemplate() {
+        String status = "-1";
+        String errcode = "";
+        String errmsg = "";
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("fileName", resourceHandler.replace("**", "") + importHostExcelFileName);
+            status = "0";
+        } catch (Exception e) {
+            errmsg += e;
+            logger.error("downloadHostTemplate：" + e);
+        }
+
+        return returnJSON(status, jsonObject, errcode, errmsg);
+    }
+
+    @ApiOperation("new 策略开通搜索列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "batchId", value = "批量任务id", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "theme", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "orderNumber", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "userName", value = "用户名称", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "description", value = "描述", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "srcIp", value = "源地址", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "dstIp", value = "目的地址", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "protocol", value = "协议", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "dstPort", value = "目的端口", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "status", value = "类型", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "taskType", value = "类型", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "psize", value = "每页条数", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/searchtasklist")
+    public JSONObject getTaskList(String id,String batchId, String theme, String orderNumber, String userName, String description, String srcIp, String dstIp, String protocol, String dstPort, String status, String taskType, int page, int psize,Authentication authentication) {
+        String protocolString = protocol;
+        if (protocol != null) {
+            if (!protocol.equals("0")) {
+                ServiceDTO serviceDTO = new ServiceDTO();
+                serviceDTO.setProtocol(protocol);
+                if (dstPort != null) {
+                    serviceDTO.setDstPorts(dstPort);
+                }
+                String jsonString = JSONObject.toJSONString(serviceDTO);
+                protocolString = org.apache.commons.lang3.StringUtils.strip(jsonString, "{}");
+            }
+        }
+
+        PageInfo<RecommendTaskEntity> pageInfo = policyRecommendTaskService.getTaskList(id,batchId, theme, orderNumber, userName, description, srcIp, dstIp, protocolString, "", status, taskType, page, psize,authentication);
+
+        String jsonObjectString = JSONObject.toJSONString(pageInfo);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取任执行务状态列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "taskId", value = "策略开通任务id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/gettaskstatus")
+    public JSONObject getTaskStatus(int taskId) {
+
+        TaskStatusVO taskStatusVO = policyRecommendTaskService.getTaskStatusByTaskId(taskId);
+
+        String jsonObjectString = JSONObject.toJSONString(taskStatusVO);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取路径分析状态列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "taskId", value = "策略开通任务id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "psize", value = "每页条数", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/analyzepathinfolist")
+    public JSONObject getAnalyzePathInfoList(int taskId, int page, int psize) {
+
+        PageInfo<PathInfoEntity> pageInfo = policyRecommendTaskService.getAnalyzePathInfoVOList(taskId, page, psize);
+
+        List<PathInfoEntity> list = pageInfo.getList();
+        for (PathInfoEntity entity : list) {
+            String srcSubnetDevices = getSubnetDeviceList(entity.getSrcNodeUuid());
+            entity.setSrcSubnetDevices(srcSubnetDevices);
+            String dstSubnetDevices = getSubnetDeviceList(entity.getDstNodeUuid());
+            entity.setDstSubnetDevices(dstSubnetDevices);
+        }
+
+        String jsonObjectString = JSONObject.toJSONString(pageInfo);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取路径验证信息列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "taskId", value = "策略开通任务id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "psize", value = "每页条数", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/verifypathinfolist")
+    public JSONObject getVerifyPathInfoList(int taskId, int page, int psize) {
+
+        PageInfo<PathInfoEntity> pageInfo = policyRecommendTaskService.getVerifyPathInfoVOList(taskId, page, psize);
+
+        List<PathInfoEntity> list = pageInfo.getList();
+        for (PathInfoEntity entity : list) {
+            String srcSubnetDevices = getSubnetDeviceList(entity.getSrcNodeUuid());
+            entity.setSrcSubnetDevices(srcSubnetDevices);
+            String dstSubnetDevices = getSubnetDeviceList(entity.getDstNodeUuid());
+            entity.setDstSubnetDevices(dstSubnetDevices);
+        }
+
+        String jsonObjectString = JSONObject.toJSONString(pageInfo);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取路径信息列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "路径信息id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "isVerifyData", value = "是否为验证路径数据", required = true, dataType = "Boolean")
+    })
+    @PostMapping("task/pathdetail")
+    public JSONObject getPathDetail(int pathInfoId, boolean isVerifyData) {
+
+        PathDetailVO pathInfoVO = policyRecommendTaskService.getPathDetail(pathInfoId, isVerifyData);
+
+        String jsonObjectString = JSONObject.toJSONString(pathInfoVO);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取路径设备详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "路径信息id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "deviceUuid", value = "设备uuid", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "isVerifyData", value = "是否为验证路径数据", required = true, dataType = "Boolean"),
+            @ApiImplicitParam(paramType = "query", name = "pathIndex", value = "路径序号", required = true, dataType = "String")
+    })
+    @PostMapping("task/devicedetail")
+    public JSONObject getDeviceDetail(int pathInfoId, String deviceUuid, boolean isVerifyData, String pathIndex) {
+        DevicePolicyVO devicePolicyVO = new DevicePolicyVO();
+        if (pathIndex == null) {
+            pathIndex = "0";
+        }
+        PathDeviceDetailEntity entity = policyRecommendTaskService.getDevieceDetail(pathInfoId, deviceUuid, isVerifyData, pathIndex);
+
+        boolean isEmptyData = false;
+        String deviceDetail = null;
+        if (entity == null) {
+            logger.error(String.format("数据库中没有设备详情数据...路径：%d, 设备：%s", pathInfoId, deviceUuid));
+            isEmptyData = true;
+        } else {
+            deviceDetail = entity.getDeviceDetail();
+            if (deviceDetail == null) {
+                logger.error(String.format("设备详情数据中路径数据为空...路径：%d，设备：%s", pathInfoId, deviceUuid));
+                isEmptyData = true;
+            }
+        }
+
+        if (isEmptyData) {
+            String jsonObjectString = JSONObject.toJSONString(devicePolicyVO);
+            JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+            return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+        }
+
+        JSONObject deviceDetailObject = JSONObject.parseObject(deviceDetail);
+        DeviceDetailRO detailDeviceRO = deviceDetailObject.toJavaObject(DeviceDetailRO.class);
+        DeviceDetailRunVO deviceDetailRunVO = client.parseDetailRunRO(detailDeviceRO);
+
+        List<PolicyDetailVO> safeListDetail = deviceDetailRunVO.getSafeList();
+        List<PolicyDetailVO> natListDetail = deviceDetailRunVO.getNatList();
+        List<PolicyDetailVO> routTableListDetail = deviceDetailRunVO.getRoutList();
+
+        devicePolicyVO.setAclList(deviceDetailRunVO.getAclList());
+        devicePolicyVO.setPolicyRoutList(deviceDetailRunVO.getPolicyRoutList());
+
+        if (safeListDetail != null) {
+            List<PolicyRecommendSecurityPolicyVO> securityPolicyVOList = new ArrayList<>();
+            for (PolicyDetailVO vo : safeListDetail) {
+                PolicyRecommendSecurityPolicyVO policyVO = new PolicyRecommendSecurityPolicyVO();
+                BeanUtils.copyProperties(vo, policyVO);
+                policyVO.setIsAble(vo.getIsAble());
+                policyVO.setDescription(vo.getDescription());
+                securityPolicyVOList.add(policyVO);
+            }
+            devicePolicyVO.setSecurityPolicyList(securityPolicyVOList);
+        }
+
+        if (natListDetail != null) {
+            List<PolicyRecommendNatPolicyVO> natPolicyVOlist = new ArrayList<>();
+            for (PolicyDetailVO vo : natListDetail) {
+                PolicyRecommendNatPolicyVO natPolicyVO = new PolicyRecommendNatPolicyVO();
+                BeanUtils.copyProperties(vo, natPolicyVO);
+                natPolicyVO.setDescription(vo.getDescription());
+                natPolicyVO.setIsAble(vo.getIsAble());
+                natPolicyVOlist.add(natPolicyVO);
+            }
+            devicePolicyVO.setNatPolicList(natPolicyVOlist);
+        }
+
+        if (routTableListDetail != null) {
+            List<PolicyRecommendPolicyRouterVO> routerVOList = new ArrayList<>();
+            for (PolicyDetailVO vo : routTableListDetail) {
+                PolicyRecommendPolicyRouterVO routerVO = new PolicyRecommendPolicyRouterVO();
+                routerVO.setNumber(vo.getNumber());
+                routerVO.setSrcIp(vo.getSrcIp());
+                routerVO.setMask(vo.getMask());
+                routerVO.setNextHop(vo.getNextStep());
+                routerVO.setNetDoor(vo.getNetDoor());
+                routerVO.setDistance(vo.getDistance());
+                routerVO.setWeight(vo.getWeight());
+                routerVO.setProtocol(vo.getProtocol());
+                routerVO.setDescription(vo.getDescription());
+                routerVOList.add(routerVO);
+            }
+            devicePolicyVO.setRouterList(routerVOList);
+        }
+
+        String jsonObjectString = JSONObject.toJSONString(devicePolicyVO);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取策略风险分析结果")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "路径信息id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/getrisk")
+    public JSONObject getRiskByPathInfoId(int pathInfoId) {
+        List<PolicyRiskEntity> riskEntityList = policyRecommendTaskService.getRiskByPathInfoId(pathInfoId);
+
+        List<RiskRuleInfoEntity> riskInfoList = new ArrayList<>();
+        for (PolicyRiskEntity riskEntity : riskEntityList) {
+            RiskRuleInfoEntity riskInfo = policyRecommendTaskService.getRiskInfoByRuleId(riskEntity.getRuleId());
+            riskInfoList.add(riskInfo);
+        }
+        String jsonObjectString = JSONObject.toJSONString(riskInfoList);
+        JSONArray jsonArray = JSONArray.parseArray(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonArray);
+    }
+
+    @ApiOperation("new 获取策略生成结果")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "路径信息id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/getpolicy")
+    public JSONObject getPolicyByPathInfoId(int pathInfoId) {
+        List<RecommendPolicyVO> policyVOList = policyRecommendTaskService.getPolicyByPathInfoId(pathInfoId);
+
+        String jsonObjectString = JSONObject.toJSONString(policyVOList);
+        JSONArray jsonArray = JSONArray.parseArray(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonArray);
+    }
+
+    @ApiOperation("new 获取合并策略结果")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "路径信息id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/getmergedpolicy")
+    public JSONObject getMergedPolicyByTaskId(int taskId) {
+        List<RecommendPolicyVO> policyVOList = policyRecommendTaskService.getMergedPolicyByTaskId(taskId);
+
+        String jsonObjectString = JSONObject.toJSONString(policyVOList);
+        JSONArray jsonArray = JSONArray.parseArray(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonArray);
+    }
+
+
+    @ApiOperation("new 获取策略检查结果列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoId", value = "策略id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/getcheckresult")
+    public JSONObject getCheckResultByPolicyId(@Param("policyId") int pathInfoId) {
+
+        List<CheckResultEntity> entityList = policyRecommendTaskService.getCheckResultByPolicyId(pathInfoId);
+
+        if (entityList.size() == 0) {
+            return getReturnJSON(ReturnCode.POLICY_MSG_OK);
+        }
+
+        Map<String, List<RuleCheckResultDataRO>> deviceMergeListMap = new HashMap<>();
+        Map<String, List<RuleCheckResultDataRO>> deviceHideListMap = new HashMap<>();
+        Map<String, List<RuleCheckResultDataRO>> deviceRedundancyListMap = new HashMap<>();
+
+        for (CheckResultEntity entity : entityList) {
+            RecommendPolicyEntity recommendPolicyEntity = policyRecommendTaskService.getPolicyByPolicyId(entity.getPolicyId());
+
+            if (recommendPolicyEntity == null) {
+                logger.info(String.format("策略(%d)数据对象不存在...", entity.getPolicyId()));
+                continue;
+            }
+            String deviceUuid = recommendPolicyEntity.getDeviceUuid();
+
+            String checkResult = entity.getCheckResult();
+            JSONObject checkResultObject = JSONObject.parseObject(checkResult);
+            RuleCheckResultRO checkResultRO = checkResultObject.toJavaObject(RuleCheckResultRO.class);
+            List<RuleCheckResultDataRO> ruleCheckResultDataROList = checkResultRO.getData();
+
+            for (RuleCheckResultDataRO data : ruleCheckResultDataROList) {
+                if (data.getBpcCode().equals(PolicyConstants.POLICY_STRING_HIDDEN_POLICY) || data.getBpcCode().equals(PolicyConstants.POLICY_STRING_HIDDEN_POLICY_RC_HIDDEN_SAME) || data.getBpcCode().equals(PolicyConstants.POLICY_STRING_HIDDEN_POLICY_RC_HIDDEN_CONFLICT)) {
+                    ipServiceNameRefClient.packRuleObject(deviceUuid, data.getPrimaryRule(), data.getOtherPrimaryRules(), data.getRelatedRules());
+                    List<RuleCheckResultDataRO> hideList = deviceHideListMap.get(deviceUuid);
+                    if (hideList == null) {
+                        hideList = new ArrayList<>();
+                        deviceHideListMap.put(deviceUuid, hideList);
+                    }
+                    hideList.add(data);
+                } else if (data.getBpcCode().equals(PolicyConstants.POLICY_STRING_MERGE_POLICY)) {
+                    ipServiceNameRefClient.packRuleObject(deviceUuid, data.getPrimaryRule(), data.getOtherPrimaryRules(), data.getRelatedRules());
+                    List<RuleCheckResultDataRO> mergeList = deviceMergeListMap.get(deviceUuid);
+                    if (mergeList == null) {
+                        mergeList = new ArrayList<>();
+                        deviceMergeListMap.put(deviceUuid, mergeList);
+                    }
+                    mergeList.add(data);
+                } else if (data.getBpcCode().equals(PolicyConstants.POLICY_STRING_REDUNDANCY_POLICY)) {
+                    ipServiceNameRefClient.packRuleObject(deviceUuid, data.getPrimaryRule(), data.getOtherPrimaryRules(), data.getRelatedRules());
+                    List<RuleCheckResultDataRO> redundancyList = deviceRedundancyListMap.get(deviceUuid);
+                    if (redundancyList == null) {
+                        redundancyList = new ArrayList<>();
+                        deviceRedundancyListMap.put(deviceUuid, redundancyList);
+                    }
+                    redundancyList.add(data);
+                } else {
+                    logger.error("invalid data bpc type: " + data.getBpcCode());
+                }
+            }
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        Set<String> deviceSet = new HashSet<>();
+        Set<String> hideDeviceSet = deviceHideListMap.keySet();
+        Set<String> mergeDeviceSet = deviceMergeListMap.keySet();
+        Set<String> redundancyDeviceSet = deviceRedundancyListMap.keySet();
+
+        deviceSet.addAll(hideDeviceSet);
+        deviceSet.addAll(mergeDeviceSet);
+        deviceSet.addAll(redundancyDeviceSet);
+        for (String deviceUuid : deviceSet) {
+            List<RuleCheckResultDataRO> hideList = deviceHideListMap.get(deviceUuid);
+            if (hideList == null) {
+                hideList = new ArrayList<>();
+            }
+            PolicyCheckVO policyResultList = new PolicyCheckVO();
+            ResultRO<List<RuleCheckResultDataRO>> hideCheckResultRO = new ResultRO<>();
+            hideCheckResultRO.setData(hideList);
+            logger.debug("hideCheckResultRO.setData:" + hideList.toString());
+
+            List<PolicyCheckListVO> checkListVO = PolicyCheckCommonUtil.getCheckList(hideCheckResultRO, PolicyCheckTypeEnum.HIDDEN);
+            if (checkListVO != null && checkListVO.size() > 0) {
+                List<PolicyCheckDetailVO> hideDetailList = new ArrayList<>();
+                for (PolicyCheckListVO policyCheckListVO : checkListVO) {
+                    hideDetailList.addAll(policyCheckListVO.getDetailList());
+                }
+
+                if (hideDetailList != null && hideDetailList.size() != 0) {
+                    List<PolicyRecommendHiddenSecurityPolicyVO> hiddenPolicyList = new ArrayList<>();
+                    for (PolicyCheckDetailVO vo : hideDetailList) {
+                        PolicyRecommendHiddenSecurityPolicyVO hidden = new PolicyRecommendHiddenSecurityPolicyVO();
+                        BeanUtils.copyProperties(vo, hidden);
+                        hidden.setPolicyId(vo.getPolicyUuid());
+                        hidden.setLineNumber(vo.getLineNum());
+                        hidden.setSaveIdleTimeout(vo.getIdleTimeout());
+                        hiddenPolicyList.add(hidden);
+                    }
+                    policyResultList.setHiddenPolicy(hiddenPolicyList);
+                }
+            }
+
+            List<RuleCheckResultDataRO> mergeList = deviceMergeListMap.get(deviceUuid);
+            if (mergeList == null) {
+                mergeList = new ArrayList<>();
+            }
+            ResultRO<List<RuleCheckResultDataRO>> mergeCheckResultRO = new ResultRO<>();
+            mergeCheckResultRO.setData(mergeList);
+            checkListVO = PolicyCheckCommonUtil.getCheckList(mergeCheckResultRO, PolicyCheckTypeEnum.MERGE);
+            if (checkListVO != null && checkListVO.size() > 0) {
+                List<PolicyCheckDetailVO> mergeDetailList = checkListVO.get(0).getDetailList();
+
+                if (mergeDetailList != null && mergeDetailList.size() != 0) {
+                    List<PolicyRecommendMergePolicyVO> mergePolicyList = new ArrayList<>();
+                    for (PolicyCheckDetailVO vo : mergeDetailList) {
+                        PolicyRecommendMergePolicyVO merge = new PolicyRecommendMergePolicyVO();
+                        BeanUtils.copyProperties(vo, merge);
+                        merge.setPolicyId(vo.getPolicyUuid());
+                        merge.setLineNumber(vo.getLineNum());
+                        merge.setSaveIdleTimeout(vo.getIdleTimeout());
+                        mergePolicyList.add(merge);
+                    }
+                    policyResultList.setMergePolicy(mergePolicyList);
+                }
+            }
+
+            List<RuleCheckResultDataRO> redundancyList = deviceRedundancyListMap.get(deviceUuid);
+            if (redundancyList == null) {
+                redundancyList = new ArrayList<>();
+            }
+            ResultRO<List<RuleCheckResultDataRO>> redundancyCheckResultRO = new ResultRO<>();
+            redundancyCheckResultRO.setData(redundancyList);
+            logger.debug("hideCheckResultRO.setData:" + redundancyList.toString());
+
+            checkListVO = PolicyCheckCommonUtil.getCheckList(redundancyCheckResultRO, PolicyCheckTypeEnum.REDUNDANCY);
+            if (checkListVO != null && checkListVO.size() > 0) {
+                List<PolicyCheckDetailVO> redundancyDetailList = new ArrayList<>();
+                for (PolicyCheckListVO policyCheckListVO : checkListVO) {
+                    redundancyDetailList.addAll(policyCheckListVO.getDetailList());
+                }
+
+                if (redundancyDetailList != null && redundancyDetailList.size() != 0) {
+                    List<PolicyRecommendHiddenSecurityPolicyVO> redundancyPolicyList = new ArrayList<>();
+                    for (PolicyCheckDetailVO vo : redundancyDetailList) {
+                        PolicyRecommendHiddenSecurityPolicyVO redundancy = new PolicyRecommendHiddenSecurityPolicyVO();
+                        BeanUtils.copyProperties(vo, redundancy);
+                        redundancy.setPolicyId(vo.getPolicyUuid());
+                        redundancy.setLineNumber(vo.getLineNum());
+                        redundancy.setSaveIdleTimeout(vo.getIdleTimeout());
+                        redundancyPolicyList.add(redundancy);
+                    }
+                    policyResultList.setRedundancyPolicy(redundancyPolicyList);
+                }
+            }
+
+            String jsonObjectString = JSONObject.toJSONString(policyResultList);
+            JSONObject object = JSONObject.parseObject(jsonObjectString);
+            jsonObject.put(deviceUuid, object);
+        }
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    @ApiOperation("new 获取生成命令行")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "taskId", value = "策略开通任务id", required = true, dataType = "Integer")
+    })
+    @PostMapping("task/getcommand")
+    public JSONObject getCommand(int taskId) {
+        List<CommandVO> commandVOList = commandTaskManager.getCommandByTaskId(taskId);
+
+        String jsonObjectString = JSONObject.toJSONString(commandVOList);
+        JSONArray jsonArray = JSONArray.parseArray(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonArray);
+    }
+
+    @ApiOperation("new 编辑生成命令行")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "taskId", value = "策略开通任务id", required = true, dataType = "Integer"),
+            @ApiImplicitParam(paramType = "query", name = "deviceUuid", value = "设备uuid", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "command", value = "命令行", required = true, dataType = "String")
+    })
+    @PostMapping("task/editcommand")
+    public JSONObject editCommand(int taskId, String deviceUuid, String command, Authentication auth,Integer type) {
+        List<CommandTaskEditableEntity> entityList = commandTaskManager.getCommandTaskByTaskId(taskId);
+
+        if (entityList == null || entityList.size() == 0) {
+            return getReturnJSON(ReturnCode.TASK_IS_DELETED);
+        }
+
+        if (entityList.get(0).getStatus() > PushConstants.PUSH_INT_PUSH_RESULT_STATUS_NOT_START) {
+            return getReturnJSON(ReturnCode.INVALID_COMMANDLINE_STATUS);
+        }
+
+        int rc = commandTaskManager.editCommandEditableEntity(taskId, auth.getName(), command, deviceUuid,type);
+        CommandTaskEditableEntity entity = commandTaskManager.getCommandEditableEntityByTaskIdAndDeviceUuid(taskId, deviceUuid);
+
+        String jsonObjectString = JSONObject.toJSONString(entity);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(rc, jsonObject);
+    }
+
+    @ApiOperation("new 添加策略开通任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "theme", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "description", value = "申请描述", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "srcIp", value = "源IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "dstIp", value = "目的IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "serviceList", value = "协议号", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "startTime", value = "策略开始时间", required = false, dataType = "Long"),
+            @ApiImplicitParam(paramType = "query", name = "endTime", value = "策略结束时间", required = false, dataType = "Long"),
+    })
+    @PostMapping("task/add")
+    public JSONObject addRecommendTask(@RequestBody AddRecommendTaskEntity entity, Authentication auth) {
+        int rc = InputValueUtils.checkIp(entity.getSrcIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "源地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        List<ServiceDTO> serviceList = entity.getServiceList();
+        Set<String> serviceSet = new HashSet<>();
+        for (ServiceDTO serviceDTO : serviceList) {
+            if (serviceSet.contains(serviceDTO.getProtocol())) {
+                return getReturnJSON(ReturnCode.FAILED, "服务中同类型协议只能添加一条！");
+            } else {
+                serviceSet.add(serviceDTO.getProtocol());
+            }
+        }
+
+        logger.info("新建任务的whatIfCases is " + entity.getWhatIfCases());
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setSrcIp(InputValueUtils.autoCorrect(entity.getSrcIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+
+        rc = InputValueUtils.checkIp(entity.getDstIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "目的地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setDstIp(InputValueUtils.autoCorrect(entity.getDstIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+
+        for (ServiceDTO service : serviceList) {
+            if (!AliStringUtils.isEmpty(service.getDstPorts())) {
+                service.setDstPorts(InputValueUtils.autoCorrectPorts(service.getDstPorts()));
+            }
+        }
+
+        //去掉IP地址中无用的空地址
+        entity.setSrcIp(InputValueUtils.formatIpAddress(entity.getSrcIp()));
+        entity.setDstIp(InputValueUtils.formatIpAddress(entity.getDstIp()));
+
+
+        //添加数据检测
+
+        RecommendTaskEntity recommendTaskEntity = new RecommendTaskEntity();
+
+        BeanUtils.copyProperties(entity, recommendTaskEntity);
+
+        //服务对象转换成字符串保存数据库, 若服务为空，则为any
+        recommendTaskEntity.setServiceList(entity.getServiceList() == null ? null : JSONObject.toJSONString(entity.getServiceList()));
+
+
+        //设置创建时间和流水号（时间相关）
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String orderNumber = "A" + simpleDateFormat.format(date);
+        recommendTaskEntity.setCreateTime(date);
+        recommendTaskEntity.setOrderNumber(orderNumber);
+
+        UserInfoDTO userInfoDTO = remoteBranchService.findOne(auth.getName());
+        if(userInfoDTO != null && org.apache.commons.lang3.StringUtils.isNotEmpty(userInfoDTO.getBranchLevel())){
+            recommendTaskEntity.setBranchLevel(userInfoDTO.getBranchLevel());
+        }else{
+            recommendTaskEntity.setBranchLevel("00");
+        }
+        //设置用户名
+        recommendTaskEntity.setUserName(auth.getName());
+
+        if (entity.getIdleTimeout() != null) {
+            recommendTaskEntity.setIdleTimeout(entity.getIdleTimeout() * HOUR_SECOND);
+        } else {
+            recommendTaskEntity.setIdleTimeout(null);
+        }
+
+
+        //设置状态和任务类型
+        recommendTaskEntity.setTaskType(PolicyConstants.POLICY_INT_PUSH_TASK_TYPE_POLICY_RECOMMEND);
+        recommendTaskEntity.setStatus(PolicyConstants.POLICY_INT_STATUS_INITIAL);
+        List<RecommendTaskEntity> list = new ArrayList<>();
+        list.add(recommendTaskEntity);
+        policyRecommendTaskService.insertRecommendTaskList(list);
+        String message = String.format("新建业务开通工单：%s 成功", recommendTaskEntity.getTheme());
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        JSONObject rs = getReturnJSON(rc, String.valueOf(recommendTaskEntity.getId()));
+        rs.put("taskId",recommendTaskEntity.getId());
+        return rs;
+    }
+
+    @ApiOperation("添加策略开通任务并开始")
+    @PostMapping("task/newstart")
+    public JSONObject addAndStartRecommendTask(@RequestBody AddRecommendTaskEntity entity, Authentication auth) {
+        JSONObject jsonObject = addRecommendTask(entity, auth);
+
+        if (jsonObject.getString("status").equals("0")) {
+            String taskId = jsonObject.getString("errmsg");
+            startRecommendTaskList(taskId,auth);
+        }
+
+        return jsonObject;
+    }
+
+    @ApiOperation("new 编辑策略开通任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "id", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "theme", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "description", value = "申请描述", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "srcIp", value = "源IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "dstIp", value = "目的IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "serviceList", value = "协议号", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "startTime", value = "策略开始时间", required = false, dataType = "Long"),
+            @ApiImplicitParam(paramType = "query", name = "endTime", value = "策略结束时间", required = false, dataType = "Long"),
+    })
+    @PostMapping("task/edit")
+    public JSONObject editRecommendTask(@RequestBody AddRecommendTaskEntity entity, Authentication auth) {
+        String idString = entity.getId();
+        if (AliStringUtils.isEmpty(idString)) {
+            return getReturnJSON(ReturnCode.INVALID_ENTITY_ID);
+        }
+
+        List<ServiceDTO> serviceList = entity.getServiceList();
+
+        if (serviceList != null) {
+            Set<String> serviceSet = new HashSet<>();
+            for (ServiceDTO serviceDTO : serviceList) {
+                if (serviceSet.contains(serviceDTO.getProtocol())) {
+                    return getReturnJSON(ReturnCode.FAILED, "服务中同类型协议只能添加一条！");
+                } else {
+                    serviceSet.add(serviceDTO.getProtocol());
+                }
+            }
+        }
+
+        //添加数据检测
+        RecommendTaskEntity recommendTaskEntity = new RecommendTaskEntity();
+        boolean invalidId = false;
+        try {
+            int taskId = Integer.valueOf(idString);
+            recommendTaskEntity = policyRecommendTaskService.getRecommendTaskByTaskId(taskId);
+        } catch (Exception e) {
+            logger.error("ID格式错误", e);
+            invalidId = true;
+        }
+
+        if (invalidId) {
+            return getReturnJSON(ReturnCode.INVALID_ENTITY_ID);
+        }
+
+        if (recommendTaskEntity == null) {
+            return getReturnJSON(ReturnCode.TASK_IS_DELETED);
+        }
+
+        if (recommendTaskEntity.getStatus() != PolicyConstants.POLICY_INT_STATUS_INITIAL) {
+            return getReturnJSON(ReturnCode.TASK_STATUS_ERROR);
+        }
+
+        if (!auth.getName().equals(recommendTaskEntity.getUserName())) {
+            return getReturnJSON(ReturnCode.INVALID_USER);
+        }
+
+        int rc = InputValueUtils.checkIp(entity.getSrcIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "源地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setSrcIp(InputValueUtils.autoCorrect(entity.getSrcIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+
+        rc = InputValueUtils.checkIp(entity.getDstIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "目的地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setDstIp(InputValueUtils.autoCorrect(entity.getDstIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+
+        //去掉IP地址中无用的空地址
+        entity.setSrcIp(InputValueUtils.formatIpAddress(entity.getSrcIp()));
+        entity.setDstIp(InputValueUtils.formatIpAddress(entity.getDstIp()));
+
+        if (serviceList != null) {
+            for (ServiceDTO service : serviceList) {
+                if (!AliStringUtils.isEmpty(service.getDstPorts())) {
+                    service.setDstPorts(InputValueUtils.autoCorrectPorts(service.getDstPorts()));
+                }
+            }
+        }
+
+        recommendTaskEntity.setTheme(entity.getTheme());
+        recommendTaskEntity.setDescription(entity.getDescription());
+
+        recommendTaskEntity.setSrcIp(entity.getSrcIp());
+        recommendTaskEntity.setDstIp(entity.getDstIp());
+
+        //有一个不为空，则为互联网开通任务
+        if (!AliStringUtils.isEmpty(entity.getEntrySubnet()) || !AliStringUtils.isEmpty(entity.getExitSubnet())) {
+            InternetAdditionalInfoEntity additionalInfoEntity = new InternetAdditionalInfoEntity();
+            JSONArray dstArray = JSONObject.parseArray(entity.getExitSubnet());
+            List<SubnetEntity> exitSubnetList = dstArray.toJavaList(SubnetEntity.class);
+            additionalInfoEntity.setExitSubnetList(exitSubnetList);
+            recommendTaskEntity.setAdditionInfo(JSONObject.toJSONString(additionalInfoEntity));
+        }
+
+        //服务对象转换成字符串保存数据库, 若服务为空，则为any
+        recommendTaskEntity.setServiceList(entity.getServiceList() == null ? null : JSONObject.toJSONString(entity.getServiceList()));
+
+        recommendTaskEntity.setStartTime(entity.getStartTime());
+        recommendTaskEntity.setEndTime(entity.getEndTime());
+
+        if (entity.getIdleTimeout() != null) {
+            recommendTaskEntity.setIdleTimeout(entity.getIdleTimeout() * HOUR_SECOND);
+        } else {
+            recommendTaskEntity.setIdleTimeout(null);
+        }
+        recommendTaskEntity.setRelevancyNat(entity.getRelevancyNat());
+        recommendTaskEntity.setSrcIpSystem(entity.getSrcIpSystem());
+        recommendTaskEntity.setDstIpSystem(entity.getDstIpSystem());
+        policyRecommendTaskService.updateTaskById(recommendTaskEntity);
+
+        String taskTypeDesc = "";
+        int taskType = recommendTaskEntity.getTaskType().intValue();
+        if (taskType == 1) {
+            taskTypeDesc = "业务开通";
+        } else if (taskType == 8) {
+            taskTypeDesc = "互联网开通";
+        } else {
+            taskTypeDesc = "未知";
+        }
+        String message = String.format("编辑%s工单: %s 成功", taskTypeDesc, recommendTaskEntity.getTheme());
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        return getReturnJSON(rc);
+    }
+
+    @ApiOperation("开始策略仿真")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "ids", value = "策略开通任务id列表", required = true, dataType = "String")
+    })
+    @PostMapping("recommend/start")
+    public JSONObject startRecommendTaskList(String ids,Authentication authentication) {
+        ids = String.format("[%s]", ids);
+        JSONArray jsonArray = JSONArray.parseArray(ids);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            logger.error("开始策略仿真任务为空！");
+            return getReturnJSON(ReturnCode.NO_TASK_ID_SELECTED_TO_START);
+        }
+
+        List<Integer> idList = null;
+        try {
+            idList = StringUtils.parseIntArrayList(ids);
+        } catch (Exception e) {
+            logger.error("解析任务列表出错！", e);
+        }
+
+        List<String> themeList = new ArrayList<>();
+        List<RecommendTaskEntity> taskEntitylist = new ArrayList<>();
+        for (int id : idList) {
+            logger.info(String.format("获取任务(%d)", id));
+            RecommendTaskEntity entity = policyRecommendTaskService.getRecommendTaskByTaskId(id);
+
+            if (entity == null) {
+                logger.error(String.format("获取任务(%d)失败, 任务不存在, 继续查找下一个...", id));
+            } else if (entity.getStatus() > PolicyConstants.POLICY_INT_TASK_TYPE_FRESH) {
+                logger.error(String.format("无法开始任务(%s), 任务已完成仿真！\n", entity.getOrderNumber()));
+            } else {
+                taskEntitylist.add(entity);
+                themeList.add(entity.getTheme());
+            }
+        }
+
+        List<SimulationTaskDTO> taskDtoList = new ArrayList<>();
+        for (RecommendTaskEntity taskEntity : taskEntitylist) {
+            SimulationTaskDTO taskDTO = new SimulationTaskDTO();
+            BeanUtils.copyProperties(taskEntity, taskDTO);
+            taskDTO.setWhatIfCaseUuid(taskEntity.getWhatIfCase());
+
+            //设置服务对象
+            if (taskEntity.getServiceList() == null) {
+                taskDTO.setServiceList(null);
+            } else {
+                JSONArray array = JSONArray.parseArray(taskEntity.getServiceList());
+                List<ServiceDTO> serviceList = array.toJavaList(ServiceDTO.class);
+                taskDTO.setServiceList(serviceList);
+            }
+
+            if (taskEntity.getTaskType() == PolicyConstants.POLICY_INT_PUSH_TASK_TYPE_INTERNET_RECOMMEND) {
+                JSONObject object = JSONObject.parseObject(taskEntity.getAdditionInfo());
+                InternetAdditionalInfoEntity additionalInfoEntity = object.toJavaObject(InternetAdditionalInfoEntity.class);
+                List<SubnetEntity> exitSubnetList = additionalInfoEntity.getExitSubnetList();
+                StringBuilder sb = new StringBuilder();
+                for (SubnetEntity entity : exitSubnetList) {
+                    sb.append(",");
+                    sb.append(entity.getSubnetUuid());
+                }
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(0);
+                }
+                taskDTO.setDstSubnet(sb.toString());
+            }
+            String relevancyNat = taskEntity.getRelevancyNat();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(relevancyNat)) {
+                WhatIfRO whatIf = createWhatIfCaseUuid(relevancyNat);
+                if (whatIf != null && !AliStringUtils.isEmpty(whatIf.getUuid())) {
+                    logger.info("创建模拟开通环境UUID为:" + whatIf.getUuid());
+                    taskDTO.setWhatIfCaseUuid(whatIf.getUuid());
+                    taskDTO.setDeviceWhatifs(whatIf.getDeviceWhatifs());
+                } else {
+                    logger.error("创建模拟开通数据失败！" + relevancyNat);
+                }
+
+            }
+            taskDtoList.add(taskDTO);
+            policyRecommendTaskService.updateTaskStatus(taskDTO.getId(), PolicyConstants.POLICY_INT_STATUS_SIMULATION_QUEUE);
+        }
+
+        recommendTaskManager.addSimulationTaskList(taskDtoList, authentication);
+
+        String message = String.format("工单：%s 进行仿真", org.apache.commons.lang3.StringUtils.join(themeList, ","));
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        String errmsg = String.format("%d个任务已加入策略仿真任务队列。\n", taskEntitylist.size());
+        if (taskEntitylist.size() == 0) {
+            errmsg = "没有策略仿真任务加入策略仿真队列。";
+        }
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, errmsg);
+    }
+
+    @ApiOperation("停止策略仿真")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "ids", value = "策略开通任务id列表", required = true, dataType = "String")
+    })
+    @PostMapping("recommend/stop")
+    public JSONObject stopRecommendTaskList(String ids) {
+        ids = String.format("[%s]", ids);
+        JSONArray jsonArray = JSONArray.parseArray(ids);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            logger.error("开始策略仿真任务为空！");
+            return getReturnJSON(ReturnCode.NO_TASK_ID_SELECTED_TO_START);
+        }
+
+        List<Integer> idList = null;
+        try {
+            idList = StringUtils.parseIntArrayList(ids);
+        } catch (Exception e) {
+            logger.error("解析任务列表出错！", e);
+        }
+
+        Map<String, String> themeMap = new HashMap<>();
+        List<String> taskList = new ArrayList<>();
+        StringBuilder errMsg = new StringBuilder();
+
+        boolean hasFailed = false;
+        for (int id : idList) {
+            logger.info(String.format("获取任务(%d)", id));
+            RecommendTaskEntity entity = policyRecommendTaskService.getRecommendTaskByTaskId(id);
+
+            if (entity == null) {
+                logger.error(String.format("获取任务(%d)失败, 任务不存在, 继续查找下一个...", id));
+                hasFailed = true;
+            } else if (entity.getStatus() == PolicyConstants.POLICY_INT_STATUS_SIMULATION_QUEUE ||
+                    entity.getStatus() == PolicyConstants.POLICY_INT_STATUS_SIMULATING) {
+                errMsg.append(String.format("无法停止任务(%s), 任务未开始或者已完成仿真！\n", entity.getTheme()));
+                hasFailed = true;
+            } else {
+                taskList.add(String.valueOf(id));
+                themeMap.put(String.valueOf(id), entity.getTheme());
+            }
+        }
+
+        if (taskList.size() == 0) {
+            logger.error("没有任务可以停止！");
+            errMsg.insert(0, "没有任务可以停止！");
+            return getReturnJSON(ReturnCode.NO_RECOMMEND_TASK_ENTITY_GET, "没有任务可以停止！");
+        }
+
+        String message = String.format("工单：%s 停止仿真", org.apache.commons.lang3.StringUtils.join(themeMap.values(), ","));
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        List<String> failedList = recommendTaskManager.stopTaskList(taskList);
+
+        for (String id : taskList) {
+            if (failedList.contains(id)) {
+                logger.info(String.format("停止任务（%s）失败", id));
+                errMsg.append(String.format("停止任务（%s）失败", id));
+                hasFailed = true;
+                logClientSimple.addBusinessLog(LogLevel.ERROR.getId(), BusinessLogType.POLICY_PUSH.getId(), String.format("停止工单: %s 失败", themeMap.get(id)));
+                continue;
+            }
+            Integer idNum = 0;
+            try {
+                idNum = Integer.valueOf(id);
+            } catch (Exception e) {
+                logger.error(String.format("转换任务id类型失败！id为(%s)", id));
+            }
+            policyRecommendTaskService.updateTaskStatus(idNum, PolicyConstants.POLICY_INT_STATUS_STOPPED);
+        }
+        String msg = "停止策略下发任务成功！";
+        int code = ReturnCode.POLICY_MSG_OK;
+        if (hasFailed) {
+            errMsg.insert(0, "停止策略下发任务完成！");
+            code = ReturnCode.INVALID_TASK_ID;
+            msg = errMsg.toString();
+        }
+
+        return getReturnJSON(code, msg);
+    }
+
+    @ApiOperation("批量开始验证任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "ids", value = "策略开通任务id", required = true, dataType = "String")
+    })
+    @PostMapping("verify/startverify")
+    public JSONObject startVerify(String ids) {
+        logger.info(String.format("开始批量验证[%s]... ", ids));
+
+        if (verifyTaskManager.isVerifyRunning()) {
+            return getReturnJSON(ReturnCode.VERIFY_TASK_IS_RUNNING);
+        }
+
+        ids = String.format("[%s]", ids);
+        JSONArray jsonArray = JSONArray.parseArray(ids);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            logger.error("添加到下发列表任务为空！");
+            return getReturnJSON(ReturnCode.NO_TASK_ID_SELECTED_TO_START);
+        }
+        StringBuilder sb = new StringBuilder();
+
+        List<Integer> idList = null;
+        try {
+            idList = StringUtils.parseIntArrayList(ids);
+        } catch (Exception e) {
+            logger.error("解析任务列表出错！", e);
+        }
+
+        List<String> themeList = new ArrayList<>();
+        List<RecommendTaskEntity> taskList = new ArrayList<>();
+        for (Integer id : idList) {
+            RecommendTaskEntity task = policyRecommendTaskService.getRecommendTaskByTaskId(id);
+            String relevancyNat = task.getRelevancyNat();
+            if (org.apache.commons.lang3.StringUtils.isNotEmpty(relevancyNat)) {
+                WhatIfRO whatIf = createWhatIfCaseUuid(relevancyNat);
+                if (whatIf != null && !AliStringUtils.isEmpty(whatIf.getUuid())) {
+                    logger.info("创建模拟开通环境UUID为:" + whatIf.getUuid());
+                    task.setWhatIfCase(whatIf.getUuid());
+                } else {
+                    logger.error("创建模拟开通数据失败！" + relevancyNat);
+                }
+
+            }
+            taskList.add(task);
+            sb.append(String.format(",%s[%s]开始验证！\n", task.getTheme(), task.getOrderNumber()));
+            themeList.add(task.getTheme());
+        }
+        String msg = sb.toString().replaceFirst(",", "");
+
+        logger.info(msg);
+        int rc = verifyTaskManager.startVerify(taskList);
+        String message = String.format("工单：%s 开始验证", org.apache.commons.lang3.StringUtils.join(themeList, ","));
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        return getReturnJSON(rc, "开始验证");
+    }
+
+    @ApiOperation("new 批量删除任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "ids", value = "策略开通任务id数组", required = true, dataType = "String")
+    })
+    @PostMapping("task/deletetask")
+    public JSONObject deleteTask(String ids) {
+        ids = String.format("[%s]", ids);
+        JSONArray jsonArray = JSONArray.parseArray(ids);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            logger.error("开始策略仿真任务为空！");
+            return getReturnJSON(ReturnCode.NO_TASK_ID_SELECTED_TO_START);
+        }
+
+        List<Integer> idList = null;
+        try {
+            idList = StringUtils.parseIntArrayList(ids);
+        } catch (Exception e) {
+            logger.error("解析任务列表出错！", e);
+        }
+
+        //检测删除的任务是否有在运行中的，有的话则不进行删除。
+        StringBuilder errMsg = new StringBuilder();
+        int rc = ReturnCode.POLICY_MSG_OK;
+        List<String> themeList = new ArrayList<>();
+        for (int id : idList) {
+            logger.info(String.format("获取任务(%d)", id));
+            RecommendTaskEntity taskEntity = policyRecommendTaskService.getRecommendTaskByTaskId(id);
+            //int taskStatus = taskEntity.getStatus();
+            themeList.add(taskEntity.getTheme());
+            if (taskEntity.getStatus() == PolicyConstants.POLICY_INT_STATUS_SIMULATION_QUEUE ||
+                    taskEntity.getStatus() == PolicyConstants.POLICY_INT_STATUS_SIMULATING ||
+                    taskEntity.getStatus() == PolicyConstants.POLICY_INT_STATUS_VERIFYING) {
+                rc = ReturnCode.CAN_NOT_DELETE_RUNNING_TASK;
+                errMsg.append(ReturnCode.getMsg(rc) + ":" + taskEntity.getTheme() + "\n");
+            }
+        }
+
+        if (rc != ReturnCode.POLICY_MSG_OK) {
+            return getReturnJSON(rc, errMsg.toString());
+        }
+
+        policyRecommendTaskService.removeTasks(idList);
+        String message = String.format("删除策略开通工单：%s 成功", org.apache.commons.lang3.StringUtils.join(themeList, ","));
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK);
+    }
+
+    @ApiOperation("new 设置路径有效")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "pathInfoIds", value = "路径信息id", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "enable", value = "是否启用(0:diable,1:enable)", required = true, dataType = "String")
+    })
+    @PostMapping("task/enablepath")
+    public JSONObject enablePath(String pathInfoIds, String enable,Authentication authentication) {
+        pathInfoIds = String.format("[%s]", pathInfoIds);
+        JSONArray jsonArray = JSONArray.parseArray(pathInfoIds);
+        if (jsonArray == null || jsonArray.size() == 0) {
+            logger.error("开始策略仿真任务为空！");
+            return getReturnJSON(ReturnCode.NO_TASK_ID_SELECTED_TO_START);
+        }
+
+        List<Integer> idList = null;
+        try {
+            idList = StringUtils.parseIntArrayList(pathInfoIds);
+        } catch (Exception e) {
+            logger.error("解析任务列表出错！", e);
+        }
+
+        PathInfoEntity entity = policyRecommendTaskService.getPathInfoByPathInfoId(idList.get(0));
+
+        int taskId = entity.getTaskId();
+        RecommendTaskEntity taskEntity = policyRecommendTaskService.getRecommendTaskByTaskId(taskId);
+        if (taskEntity.getStatus() > PolicyConstants.POLICY_INT_STATUS_SIMULATION_DONE) {
+            return getReturnJSON(ReturnCode.INVALID_TASK_STATUS);
+        }
+
+        for (Integer pathInfoId : idList) {
+            policyRecommendTaskService.setPathEnable(pathInfoId, enable);
+        }
+
+        String message = String.format("修改工单：%s ，路径id: %s，将路径设置为 %s", taskEntity.getTheme(), pathInfoIds, enable.equals("0") ? "无效" : "有效");
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+
+        SimulationTaskDTO task = new SimulationTaskDTO();
+        BeanUtils.copyProperties(taskEntity, task);
+        //设置服务对象
+        if (taskEntity.getServiceList() == null) {
+            task.setServiceList(null);
+        } else {
+            JSONArray array = JSONArray.parseArray(taskEntity.getServiceList());
+            List<ServiceDTO> serviceList = array.toJavaList(ServiceDTO.class);
+            task.setServiceList(serviceList);
+        }
+
+        int rc = recommendTaskManager.addReassembleCommandLineTask(task,authentication);
+
+        return getReturnJSON(rc);
+    }
+
+    @ApiOperation("获取策略命令行")
+    @GetMapping("download")
+    public JSONObject download(@ApiParam(name = "ids", value = "任务id", required = true) @RequestParam String ids,
+                               HttpServletResponse response) {
+        File file = null;
+        InputStream fin = null;
+        ServletOutputStream out = null;
+        String zipPath = policyRecommendTaskService.getRecommendZip(ids, dirPath);
+        if (zipPath == null) {
+            return getReturnJSON(ReturnCode.NO_COMMAND_TO_DOWNLOAD);
+        }
+        try {
+            file = new File(zipPath);
+            fin = new FileInputStream(file);
+
+            String fileName = file.getName();
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("application/msword");
+            // 设置浏览器以下载的方式处理该文件名
+            response.setHeader("Content-Disposition", "attachment;filename="
+                    .concat(String.valueOf(URLEncoder.encode(fileName, "UTF-8"))));
+            response.setCharacterEncoding("utf-8");
+            //您在这里稍微注意一下,中文在火狐下会出现乱码的现象
+            out = response.getOutputStream();
+            byte[] buffer = new byte[512];  // 缓冲区
+            int bytesToRead = -1;
+            // 通过循环将读入的Word文件的内容输出到浏览器中
+            while ((bytesToRead = fin.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesToRead);
+            }
+        } catch (Exception e) {
+            logger.error("压缩包下载异常", e);
+        } finally {
+            try {
+                if (fin != null) {
+                    fin.close();
+                }
+                ;
+                if (out != null) {
+                    out.close();
+                }
+                ;
+                if (file != null) {
+                    file.delete();
+                }
+                ;
+            } catch (IOException e) {
+                logger.error("io流异常");
+            }
+        }
+
+        //上面流已经返回了，后面不能有新的return值，否则会抛异常
+        return null;
+    }
+
+    @ApiOperation("new 获取单个任务详细信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskId", value = "策略开通任务id", required = true, dataType = "String")
+    })
+    @PostMapping("task/getpathstatic")
+    public JSONObject getPathStaticByTaskId(String taskId) {
+        int taskIdNum = 0;
+        try {
+            taskIdNum = Integer.valueOf(taskId);
+        } catch (Exception e) {
+            getReturnJSON(ReturnCode.FAILED, "工单号不正确!");
+        }
+
+        RecommendTaskEntity taskEntity = policyRecommendTaskService.getRecommendTaskByTaskId(taskIdNum);
+        if (taskEntity.getStatus().equals(PolicyConstants.POLICY_INT_STATUS_SIMULATION_NOT_STARTED)) {
+            return getReturnJSON(ReturnCode.POLICY_MSG_OK, "模拟仿真未开始");
+        }
+
+        List<PathInfoEntity> list = policyRecommendTaskService.getPathInfoByTaskId(taskIdNum);
+        if (list.size() == 0) {
+            getReturnJSON(ReturnCode.POLICY_MSG_OK, "无路径生成");
+        }
+
+        int success = 0;
+        int failed = 0;
+        int notStart = 0;
+        int error = 0;
+        int access = 0;
+        int noSrcSubnet = 0;
+        int noDstSubnet = 0;
+        int pathNoExists = 0;
+        for (PathInfoEntity entity : list) {
+            switch (entity.getAnalyzeStatus()) {
+                case PolicyConstants.POLICY_INT_RECOMMEND_TASK_NO_STARTED:
+                    notStart++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_FINISHED:
+                    success++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_ERROR:
+                    error++;
+                    failed++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_FULL_ACCESS:
+                    access++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_SRC_ADDRESS_HAS_NO_SUBNET:
+                    noSrcSubnet++;
+                    failed++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_DST_ADDRESS_HAS_NO_SUBNET:
+                    noDstSubnet++;
+                    failed++;
+                    break;
+                case PolicyConstants.POLICY_INT_RECOMMEND_ANALYZE_NO_ACCESS:
+                    pathNoExists++;
+                    failed++;
+                    break;
+            }
+        }
+
+        JSONObject object = new JSONObject();
+
+        if (notStart > 0) {
+            object.put("info", String.format("未开始（未开始 %d 条路径）", notStart));
+        }
+        if (success > 0) {
+            object.put("success", String.format("开通成功（开通 %d 条路径）", success));
+        }
+        if (access > 0) {
+            object.put("access", String.format("无需开通（已有通路 %d 条）", access));
+        }
+        if (failed > 0) {
+            StringBuilder sb = new StringBuilder();
+            if (error > 0) {
+                sb.append(String.format(";系统执行异常 %d 条", error));
+            }
+            if (noSrcSubnet > 0) {
+                sb.append(String.format(";源地址无对应子网 %d 条", noSrcSubnet));
+            }
+            if (noDstSubnet > 0) {
+                sb.append(String.format(";未找到可达路径 %d 条", noDstSubnet));
+            }
+            if (pathNoExists > 0) {
+                sb.append(String.format("; %d 条路径不存在", pathNoExists));
+            }
+            if (sb.length() > 0) {
+                sb.deleteCharAt(0);
+            }
+            object.put("danger", String.format("开通失败（%s）", sb.toString()));
+        }
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, object);
+    }
+
+    @ApiOperation("new 获取单个任务详细信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskId", value = "策略开通任务id", required = true, dataType = "String")
+    })
+    @PostMapping("task/gettaskbyid")
+    public JSONObject getTaskById(String taskId) {
+        int taskIdNum = Integer.valueOf(taskId);
+        RecommendTaskEntity recommendTaskEntity = policyRecommendTaskService.getRecommendTaskByTaskId(taskIdNum);
+        PushTaskDetailVO pushTaskDetailVO = new PushTaskDetailVO();
+
+        BeanUtils.copyProperties(recommendTaskEntity, pushTaskDetailVO);
+        if (recommendTaskEntity.getTaskType() == PolicyConstants.POLICY_INT_PUSH_TASK_TYPE_MANUAL_CREATED) {
+            String additionInfo = recommendTaskEntity.getAdditionInfo();
+            JSONObject object = JSONObject.parseObject(additionInfo);
+            PushAdditionalInfoEntity pushAdditionalInfoEntity = object.toJavaObject(PushAdditionalInfoEntity.class);
+            String deviceUuid = pushAdditionalInfoEntity.getDeviceUuid();
+            if (deviceUuid != null) {
+                NodeEntity nodeEntity = policyRecommendTaskService.getTheNodeByUuid(deviceUuid);
+                if (nodeEntity != null) {
+                    pushTaskDetailVO.setDeviceName(nodeEntity.getDeviceName());
+                }
+            }
+            pushTaskDetailVO.setSrcZone(pushAdditionalInfoEntity.getSrcZone());
+            pushTaskDetailVO.setDstZone(pushAdditionalInfoEntity.getDstZone());
+            pushTaskDetailVO.setInDevItf(pushAdditionalInfoEntity.getInDevItf());
+            pushTaskDetailVO.setOutDevItf(pushAdditionalInfoEntity.getOutDevItf());
+            pushTaskDetailVO.setAction(pushAdditionalInfoEntity.getAction());
+            pushTaskDetailVO.setCreateTime(recommendTaskEntity.getCreateTime());
+        }
+
+        String serviceListString = recommendTaskEntity.getServiceList();
+        if (!AliStringUtils.isEmpty(serviceListString)) {
+            JSONArray jsonArray = JSONArray.parseArray(serviceListString);
+            List<ServiceDTO> serviceList = jsonArray.toJavaList(ServiceDTO.class);
+            for (ServiceDTO serviceDTO : serviceList) {
+                serviceDTO.setProtocol(ProtocolUtils.getProtocolByString(serviceDTO.getProtocol()));
+                serviceDTO.setSrcPorts(null);
+                if (serviceDTO.getDstPorts() != null) {
+                    if (serviceDTO.getDstPorts().equalsIgnoreCase(PolicyConstants.POLICY_STR_VALUE_ANY)) {
+                        serviceDTO.setDstPorts(null);
+                    }
+                }
+            }
+            pushTaskDetailVO.setServiceList(JSONObject.toJSONString(serviceList));
+        }
+
+        if (recommendTaskEntity.getTaskType() == PolicyConstants.POLICY_INT_PUSH_TASK_TYPE_INTERNET_RECOMMEND) {
+            String additionalInfo = recommendTaskEntity.getAdditionInfo();
+            JSONObject object = JSONObject.parseObject(additionalInfo);
+            InternetAdditionalInfoEntity additionalInfoEntity = object.toJavaObject(InternetAdditionalInfoEntity.class);
+            pushTaskDetailVO.setExitSubnet(JSONObject.toJSONString(additionalInfoEntity.getExitSubnetList()));
+        }
+
+        String jsonObjectString = JSONObject.toJSONString(pushTaskDetailVO);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+
+    @ApiOperation("new 添加互联网开通任务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "theme", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "description", value = "申请描述", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "srcIp", value = "源IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "dstIp", value = "目的IP", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "entrySubnet", value = "入口子网", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "exitSubnet", value = "出口子网", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "serviceList", value = "协议号", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "startTime", value = "策略开始时间", required = false, dataType = "Long"),
+            @ApiImplicitParam(paramType = "query", name = "endTime", value = "策略结束时间", required = false, dataType = "Long"),
+    })
+    @PostMapping("task/addinternat")
+    public JSONObject addInternatRecommendTask(@RequestBody AddRecommendTaskEntity entity, Authentication auth) {
+        int rc = InputValueUtils.checkIp(entity.getSrcIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "源地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setSrcIp(InputValueUtils.autoCorrect(entity.getSrcIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+
+        rc = InputValueUtils.checkIp(entity.getDstIp());
+        if (rc != ReturnCode.POLICY_MSG_OK && rc != ReturnCode.INVALID_IP_RANGE) {
+            String msg = "目的地址错误！" + ReturnCode.getMsg(rc);
+            return getReturnJSON(rc, msg);
+        }
+
+        //若出IP范围起始地址大于终止地址错误，则自动纠正
+        if (rc == ReturnCode.INVALID_IP_RANGE) {
+            entity.setDstIp(InputValueUtils.autoCorrect(entity.getDstIp()));
+            rc = ReturnCode.POLICY_MSG_OK;
+        }
+        List<ServiceDTO> serviceList = entity.getServiceList();
+
+        if (serviceList != null) {
+            for (ServiceDTO service : serviceList) {
+                if (!AliStringUtils.isEmpty(service.getDstPorts())) {
+                    service.setDstPorts(InputValueUtils.autoCorrectPorts(service.getDstPorts()));
+                }
+            }
+        }
+
+        //去掉IP地址中无用的空地址
+        entity.setSrcIp(InputValueUtils.formatIpAddress(entity.getSrcIp()));
+        entity.setDstIp(InputValueUtils.formatIpAddress(entity.getDstIp()));
+
+        //添加数据检测
+
+        RecommendTaskEntity recommendTaskEntity = new RecommendTaskEntity();
+
+        BeanUtils.copyProperties(entity, recommendTaskEntity);
+
+
+        //服务对象转换成字符串保存数据库, 若服务为空，则为any
+        recommendTaskEntity.setServiceList(entity.getServiceList() == null ? null : JSONObject.toJSONString(entity.getServiceList()));
+
+        UserInfoDTO   userInfoDTO = remoteBranchService.findOne(auth.getName());
+        if(userInfoDTO != null && org.apache.commons.lang3.StringUtils.isNotEmpty(userInfoDTO.getBranchLevel())){
+            recommendTaskEntity.setBranchLevel(userInfoDTO.getBranchLevel());
+        }else{
+            recommendTaskEntity.setBranchLevel("00");
+        }
+        //设置创建时间和流水号（时间相关）
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        String orderNumber = "A" + simpleDateFormat.format(date);
+        recommendTaskEntity.setCreateTime(date);
+        recommendTaskEntity.setOrderNumber(orderNumber);
+
+        //设置用户名
+        recommendTaskEntity.setUserName(auth.getName());
+
+        InternetAdditionalInfoEntity additionalInfoEntity = new InternetAdditionalInfoEntity();
+        JSONArray dstArray = JSONObject.parseArray(entity.getExitSubnet());
+        List<SubnetEntity> exitSubnetList = dstArray.toJavaList(SubnetEntity.class);
+        additionalInfoEntity.setExitSubnetList(exitSubnetList);
+        recommendTaskEntity.setAdditionInfo(JSONObject.toJSONString(additionalInfoEntity));
+        if (entity.getIdleTimeout() != null) {
+            recommendTaskEntity.setIdleTimeout(entity.getIdleTimeout() * HOUR_SECOND);
+        } else {
+            recommendTaskEntity.setIdleTimeout(null);
+        }
+        //设置状态和任务类型
+        recommendTaskEntity.setTaskType(PolicyConstants.POLICY_INT_PUSH_TASK_TYPE_INTERNET_RECOMMEND);
+        recommendTaskEntity.setStatus(PolicyConstants.POLICY_INT_STATUS_INITIAL);
+        List<RecommendTaskEntity> list = new ArrayList<>();
+        list.add(recommendTaskEntity);
+        policyRecommendTaskService.insertRecommendTaskList(list);
+        String message = String.format("新建互联网开通工单：%s 成功", recommendTaskEntity.getTheme());
+        logClientSimple.addBusinessLog(LogLevel.INFO.getId(), BusinessLogType.POLICY_PUSH.getId(), message);
+        return getReturnJSON(rc);
+    }
+
+    @ApiOperation("new 策略开通搜索列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "theme", value = "策略主题", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "userName", value = "用户名称", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "startTime", value = "策略开始时间", required = false, dataType = "Long"),
+            @ApiImplicitParam(paramType = "query", name = "endTime", value = "策略结束时间", required = false, dataType = "Long"),
+            @ApiImplicitParam(paramType = "query", name = "page", value = "页数", required = true, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "psize", value = "每页条数", required = true, dataType = "String")
+    })
+    @PostMapping("task/searchbatchlist")
+    public JSONObject getbatchList(String theme, String userName, Long taskStart, Long taskEnd, int page, int psize) {
+        PageInfo<BatchTaskVO> pageInfo = policyRecommendTaskService.searchBatchTaskList(theme, userName, page, psize);
+
+        String jsonObjectString = JSONObject.toJSONString(pageInfo);
+        JSONObject jsonObject = JSONObject.parseObject(jsonObjectString);
+
+        return getReturnJSON(ReturnCode.POLICY_MSG_OK, jsonObject);
+    }
+
+    String getSubnetDeviceList(String subnetUuid) {
+        String devices = new String();
+        if (AliStringUtils.isEmpty(subnetUuid)) {
+            logger.info("子网uuid为空，没有关联设备");
+            return devices;
+        }
+
+        List<String> deviceUuidList = whaleService.getSubnetDeviceUuidList(subnetUuid);
+        if (deviceUuidList == null) {
+            logger.error("获取子网关联设备uuidList失败");
+            return devices;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (String deviceUuid : deviceUuidList) {
+            NodeEntity node = policyRecommendTaskService.getTheNodeByUuid(deviceUuid);
+            if (node == null) {
+                logger.error(String.format("设备(%s)不存在...", deviceUuid));
+                continue;
+            }
+            sb.append(PolicyConstants.ADDRESS_SEPERATOR);
+            sb.append(String.format("%s(%s)", node.getDeviceName(), node.getIp()));
+        }
+
+        if (sb.length() > 0) {
+            sb.deleteCharAt(0);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 检测Nat模板页工单列表合法性
+     *
+     * @param natExcelList nat模板页工单列表
+     * @return 错误提示，若为空字符串（“”）,则无错误
+     */
+    String checkExcelNatTaskValidation(List<ExcelTaskNatEntity> natExcelList) {
+        StringBuilder sb = new StringBuilder();
+        int rowNum = 2;
+        List<ExcelTaskNatEntity> emptyList = new ArrayList<>();
+        Set<String> indexSet = new HashSet<>();
+        for (ExcelTaskNatEntity entity : natExcelList) {
+            if (entity.isEmpty()) {
+                emptyList.add(entity);
+                continue;
+            }
+
+            int rc = entity.validation();
+            if (rc != ReturnCode.POLICY_MSG_OK) {
+                sb.append(String.format("Nat模板页第%d行错误！%s\n", rowNum, ReturnCode.getMsg(rc)));
+            }
+
+            if (indexSet.contains(entity.getId())) {
+                sb.append(String.format("Nat模板页第%d行错误！序号重复。\n", rowNum));
+            } else {
+                indexSet.add(entity.getId());
+            }
+
+            if (AliStringUtils.isEmpty(entity.getPostSrcAddress()) && AliStringUtils.isEmpty(entity.getPostDstAddress())) {
+                sb.append(String.format("Nat模板页第%d行错误！转换后源/目的地址不能都为空", rowNum));
+            }
+            String deviceIp = entity.getDeviceIp();
+            NodeEntity nodeEntity = policyRecommendTaskService.getDeviceByManageIp(deviceIp);
+            if (nodeEntity == null) {
+                sb.append(String.format("Nat模板页第%d行错误！设备%s不存在！\n", rowNum, deviceIp));
+                rowNum++;
+                continue;
+            }
+
+            if (!InputValueUtils.validOrderName(entity.getTheme())) {
+                sb.append("Nat模板页第" + rowNum + "行主题（工单号）不合法，主题（工单号）长度不超过64个字符，只能包括数字，字母和短横线(-)，只能以字母开头！<br>");
+                continue;
+            }
+
+            if (entity.getNatType().equalsIgnoreCase("STATIC")) {
+                if (nodeEntity.getModelNumber().equals("Cisco ASA")) {
+                    if (AliStringUtils.isEmpty(entity.getPostSrcAddress()) || AliStringUtils.isEmpty(entity.getPreSrcAddress())) {
+                        sb.append(String.format("Nat模板页第%d行错误！Cisco设备静态Nat转换前/转换后源地址不能为空！", rowNum));
+                    }
+                } else {
+                    if (AliStringUtils.isEmpty(entity.getPostDstAddress())) {
+                        sb.append(String.format("Nat模板页第%d行错误！静态Nat转换后源的地址不能为空！", rowNum));
+                    }
+                }
+            }
+            rowNum++;
+        }
+
+        natExcelList.removeAll(emptyList);
+
+        return sb.toString();
+    }
+
+    /**
+     * 将Nat开通工单Excel数据转化为WhatIfNatDTO列表
+     *
+     * @param natExcelList nat模板页工单列表
+     * @return WhatIfNatDTO列表
+     */
+    List<WhatIfNatDTO> getWhatIfNatDTOList(List<ExcelTaskNatEntity> natExcelList) {
+        List<WhatIfNatDTO> whatIfNatDTOList = new ArrayList<>();
+        for (ExcelTaskNatEntity entity : natExcelList) {
+            WhatIfNatDTO whatIfNatDTO = new WhatIfNatDTO();
+            NodeEntity nodeEntity = policyRecommendTaskService.getDeviceByManageIp(entity.getDeviceIp());
+            if (nodeEntity == null) {
+                logger.error(String.format("设备%s不存在，无法获取设备UUID，跳过转换WhatIfNatDTO过程...", entity.getDeviceIp()));
+                continue;
+            }
+
+            String deviceUuid = nodeEntity.getUuid();
+            whatIfNatDTO.setDeviceUuid(deviceUuid);
+            whatIfNatDTO.setName(entity.getTheme() + "-" + entity.getId());
+            BeanUtils.copyProperties(entity, whatIfNatDTO);
+            if (entity.getNatType().equals("STATIC")) {
+                whatIfNatDTO.setNatType("STATIC");
+                if (!AliStringUtils.isEmpty(entity.getPostSrcAddress())) {
+                    whatIfNatDTO.setNatField("BI_DIR_SRC");
+                } else if (!AliStringUtils.isEmpty(entity.getPostDstAddress())) {
+                    whatIfNatDTO.setNatField("BI_DIR_DST");
+                }
+            } else if (entity.getNatType().equals("SNAT")) {
+                whatIfNatDTO.setNatType("DYNAMIC");
+                whatIfNatDTO.setNatField("SRC");
+                whatIfNatDTO.setPostDstAddress(null);
+            } else if (entity.getNatType().equals("DNAT")) {
+                whatIfNatDTO.setNatField("DST");
+                whatIfNatDTO.setNatType("DYNAMIC");
+                whatIfNatDTO.setPostSrcAddress(null);
+            } else if (entity.getNatType().equals("BOTH")) {
+                whatIfNatDTO.setNatField("BOTH");
+                whatIfNatDTO.setNatType("DYNAMIC");
+            }
+            whatIfNatDTOList.add(whatIfNatDTO);
+        }
+
+        return whatIfNatDTOList;
+    }
+
+
+
+    /**
+     * 创建模拟变更环境
+     *
+     * @param natExcelList   模拟变更环境数据列表
+     * @param natTaskList    nat开通任务列表
+     * @param whatIfCaseName 模拟变更名称
+     * @param user           用户
+     * @return 模拟变更环境UUID
+     */
+    private WhatIfRO createWhatIfCaseUuid(List<ExcelTaskNatEntity> natExcelList, List<RecommendTaskEntity> natTaskList, String whatIfCaseName, String user,UserInfoDTO userInfoDTO) {
+        WhatIfRO whatIf = null;
+        if (natExcelList != null && natExcelList.size() > 0) {
+            List<WhatIfNatDTO> whatIfNatDTOList = getWhatIfNatDTOList(natExcelList);
+            whatIf = whatIfService.createWhatIfCase(whatIfNatDTOList, whatIfCaseName, whatIfCaseName);
+            if (whatIf != null && !AliStringUtils.isEmpty(whatIf.getUuid())) {
+                logger.info("创建模拟开通环境UUID为:" + whatIf.getUuid());
+                List<RecommendTaskEntity> tmpList = excelParser.getRecommendTaskEntity(natExcelList, whatIfCaseName, user,userInfoDTO);
+                natTaskList.addAll(tmpList);
+            } else {
+                logger.error("创建模拟开通数据失败！" + JSONObject.toJSONString(natExcelList));
+            }
+        }
+        return whatIf;
+    }
+
+
+
+    /**
+     * 创建模拟变更环境
+     * <p>
+     * //     * @param natExcelList   模拟变更环境数据列表
+     * //     * @param natTaskList    nat开通任务列表
+     * //     * @param whatIfCaseName 模拟变更名称
+     * //     * @param user           用户
+     *
+     * @return 模拟变更环境UUID
+     */
+    private WhatIfRO createWhatIfCaseUuid(String relevancyNat) {
+        WhatIfRO whatIf = null;
+        String whatIfCaseName = String.format("A%s", String.valueOf(System.currentTimeMillis()));
+        JSONArray whatIfCaseArray = JSONObject.parseArray(relevancyNat);
+        List<WhatIfNatDTO> whatIfNatDTOList = new ArrayList<>();
+        if (whatIfCaseArray != null && whatIfCaseArray.size() > 0) {
+
+            for (int i = 0; i < whatIfCaseArray.size(); i++) {
+                JSONObject jsonObject = (JSONObject) whatIfCaseArray.get(i);
+                int taskId = jsonObject.getIntValue("taskId");
+                RecommendTaskEntity recommendTaskByTask = policyRecommendTaskService.getRecommendTaskByTaskId(taskId);
+                WhatIfNatDTO whatIfNatDTO = new WhatIfNatDTO();
+                String additionInfo = recommendTaskByTask.getAdditionInfo();
+                if (org.apache.commons.lang3.StringUtils.isEmpty(additionInfo)) {
+                    //不是nat策略
+                    continue;
+                }
+                JSONObject additionJson = JSONObject.parseObject(additionInfo);
+                String deviceUuid = additionJson.getString("deviceUuid");
+                if (deviceUuid == null) {
+                    logger.error(String.format("设备%s不存在，无法获取设备UUID，跳过转换WhatIfNatDTO过程...", deviceUuid));
+                    continue;
+                }
+                whatIfNatDTO.setDeviceUuid(deviceUuid);
+                whatIfNatDTO.setName(recommendTaskByTask.getTheme() );
+                BeanUtils.copyProperties(recommendTaskByTask, whatIfNatDTO);
+                whatIfNatDTO.setPreDstAddress(recommendTaskByTask.getDstIp());
+                whatIfNatDTO.setPreSrcAddress(recommendTaskByTask.getSrcIp());
+
+                String preService = recommendTaskByTask.getServiceList();
+                List<ServiceDTO> serviceDTOList = new ArrayList<>();
+                if (org.apache.commons.lang3.StringUtils.isNotEmpty(preService)) {
+                    serviceDTOList = JSONArray.parseArray(preService, ServiceDTO.class);
+                    whatIfNatDTO.setPreServiceList(serviceDTOList);
+                }
+                whatIfNatDTO.setDstZone(additionJson.getString("dstZone"));
+
+                whatIfNatDTO.setSrcZone(additionJson.getString("srcZone"));
+                whatIfNatDTO.setInDevItf(additionJson.getString("srcItf"));
+                whatIfNatDTO.setOutDevItf(additionJson.getString("dstItf"));
+                String natField = NatTypeEnum.getNatByCode(recommendTaskByTask.getTaskType()).getNatField();
+                if ("STATIC".equalsIgnoreCase(natField)) {
+                    whatIfNatDTO.setNatType("STATIC");
+                    String preDstAddress = additionJson.getString("insideAddress");
+                    whatIfNatDTO.setPreDstAddress(preDstAddress);
+                    String postDstAddress = additionJson.getString("globalAddress");
+                    whatIfNatDTO.setPostDstAddress(postDstAddress);
+                } else if ("SRC".equalsIgnoreCase(natField)) {
+                    whatIfNatDTO.setNatType("DYNAMIC");
+                    whatIfNatDTO.setNatField("SRC");
+                    whatIfNatDTO.setPostDstAddress(null);
+                    whatIfNatDTO.setPostSrcAddress(additionJson.getString("postIpAddress"));
+                } else if ("DST".equalsIgnoreCase(natField)) {
+                    whatIfNatDTO.setNatField("DST");
+                    whatIfNatDTO.setNatType("DYNAMIC");
+                    whatIfNatDTO.setPostSrcAddress(null);
+                    whatIfNatDTO.setPostDstAddress(additionJson.getString("postIpAddress"));
+                } else if ("BOTH".equalsIgnoreCase(natField)) {
+                    whatIfNatDTO.setNatField("BOTH");
+                    whatIfNatDTO.setNatType("DYNAMIC");
+                    whatIfNatDTO.setPostSrcAddress(additionJson.getString("postSrcIp"));
+                    whatIfNatDTO.setPostDstAddress(additionJson.getString("postDstIp"));
+                    String postPort = additionJson.getString("postPort");
+                    if (CollectionUtils.isNotEmpty(serviceDTOList) && org.apache.commons.lang3.StringUtils.isNotEmpty(postPort)) {
+                        List<ServiceDTO> serviceDTOListPost = new ArrayList<>();
+
+                        for (ServiceDTO serviceDTO : serviceDTOList) {
+                            ServiceDTO serviceDTO1 = new ServiceDTO();
+                            serviceDTO1.setProtocol(serviceDTO.getProtocol());
+                            serviceDTO1.setDstPorts(postPort);
+                            serviceDTOListPost.add(serviceDTO1);
+                        }
+                        whatIfNatDTO.setPostServiceList(serviceDTOListPost);
+                    }
+                }
+                whatIfNatDTOList.add(whatIfNatDTO);
+            }
+        }
+        whatIf = whatIfService.createWhatIfCase(whatIfNatDTOList, whatIfCaseName, whatIfCaseName);
+        return whatIf;
+    }
+
+
+    @ApiOperation(value = "策略开通excel导出")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "isReload", value = "是否重新下载", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "startTime", value = "开始时间", required = false, dataType = "String"),
+            @ApiImplicitParam(paramType = "query", name = "endTime", value = "结束时间", required = false, dataType = "String")
+    })
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "")})
+    @RequestMapping(value = "task/export", produces = "application/json; charset=utf-8", method = RequestMethod.GET)
+    @ResponseBody
+    public ResultRO<JSONObject> download(HttpServletResponse response, String isReload,String startTime, String endTime,Authentication authentication) throws Exception {
+
+        List<RecommendTaskEntity> taskList = policyRecommendTaskService.getTaskListByTime(startTime, endTime,authentication);
+
+        ResultRO<JSONObject> resultRO = new ResultRO(true);
+        JSONObject jsonObject = new JSONObject();
+        String standardDateTime = DateUtil.getTimeStamp();
+        String preFilename = "策略开通导出";
+        try {
+            preFilename = new String(preFilename.getBytes("UTF-8"), "UTF-8");
+            preFilename += "_" + standardDateTime;
+        } catch (UnsupportedEncodingException e1) {
+            logger.error("生成策略开通报表文件名称异常", e1);
+        }
+
+        String destDirName = dirPath + "/policyAddExcel";
+        String filePath = destDirName + "/" + preFilename + ".xlsx";
+        String doingFileTemp = destDirName + "/" + "policyAdddoing.temp";
+
+        try {
+            // 生成策略开通文件夹
+            if (!new File(destDirName).exists()) {
+                FileUtils.createDir(destDirName);
+            }
+
+            String fileIsExistsName = FileUtils.isDirExistFile(destDirName);
+            boolean doingFileTempIsExists = FileUtils.fileIsExists(doingFileTemp);
+            boolean fileIsExists = FileUtils.fileIsExists(destDirName + "/" + fileIsExistsName);
+            if (null == isReload) {
+                if (fileIsExists && doingFileTempIsExists == false) {
+                    resultRO.setMessage("文件生成成功");
+                    jsonObject.put("filePath", fileIsExistsName);
+                    jsonObject.put("status", 1);
+                    resultRO.setData(jsonObject);
+                    return resultRO;
+                } else if (doingFileTempIsExists) {
+                    // 有正在生成的临时文件
+                    resultRO.setMessage("文件生成中");
+                    jsonObject.put("filePath", preFilename + ".xlsx");
+                    jsonObject.put("status", 2);
+                    resultRO.setData(jsonObject);
+                    return resultRO;
+                } else if (doingFileTempIsExists == false && fileIsExists == false) {
+                    // 生成临时文件
+                    File doingFile = new File(doingFileTemp);
+                    doingFile.createNewFile();
+                    resultRO.setMessage("生成成功");
+                    jsonObject.put("filePath", preFilename + ".xlsx");
+                    jsonObject.put("status", 2);
+                    new PolicyAddThread(filePath, doingFile, taskList).start();
+                    resultRO.setData(jsonObject);
+                    return resultRO;
+                }
+            }
+            if ("true".equals(isReload)) {
+                // 生成临时文件
+                FileUtils.deleteFileByPath(destDirName + "/" + fileIsExistsName);
+                // 不存在获取数据从新下载
+                // 生成临时文件
+                File doingFile = new File(doingFileTemp);
+                doingFile.createNewFile();
+                new PolicyAddThread(filePath, doingFile, taskList).start();
+                resultRO.setMessage("正在生成文件");
+                jsonObject.put("filePath", preFilename + ".xlsx");
+                jsonObject.put("status", 2);
+                resultRO.setData(jsonObject);
+                return resultRO;
+            } else {
+                downLoadPolicyAdd(response, destDirName + "/" + fileIsExistsName, destDirName);
+                return null;
+            }
+        } catch (Exception e) {
+            File doingFile = new File(doingFileTemp);
+            doingFile.delete();
+            logger.error("下载策略概览Excel表格失败:", e);
+            resultRO.setMessage("数据导出失败");
+            resultRO.setSuccess(false);
+            jsonObject.put("filePath", filePath);
+            jsonObject.put("status", 3);
+            resultRO.setData(jsonObject);
+        }
+        return resultRO;
+    }
+
+    // 策略开通下载
+    private void downLoadPolicyAdd(HttpServletResponse response, String fileExcitPath, String destDirName) {
+        File src = new File(fileExcitPath);
+        FileUtils.downloadOverView(src, response);
+    }
+
+    // 策略开通线程启动类,用于生成excel
+    private class PolicyAddThread extends Thread {
+        private String filePath;
+        private File doingFile;
+        private List<RecommendTaskEntity> taskList;
+
+        public PolicyAddThread(String filePath, File doingFile, List<RecommendTaskEntity> taskList) {
+            super();
+            this.filePath = filePath;
+            this.doingFile = doingFile;
+            this.taskList = taskList;
+        }
+
+        public PolicyAddThread() {
+            super();
+        }
+
+        @Override
+        public void run() {
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(filePath);
+                List<List<String>> data = new ArrayList<List<String>>();
+                int index = 1;
+                for (RecommendTaskEntity task : taskList) {
+                    String relevancyNat = task.getRelevancyNat();
+                    if(org.apache.commons.lang3.StringUtils.isNotBlank(relevancyNat)){
+                        JSONArray natList = JSONArray.parseArray(relevancyNat);
+                        for(int i = 0; i< natList.size();i ++){
+                            List<String> rowData = new ArrayList<>();
+                            JSONObject json = natList.getJSONObject(i);
+                            int id = json.getInteger("id");
+                            PageInfo<PolicyTaskDetailVO> pageInfo = policyRecommendTaskService.getNatPolicyTaskList(null, null, 1, 20,null,id,null,null);
+                            PolicyTaskDetailVO natDetail = pageInfo.getList().get(0);
+
+                            rowData.add(index+"");
+                            rowData.add(task.getTheme());
+                            rowData.add(getStatusString(task.getStatus()));
+                            rowData.add(task.getSrcIp());
+                            rowData.add(task.getSrcIpSystem());
+                            rowData.add(task.getDstIp());
+                            rowData.add(task.getDstIpSystem());
+                            rowData.add(getServiceString(task.getServiceList()));
+                            rowData.add(task.getIdleTimeout() == null ? "":task.getIdleTimeout().toString());
+                            if(task.getStartTime() == null ){
+                                rowData.add("");
+                            } else {
+                                rowData.add(getTimeString(task.getStartTime())+"-"+getTimeString(task.getEndTime()));
+                            }
+                            rowData.add(task.getUserName());
+                            rowData.add(getTimeString(task.getCreateTime()));
+                            rowData.add(task.getDescription());
+
+                            // nat数据
+                            rowData.add(natDetail.getPolicyName());
+                            rowData.add(natDetail.getDeviceIp());
+                            rowData.add(natDetail.getSrcDomain());
+                            rowData.add(natDetail.getDstDomain());
+                            rowData.add(natDetail.getPreSrcIp());
+                            rowData.add(natDetail.getPostSrcIp());
+                            rowData.add(natDetail.getDstIp());
+                            rowData.add(getServiceString(natDetail.getService()));
+                            if(natDetail.getCreateTime() == null ){
+                                rowData.add("");
+                            } else {
+                                rowData.add(getTimeString(natDetail.getCreateTime()));
+                            }
+                            rowData.add(natDetail.getUserName());
+                            data.add(rowData);
+                            index++;
+                        }
+                    } else {
+                        List<String> rowData = new ArrayList<>();
+                        rowData.add(String.valueOf(index));
+                        rowData.add(task.getTheme());
+                        rowData.add(getStatusString(task.getStatus()));
+                        rowData.add(task.getSrcIp());
+                        rowData.add(task.getSrcIpSystem());
+                        rowData.add(task.getDstIp());
+                        rowData.add(task.getDstIpSystem());
+                        rowData.add(getServiceString(task.getServiceList()));
+                        rowData.add(task.getIdleTimeout() == null ? "":task.getIdleTimeout().toString());
+                        if(task.getStartTime() == null ){
+                            rowData.add("");
+                        } else {
+                            rowData.add(getTimeString(task.getStartTime())+"-"+getTimeString(task.getEndTime()));
+                        }
+                        rowData.add(task.getUserName());
+
+                        if(task.getCreateTime() == null ){
+                            rowData.add("");
+                        } else {
+                            rowData.add(getTimeString(task.getCreateTime()));
+                        }
+                        rowData.add(task.getDescription());
+                        data.add(rowData);
+                        index++;
+                    }
+                }
+                String[] headers = { "序号", "主题（工单号）", "任务状态",  "源地址", "源地址所属系统", "目的地址", "目的地址所属系统", "服务", "长连接（秒）", "生效时间","申请人","创建时间","有效期","仿真NAT(主题工单号)",
+                        "仿真NAT（设备）", "仿真NAT（源域/接口）", "仿真NAT（目的域/接口）","仿真NAT（源地址-转换前）", "仿真NAT（源地址-转换后）", "仿真NAT（目的地址）", "仿真NAT（服务）","仿真NAT（创建时间）", "仿真NAT（创建人）"};
+                ExportExcelUtils eeu = new ExportExcelUtils();
+                XSSFWorkbook workbook = new XSSFWorkbook();
+                eeu.exportPolicyAddData(workbook, 0, "策略开通列表", headers, data, out);
+                // 原理就是将所有的数据一起写入，然后再关闭输入流。
+                workbook.write(out);
+            } catch (Exception e) {
+                File file = new File(filePath);
+                if(file.exists()) {
+                    file.delete();
+                }
+                logger.error("策略开通导出excel异常", e);
+            }finally {
+                try{
+                    if(out != null) {
+                        out.close();
+                    }
+                }catch (IOException e1){
+                    logger.error("关闭流异常");
+                }
+            }
+            doingFile.delete();
+        }
+    }
+
+    private String getTimeString(Date time){
+        if(time == null){
+            return "";
+        }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String timeString = sdf.format(time);
+        return timeString;
+    }
+
+    /**
+     * 导出excel状态字段调整
+     * @param status
+     * @return
+     */
+    private String getStatusString(Integer status){
+        switch (status.intValue()) {
+            case 0 :
+                return "仿真未开始";
+            case 1 :
+                return "仿真等待中";
+            case 2 :
+                return "仿真执行中";
+            case 9 :
+                return "仿真失败";
+            case 10 :
+                return "仿真完成";
+            case 20:
+                return "下发成功";
+            case 21:
+                return "验证中";
+            case 22:
+                return  "验证等待中";
+            case 29:
+                return  "验证失败";
+            case 30:
+                return "验证完成";
+             default:
+                 return String.valueOf(status);
+        }
+    }
+
+    /**
+     * 导出-获取服务
+     * @param service
+     * @return
+     */
+    private String getServiceString(String service){
+        StringBuilder serviceSb = new StringBuilder();
+        if(org.apache.commons.lang3.StringUtils.isBlank(service)){
+            return serviceSb.toString();
+        }else {
+            JSONArray jsonArray = JSONArray.parseArray(service);
+            for(int i= 0 ; i< jsonArray.size(); i++ ){
+                JSONObject json = jsonArray.getJSONObject(i);
+                String protocol = json.getString("protocol");
+                String dstPorts = json.getString("dstPorts");
+                if(org.apache.commons.lang3.StringUtils.equalsIgnoreCase("any", protocol)){
+                    serviceSb.append(protocol);
+                    continue;
+                }
+                if(org.apache.commons.lang3.StringUtils.isBlank(dstPorts)){
+                    serviceSb.append(protocol).append(" \n");
+                } else {
+                    serviceSb.append(protocol).append(":").append(dstPorts).append(" \n");
+                }
+            }
+            return serviceSb.toString();
+        }
+    }
+
+    /**
+     * 分页查询
+     */
+    @ApiOperation("仿真导入历史列表，查询传参JSON格式")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "page", value = "页数",  dataType = "Integer"),
+            @ApiImplicitParam(paramType="query", name = "limit", value = "每页条数", dataType = "Integer")
+    })
+    @PostMapping("/pageList")
+    public ReturnT pageList(@RequestBody PushRecommendTaskHistoryEntity historyEntity) {
+        try {
+            PageInfo<PushRecommendTaskHistoryEntity> pageInfoList = recommendTaskHistoryService.findList(historyEntity, historyEntity.getPage(), historyEntity.getLimit());
+            return new ReturnT(pageInfoList);
+        } catch (Exception e) {
+            logger.error("分页查询仿真导入历史列表异常", e);
+            return ReturnT.FAIL;
+        }
+
+    }
+}

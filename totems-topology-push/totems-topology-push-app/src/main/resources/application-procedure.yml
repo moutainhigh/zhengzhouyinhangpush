@@ -1,0 +1,25 @@
+issued:
+  command-before-builder:
+    usg6000noTop: "save\ny\n"
+    cisco: "enable\n"
+    h3cV7: "save force\n"
+    ssg: "save config\n"
+
+
+
+# 配置跳板机ip和登陆信息
+local_machine_port:
+jump_machine_a_ip:
+jump_machine_a_port:
+jump_machine_a_username:
+jump_machine_a_password:
+
+jump_machine_b_ip:
+jump_machine_b_port:
+jump_machine_b_username:
+jump_machine_b_password:
+
+# 配置跳板机所纳管的设备ip网段,可配置单ip/网段/范围。若有多个以英文逗号分隔
+relevant_subnet:
+  jump_machine_a_ip:
+  jump_machine_b_ip:

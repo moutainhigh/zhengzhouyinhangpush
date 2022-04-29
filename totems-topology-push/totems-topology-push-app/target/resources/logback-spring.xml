@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+
+    <!-- 项目名称 -->
+    <property name="PROJECT_NAME" value="push" />
+    <!--定义日志文件的存储地址 勿在 LogBack 的配置中使用相对路径-->
+    <springProperty scope="context" name="LOG_ROOT_BASEDIR" source="server.root.basedir"/>
+    <property name="LOG_HOME" value="${LOG_ROOT_BASEDIR}/service/push/logs" />
+
+    <!-- 控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %highlight([%-5level] %logger{50} - %msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 系统错误日志文件 -->
+    <appender name="ERROR_LOG"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只打印ERROR级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_HOME}/${PROJECT_NAME}.error.log</file>
+        <!-- 根据固定窗口模式生成日志文件，结合triggeringPolicy（当日志文件达到10MB时触发滚动，生成新的日志文件） -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}.error.%i.log</FileNamePattern>
+            <minIndex>1</minIndex>
+            <!--最大归档文件数-->
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <!--日志文件最大的大小-->
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    
+    <!-- 系统错误日志文件 -->
+    <appender name="WARN_LOG"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只打印ERROR级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_HOME}/${PROJECT_NAME}.warn.log</file>
+        <!-- 根据固定窗口模式生成日志文件，结合triggeringPolicy（当日志文件达到10MB时触发滚动，生成新的日志文件） -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}.warn.%i.log</FileNamePattern>
+            <minIndex>1</minIndex>
+            <!--最大归档文件数-->
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <!--日志文件最大的大小-->
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 自己打印的日志文件，用于记录重要日志信息 -->
+    <appender name="INFO_LOG"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只打印ERROR级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_HOME}/${PROJECT_NAME}.info.log</file>
+        <!-- 根据固定窗口模式生成日志文件，结合triggeringPolicy（当日志文件达到10MB时触发滚动，生成新的日志文件） -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}.info.%i.log</FileNamePattern>
+            <minIndex>1</minIndex>
+            <!--最大归档文件数-->
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <!--日志文件最大的大小-->
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="DEBUG_LOG"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 过滤器，只打印ERROR级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <!-- 设置过滤级别 -->
+            <level>DEBUG</level>
+            <!-- 用于配置符合过滤条件的操作 -->
+            <onMatch>ACCEPT</onMatch>
+            <!-- 用于配置不符合过滤条件的操作 -->
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_HOME}/${PROJECT_NAME}.debug.log</file>
+        <!-- 根据固定窗口模式生成日志文件，结合triggeringPolicy（当日志文件达到10MB时触发滚动，生成新的日志文件） -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}.debug.%i.log</FileNamePattern>
+            <minIndex>1</minIndex>
+            <!--最大归档文件数-->
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <!--日志文件最大的大小-->
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %highlight([%-5level] %logger{50} - %msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+    <springProfile name="dev">
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="INFO_LOG" />
+        <appender-ref ref="WARN_LOG" />
+        <appender-ref ref="ERROR_LOG"/>
+        <appender-ref ref="DEBUG_LOG" />
+    </root>
+    </springProfile>
+
+    <springProfile name="produce">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="INFO_LOG"/>
+            <appender-ref ref="ERROR_LOG"/>
+        </root>
+    </springProfile>
+</configuration>

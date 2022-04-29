@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.RiskRuleInfoMapper">
+    <resultMap id="RiskInfoMap" type="com.abtnetworks.totems.recommend.entity.RiskRuleInfoEntity">
+        <result column="rule_id" jdbcType="VARCHAR" property="ruleId" />
+        <result column="rule_level" jdbcType="INTEGER" property="ruleLevel" />
+        <result column="sort_id" jdbcType="INTEGER" property="sortId" />
+        <result column="second_sort_id" jdbcType="INTEGER" property="secondSortId" />
+        <result column="rule_name" jdbcType="VARCHAR" property="ruleName" />
+        <result column="rule_desc" jdbcType="VARCHAR" property="ruleDesc" />
+    </resultMap>
+    
+    <resultMap id="RiskDetailMap" type="com.abtnetworks.totems.recommend.entity.RiskRuleDetailEntity">
+        <result column="rule_id" jdbcType="VARCHAR" property="ruleId" />
+        <result column="src_zone_level" jdbcType="VARCHAR" property="srcZoneLevel" />
+        <result column="dst_zone_level" jdbcType="VARCHAR" property="dstZoneLevel" />
+        <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+        <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+        <result column="protocol" jdbcType="VARCHAR" property="protocol" />
+        <result column="port" jdbcType="VARCHAR" property="port" />
+        <result column="policy_type" jdbcType="VARCHAR" property="policyType" />
+    </resultMap>
+
+    <select id="getRiskInfoByRuleId" parameterType="java.lang.String" resultMap="RiskInfoMap" >
+        select * from risk_rule_info where rule_id=#{ruleId, jdbcType=VARCHAR}
+    </select>
+    
+    <select id="getRiskInfoBySecondSortId" parameterType="java.lang.Integer" resultMap="RiskInfoMap" >
+        select * from risk_rule_info where second_sort_id=#{secondSortId, jdbcType=INTEGER}
+    </select>
+    
+    <select id="getRiskDetailByRuleId" parameterType="java.lang.String" resultMap="RiskDetailMap" >
+        select * from risk_rule_detail where rule_id=#{ruleId, jdbcType=VARCHAR}
+    </select>
+</mapper>

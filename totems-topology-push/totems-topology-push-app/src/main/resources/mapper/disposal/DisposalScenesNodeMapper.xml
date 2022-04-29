@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalScenesNodeMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalScenesNodeEntity" >
+        <result column="id" property="id" />
+        <result column="scenes_uuid" property="scenesUuid" />
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="device_name" property="deviceName" />
+        <result column="src_zone_name" property="srcZoneName" />
+        <result column="src_zone_uuid" property="srcZoneUuid" />
+        <result column="src_if" property="srcItf" />
+        <result column="src_if_alias" property="srcItfAlias" />
+        <result column="dst_zone_name" property="dstZoneName" />
+        <result column="dst_zone_uuid" property="dstZoneUuid" />
+        <result column="dst_if" property="dstItf" />
+        <result column="dst_if_alias" property="dstItfAlias" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.abtnetworks.totems.disposal.dto.DisposalScenesDTO" >
+        <result column="name" property="name" />
+        <result column="remarks" property="remarks" />
+        <result column="scenes_uuid" property="scenesUuid" />
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="device_name" property="deviceName" />
+        <result column="src_zone_name" property="srcZoneName" />
+        <result column="src_zone_uuid" property="srcZoneUuid" />
+        <result column="src_if" property="srcItf" />
+        <result column="src_if_alias" property="srcItfAlias" />
+        <result column="dst_zone_name" property="dstZoneName" />
+        <result column="dst_zone_uuid" property="dstZoneUuid" />
+        <result column="dst_if" property="dstItf" />
+        <result column="dst_if_alias" property="dstItfAlias" />
+        <result column="type" property="type" />
+        <result column="deviceIp" property="deviceIp" />
+        <result column="vendor_id" property="vendorId" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `scenes_uuid`,
+        `device_uuid`,
+        `device_name`,
+        `src_zone_name`,
+        `src_zone_uuid`,
+        `src_if`,
+        `src_if_alias`
+        `dst_zone_name`,
+        `dst_zone_uuid`,
+        `dst_if`,
+        `dst_if_alias`
+    </sql>
+
+    <sql id="Dto_Column_List">
+        s.`name`,
+        s.`remarks`,
+        sn.`scenes_uuid`,
+        sn.`device_uuid`,
+        sn.`src_zone_name`,
+        sn.`src_zone_uuid`,
+        sn.`src_if`,
+        sn.`src_if_alias`,
+        sn.`dst_zone_name`,
+        sn.`dst_zone_uuid`,
+        sn.`dst_if`,
+        sn.`dst_if_alias`,
+        sn.`device_name`,
+        n.`type`,
+        n.`ip` AS deviceIp,
+        n.`vendor_id`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_scenes_node (
+            `scenes_uuid`,
+            `device_uuid`,
+            `device_name`,
+            `src_zone_name`,
+            `src_zone_uuid`,
+            `src_if`,
+            `src_if_alias`,
+            `dst_zone_name`,
+            `dst_zone_uuid`,
+            `dst_if`,
+            `dst_if_alias`
+        )
+        VALUES(
+            #{scenesUuid},
+            #{deviceUuid},
+            #{deviceName},
+            #{srcZoneName},
+            #{srcZoneUuid},
+            #{srcItf},
+            #{srcItfAlias},
+            #{dstZoneName},
+            #{dstZoneUuid}
+            #{dstItf},
+            #{dstItfAlias}
+        )
+    </insert>
+
+    <insert id="bulkInsert">
+        INSERT INTO disposal_scenes_node (
+            `scenes_uuid`,
+            `device_uuid`,
+            `device_name`,
+            `src_zone_name`,
+            `src_zone_uuid`,
+            `src_if`,
+            `src_if_alias`,
+            `dst_zone_name`,
+            `dst_zone_uuid`,
+            `dst_if`,
+            `dst_if_alias`
+        )
+        VALUES
+        <foreach collection="list" item="tmp" separator="," >
+        (
+            #{scenesUuid},
+            #{tmp.deviceUuid},
+            #{tmp.deviceName},
+            #{tmp.srcZoneName},
+            #{tmp.srcZoneUuid},
+            #{tmp.srcItf},
+            #{tmp.srcItfAlias},
+            #{tmp.dstZoneName},
+            #{tmp.dstZoneUuid},
+            #{tmp.dstItf},
+            #{tmp.dstItfAlias}
+        )
+        </foreach>
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_scenes_node
+        WHERE `id` = #{id}
+    </delete>
+
+    <delete id="deleteByScenesUuid">
+        DELETE FROM disposal_scenes_node
+        WHERE `scenes_uuid` = #{scenesUuid}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_scenes_node
+        SET
+            id = #{id},
+            scenes_uuid = #{scenesUuid},
+            device_uuid = #{deviceUuid},
+            device_name = #{deviceName},
+            src_zone_name = #{srcZoneName},
+            src_zone_uuid = #{srcZoneUuid},
+            src_if = #{srcItf},
+            src_if_alias = #{srcItfAlias},
+            dst_zone_name = #{dstZoneName},
+            dst_zone_uuid = #{dstZoneUuid}
+            dst_if = #{dstItf}
+            dst_if_alias = #{dst_if_alias}
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_scenes_node
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_scenes_node
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name LIKE concat('%', #{deviceName}, '%')
+            </if>
+            <if test="srcZoneName != null and srcZoneName != ''">
+                AND src_zone_name LIKE concat('%', #{srcZoneName}, '%')
+            </if>
+            <if test="srcZoneUuid != null and srcZoneUuid != ''">
+                AND src_zone_uuid = #{srcZoneUuid}
+            </if>
+            <if test="srcItf != null and srcItf != ''">
+                AND src_if = #{srcItf}
+            </if>
+            <if test="srcItfAlias != null and srcItfAlias != ''">
+                AND src_if_alias = #{srcItfAlias}
+            </if>
+            <if test="dstZoneName != null and dstZoneName != ''">
+                AND dst_zone_name LIKE concat('%', #{dstZoneName}, '%')
+            </if>
+            <if test="dstZoneUuid != null and dstZoneUuid != ''">
+                AND dst_zone_uuid = #{dstZoneUuid}
+            </if>
+            <if test="dstItf != null and dstItf != ''">
+                AND dst_if = #{dstItf}
+            </if>
+            <if test="dstItfAlias != null and dstItfAlias != ''">
+                AND dst_if_alias = #{dstItfAlias}
+            </if>
+        </where>
+    </select>
+
+    <select id="findByScenesUuid" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_scenes_node sn
+        LEFT JOIN topo_node n ON sn.device_uuid = n.uuid
+        LEFT JOIN disposal_scenes s ON s.uuid = sn.scenes_uuid
+        <where>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND sn.scenes_uuid = #{scenesUuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_scenes_node
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND scenes_uuid = #{scenesUuid}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name LIKE concat('%', #{deviceName}, '%')
+            </if>
+            <if test="srcZoneName != null and srcZoneName != ''">
+                AND src_zone_name LIKE concat('%', #{srcZoneName}, '%')
+            </if>
+            <if test="srcZoneUuid != null and srcZoneUuid != ''">
+                AND src_zone_uuid = #{srcZoneUuid}
+            </if>
+            <if test="srcItf != null and srcItf != ''">
+                AND src_if = #{srcItf}
+            </if>
+            <if test="srcItfAlias != null and srcItfAlias != ''">
+                AND src_if_alias = #{srcItfAlias}
+            </if>
+            <if test="dstZoneName != null and dstZoneName != ''">
+                AND dst_zone_name LIKE concat('%', #{dstZoneName}, '%')
+            </if>
+            <if test="dstZoneUuid != null and dstZoneUuid != ''">
+                AND dst_zone_uuid = #{dstZoneUuid}
+            </if>
+            <if test="dstItf != null and dstItf != ''">
+                AND dst_if = #{dstItf}
+            </if>
+            <if test="dstItfAlias != null and dstItfAlias != ''">
+                AND dst_if_alias = #{dstItfAlias}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="findDtoList" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_scenes_node sn
+        INNER JOIN topo_node n ON sn.device_uuid = n.uuid
+        INNER JOIN disposal_scenes s ON s.uuid = sn.scenes_uuid
+        <where>
+            <if test="name != null and name != ''">
+                AND s.name = #{name}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND s.remarks = #{remarks}
+            </if>
+            <if test="scenesUuid != null and scenesUuid != ''">
+                AND sn.scenes_uuid = #{scenesUuid}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND sn.device_uuid = #{deviceUuid}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND sn.device_name LIKE concat('%', #{deviceName}, '%')
+            </if>
+            <if test="srcZoneName != null and srcZoneName != ''">
+                AND sn.src_zone_name LIKE concat('%', #{srcZoneName}, '%')
+            </if>
+            <if test="srcZoneUuid != null and srcZoneUuid != ''">
+                AND sn.src_zone_uuid = #{srcZoneUuid}
+            </if>
+            <if test="srcItf != null and srcItf != ''">
+                AND src_if = #{srcItf}
+            </if>
+            <if test="srcItfAlias != null and srcItfAlias != ''">
+                AND src_if_alias = #{srcItfAlias}
+            </if>
+            <if test="dstZoneName != null and dstZoneName != ''">
+                AND sn.dst_zone_name LIKE concat('%', #{dstZoneName}, '%')
+            </if>
+            <if test="dstZoneUuid != null and dstZoneUuid != ''">
+                AND sn.dst_zone_uuid = #{dstZoneUuid}
+            </if>
+            <if test="dstItf != null and dstItf != ''">
+                AND dst_if = #{dstItf}
+            </if>
+            <if test="dstItfAlias != null and dstItfAlias != ''">
+                AND dst_if_alias = #{dstItfAlias}
+            </if>
+            <if test="queryTypeList != null and queryTypeList.size() > 0">
+                AND n.type IN
+                <foreach item="type" collection="queryTypeList" open="(" separator="," close=")">
+                    #{type}
+                </foreach>
+            </if>
+        </where>
+        order by sn.id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_scenes_node
+    </select>
+
+    <select id="clearRubbish">
+        delete from disposal_scenes_node where device_uuid not in(select ifnull(uuid,'') from topo_node)
+    </select>
+
+    <select id="findDtoListForIssue" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_scenes_node sn
+        INNER JOIN topo_node n ON sn.device_uuid = n.uuid
+        INNER JOIN disposal_scenes s ON s.uuid = sn.scenes_uuid
+        <where>
+           1=1
+
+            <if test="scenesUuid != null and scenesUuid != ''">
+
+                    AND sn.scenes_uuid in (#{scenesUuid})
+
+
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND sn.device_uuid = #{deviceUuid}
+            </if>
+
+
+        </where>
+
+    </select>
+
+    <select id="findBySceneUuidList" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_scenes_node sn
+        INNER JOIN topo_node n ON sn.device_uuid = n.uuid
+        INNER JOIN disposal_scenes s ON s.uuid = sn.scenes_uuid
+        <where>
+            <if test="scenesUuids != null and scenesUuids.size() > 0">
+                AND sn.scenes_uuid IN
+                <foreach item="uuidItem" collection="scenesUuids" open="(" separator="," close=")">
+                    #{uuidItem}
+                </foreach>
+            </if>
+        </where>
+        order by sn.id DESC
+    </select>
+</mapper>

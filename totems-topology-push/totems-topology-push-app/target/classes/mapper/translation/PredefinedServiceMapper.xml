@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.translation.dao.PredefinedServiceMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.translation.entity.PredefinedService" >
+        <result column="id" property="id" />
+        <result column="protocol" property="protocol" />
+        <result column="source_port_type" property="sourcePortType" />
+        <result column="destination_port_code" property="destinationPortCode" />
+        <result column="port" property="port" />
+        <result column="vender_obj_name" property="venderObjName" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `protocol`,
+        `source_port_type`,
+        `destination_port_code`,
+        `port`,
+        `vender_obj_name`
+    </sql>
+
+    <insert id="insert"  useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO push_predefined_service (
+            `id`,
+            `protocol`,
+            `source_port_type`,
+            `destination_port_code`,
+            `port`,
+            `vender_obj_name`
+        )
+        VALUES(
+            #{id},
+            #{protocol},
+            #{sourcePortType},
+            #{destinationPortCode},
+            #{port},
+            #{venderObjName}
+        )
+    </insert>
+
+    <update id="update" >
+        update push_predefined_service
+        set
+            `protocol` = #{protocol},
+            `source_port_type` = #{sourcePortType},
+            `destination_port_code` = #{destinationPortCode},
+            `port` = #{port},
+            `vender_obj_name` = #{venderObjName}
+        where id = #{id}
+    </update>
+
+    <update id="updateVenderObjectNameById" >
+        update push_predefined_service set vender_obj_name = #{venderObjName} where id = #{id}
+    </update>
+
+    <insert id="insertList">
+        INSERT INTO push_predefined_service (
+        `id`,
+        `protocol`,
+        `source_port_type`,
+        `destination_port_code`,
+        `port`,
+        `vender_obj_name`
+        )
+        VALUES
+        <foreach collection="list" item="tmp" separator="," >
+            (
+            #{tmp.id},
+            #{tmp.protocol},
+            #{tmp.sourcePortType},
+            #{tmp.destinationPortCode},
+            #{tmp.port},
+            #{tmp.venderObjName}
+            )
+        </foreach>
+
+    </insert>
+
+
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_predefined_service
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="findByProtocolAndPort" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_predefined_service
+        WHERE `protocol` = #{protocol} and `port` = #{port}
+        order by id DESC
+    </select>
+
+    <select id="find" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_predefined_service
+        WHERE
+        `protocol` = #{protocol}
+        and `source_port_type` = #{sourcePortType}
+        and `destination_port_code` = #{destinationPortCode}
+        and `port` = #{port}
+        order by id DESC
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_predefined_service
+        order by id DESC
+    </select>
+
+</mapper>

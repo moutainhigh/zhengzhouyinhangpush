@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="DB2Tables" targetRuntime="MyBatis3">
+        <commentGenerator>
+            <property name="suppressDate" value="true"/>
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!--数据库链接地址账号密码-->
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://192.168.215.12:3306/topology"
+                        userId="root"
+                        password="123.Totems#@!">
+        </jdbcConnection>
+        <javaTypeResolver>
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+        <!--生成Model类存放位置-->
+        <javaModelGenerator targetPackage="com.abtnetworks.totems.mybatis.domain" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+        <!--生成映射文件存放位置-->
+        <sqlMapGenerator targetPackage="com.abtnetworks.totems.mybatis.mapper" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!--生成Dao类存放位置-->
+        <javaClientGenerator type="XMLMAPPER"
+                             targetPackage="com.abtnetworks.totems.mybatis.dao.mysql" targetProject="src/main/java">
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!--生成对应表及类名-->
+
+
+        <!--<table tableName="push_recommend_task"
+               domainObjectName="RecommendTaskEntity"
+               mapperName="RecommendTaskMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="src_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="dst_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="service_list" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="addtion_info" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="task_type" javaType="java.lang.Integer" jdbcType="Integer" />
+        </table>-->
+    
+        <!--<table tableName="push_path_info"
+               domainObjectName="PathInfoEntity"
+               mapperName="PathInfoMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="src_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="dst_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="service" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="analyze_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="advice_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="check_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="risk_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="cmd_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="push_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="gather_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="access_analyze_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="verify_status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="path_status" javaType="java.lang.Integer" jdbcType="Integer" />
+        </table>-->
+
+        <!--
+        <table tableName="push_path_detail"
+               domainObjectName="PathDetailEntity"
+               mapperName="PathDetailMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="analyze_path" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="verify_path" javaType="java.lang.String" jdbcType="VARCHAR" />
+        </table> -->
+
+        <!--
+        <table tableName="push_recommend_policy"
+               domainObjectName="RecommendPolicyEntity"
+               mapperName="RecommendPolicyMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="src_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="dst_ip" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="service" javaType="java.lang.String" jdbcType="VARCHAR" />
+        </table> -->
+
+        <table tableName="push_command_task_editable"
+               domainObjectName="CommandTaskEditableEntity"
+               mapperName="CommandTaskEdiableMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="commandline" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="commandline_revert" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="commandline_echo" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="status" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="auto_push" javaType="java.lang.Integer" jdbcType="Integer" />
+            <columnOverride column="task_type" javaType="java.lang.Integer" jdbcType="Integer" />
+        </table>
+
+        <!--
+        <table tableName="push_policy_check_result"
+               domainObjectName="CheckResultEntity"
+               mapperName="CheckResultMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="check_result" javaType="java.lang.String" jdbcType="VARCHAR" />
+        </table> -->
+
+        <!--
+        <table tableName="push_policy_risk"
+               domainObjectName="PolicyRiskEntity"
+               mapperName="PolicyRiskMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="obj_json" javaType="java.lang.String" jdbcType="VARCHAR" />
+        </table> -->
+    
+        <!--<table tableName="push_path_device_detail"
+               domainObjectName="PathDeviceDetailEntity"
+               mapperName="PathDeviceDetailMapper"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false">
+            <columnOverride column="device_detail" javaType="java.lang.String" jdbcType="VARCHAR" />
+            <columnOverride column="is_verify_data" javaType="java.lang.Integer" jdbcType="Integer" />
+        </table>-->
+
+    </context>
+</generatorConfiguration>

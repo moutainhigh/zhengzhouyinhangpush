@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.abtnetworks</groupId>
+    <artifactId>totems-topology-push</artifactId>
+    <version>1.8.6-SNAPSHOT</version>
+  </parent>
+  <groupId>com.abtnetworks</groupId>
+  <artifactId>totems-topology-push-common</artifactId>
+  <version>1.8.6-SNAPSHOT</version>
+  <name>totems-topology-push-common</name>
+  <description>Demo project for Spring Boot</description>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+    </license>
+  </licenses>
+  <distributionManagement>
+    <repository>
+      <id>sapling-release</id>
+      <name>sapling Porject Release</name>
+      <url>http://192.168.215.115:8081/nexus/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>sapling-snapshot</id>
+      <name>sapling Porject Snapshot</name>
+      <url>http://192.168.215.115:8081/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    <java.version>1.8</java.version>
+    <main.basedir>${basedir}/../..</main.basedir>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.abtnetworks</groupId>
+      <artifactId>totems-topology-push-command-line</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+  </dependencies>
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <id>sapling-snapshots</id>
+      <url>http://192.168.215.115:8081/nexus/content/groups/sapling/</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

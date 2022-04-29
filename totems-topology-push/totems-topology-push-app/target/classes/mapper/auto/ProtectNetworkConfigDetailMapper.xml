@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.ProtectNetworkConfigDetailMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigDetailEntity">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="config_id" jdbcType="BIGINT" property="configId" />
+    <result column="ipv4_start" jdbcType="BIGINT" property="ipv4Start" />
+    <result column="ipv4_end" jdbcType="BIGINT" property="ipv4End" />
+    <result column="ipv6_start" jdbcType="VARCHAR" property="ipv6Start" />
+    <result column="ipv6_end" jdbcType="VARCHAR" property="ipv6End" />
+    <result column="ip_type" jdbcType="INTEGER" property="ipType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, config_id, ipv6_start, ipv6_end, ip_type, create_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_protect_network_config_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from push_protect_network_config_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigDetailEntity">
+    insert into push_protect_network_config_detail (id, config_id, ipv4_start, ipv4_end,ipv6_start,
+      ipv6_end, ip_type, create_time
+      )
+    values (#{id,jdbcType=BIGINT}, #{configId,jdbcType=BIGINT},#{ipv4Start,jdbcType=BIGINT},#{ipv4End,jdbcType=BIGINT},
+    HEX( INET6_ATON ( #{ipv6Start,jdbcType=VARCHAR} )),HEX( INET6_ATON ( #{ipv6End,jdbcType=VARCHAR} )),
+     #{ipType,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigDetailEntity">
+    insert into push_protect_network_config_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="configId != null">
+        config_id,
+      </if>
+      <if test="ipv4Start != null">
+        ipv4_start,
+      </if>
+      <if test="ipv4End != null">
+        ipv4_end,
+      </if>
+      <if test="ipv6Start != null">
+        ipv4_start,
+      </if>
+      <if test="ipv6End != null">
+        ipv6_end,
+      </if>
+      <if test="ipType != null">
+        ip_type,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="configId != null">
+        #{configId,jdbcType=BIGINT},
+      </if>
+      <if test="ipv4Start != null">
+        #{ipv4Start,jdbcType=BIGINT},
+      </if>
+      <if test="ipv4End != null">
+        #{ipv4End,jdbcType=BIGINT},
+      </if>
+      <if test="ipv6Start != null">
+        #{ipv6Start,jdbcType=VARCHAR},
+      </if>
+      <if test="ipv6End != null">
+        #{ipv6End,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        #{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigDetailEntity">
+    update push_protect_network_config_detail
+    <set>
+      <if test="configId != null">
+        config_id = #{configId,jdbcType=BIGINT},
+      </if>
+      <if test="ipv4Start != null">
+        ipv4_start = #{ipv4Start,jdbcType=BIGINT},
+      </if>
+      <if test="ipv4End != null">
+        ipv4_end = #{ipv4End,jdbcType=BIGINT},
+      </if>
+      <if test="ipv6Start != null">
+        ipv6_start = #{ipv6Start,jdbcType=VARCHAR},
+      </if>
+      <if test="ipv6End != null">
+        ipv6_end = #{ipv6End,jdbcType=VARCHAR},
+      </if>
+      <if test="ipType != null">
+        ip_type = #{ipType,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigDetailEntity">
+    update push_protect_network_config_detail
+    set config_id = #{configId,jdbcType=BIGINT},
+      ipv4_start = #{ipv4Start,jdbcType=BIGINT},
+      ipv4_end = #{ipv4End,jdbcType=BIGINT},
+      ipv6_start = #{ipv6Start,jdbcType=VARCHAR},
+      ipv6_end = #{ipv6End,jdbcType=VARCHAR},
+      ip_type = #{ipType,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <delete id="deleteByConfigId" parameterType="java.lang.Long">
+    delete from push_protect_network_config_detail
+    where config_id = #{configId,jdbcType=BIGINT}
+  </delete>
+
+  <select id="findList" resultMap="BaseResultMap">
+    SELECT * from push_protect_network_config_detail
+    <where>
+      <choose>
+        <when test="ipType == 0">
+          ipv4_start &lt;= #{ipv4End,jdbcType=BIGINT} and ipv4_end &gt;= #{ipv4Start,jdbcType=BIGINT}
+        </when>
+        <when test="ipType == 1">
+          ipv6_start &lt;= HEX( INET6_ATON ( #{ipv6End,jdbcType=VARCHAR} ) ) and
+          ipv6_end &gt;= HEX( INET6_ATON ( #{ipv6Start,jdbcType=VARCHAR} ))
+        </when>
+      </choose>
+    </where>
+    GROUP BY config_id order by id DESC
+  </select>
+
+  <select id="findByConfigId" resultMap="BaseResultMap">
+    SELECT * from push_protect_network_config_detail
+    where config_id = #{configId,jdbcType=BIGINT} order by id DESC
+  </select>
+
+</mapper>

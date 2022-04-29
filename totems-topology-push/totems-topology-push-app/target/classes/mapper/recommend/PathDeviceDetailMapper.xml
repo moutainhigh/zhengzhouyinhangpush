@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.PathDeviceDetailMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.PathDeviceDetailEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="path_info_id" jdbcType="INTEGER" property="pathInfoId" />
+    <result column="is_verify_data" jdbcType="INTEGER" property="isVerifyData" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="device_detail" jdbcType="VARCHAR" property="deviceDetail" />
+    <result column="path_index" jdbcType="INTEGER" property="pathIndex" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, path_info_id, is_verify_data, device_uuid, device_detail, path_index
+  </sql>
+
+  <!-- 获取路径设备详情 -->
+  <select id="selectPathDeviceDetail" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_path_device_detail
+    where path_info_id = #{pathInfoId, jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+    and is_verify_data = #{isVerifyData, jdbcType=INTEGER}
+    and path_index = #{pathIndex, jdbcType=INTEGER}
+  </select>
+
+  <!-- 获取路径设备详情 -->
+  <select id="selectAnalyzePathDeviceDetail" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_path_device_detail
+    where path_info_id=#{pathInfoId, jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+    and is_verify_data = 0
+    and path_index = #{pathIndex, jdbcType=INTEGER}
+  </select>
+
+  <!-- 获取验证路径设备详情数据 -->
+  <select id="selectVerifyPathDeviceDetail" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_path_device_detail
+    where path_info_id = #{pathInfoId, jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+    and is_verify_data = 1
+    and path_index = #{pathIndex, jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据路径信息id删除设备路径详情数据 -->
+  <delete id="deleteByPathInfoId" parameterType="java.lang.Integer">
+    delete from push_path_device_detail
+    where path_info_id = #{path_info_id,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据路径信息id删除设备路径详情数据 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_path_device_detail
+    where path_info_id in (select id
+    from push_path_info
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>)
+  </delete>
+
+  <!-- 插入设备路径详情数据 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.PathDeviceDetailEntity">
+    insert into push_path_device_detail
+    (path_info_id, is_verify_data,
+      device_uuid, device_detail, path_index)
+    values (#{pathInfoId,jdbcType=INTEGER}, #{isVerifyData,jdbcType=INTEGER},
+      #{deviceUuid,jdbcType=VARCHAR}, #{deviceDetail,jdbcType=VARCHAR}, #{pathIndex, jdbcType=INTEGER})
+  </insert>
+
+  <update id="update" parameterType="com.abtnetworks.totems.recommend.entity.PathDeviceDetailEntity">
+    update push_path_device_detail
+    set device_detail=#{deviceDetail, jdbcType=VARCHAR}
+    where path_info_id = #{pathInfoId, jdbcType=INTEGER}
+    and is_verify_data = #{isVerifyData, jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+    and path_index = #{pathIndex, jdbcType=INTEGER}
+  </update>
+
+  <!--批量添加策略开通任务-->
+  <insert id="insertList" parameterType="java.util.List">
+    insert into push_path_device_detail
+    (
+    path_info_id, is_verify_data,
+    device_uuid, device_detail, path_index
+    )
+    values
+    <foreach collection="list" item="entity" index="index" separator=",">
+      (
+      #{entity.pathInfoId,jdbcType=INTEGER}, #{entity.isVerifyData,jdbcType=INTEGER},
+      #{entity.deviceUuid,jdbcType=VARCHAR}, #{entity.deviceDetail,jdbcType=VARCHAR}, #{entity.pathIndex, jdbcType=INTEGER}
+      )
+    </foreach>
+  </insert>
+</mapper>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.MergedPolicyMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.RecommendPolicyEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="task_id" jdbcType="INTEGER" property="taskId" />
+    <result column="path_info_id" jdbcType="INTEGER" property="pathInfoId" />
+    <result column="src_ip" jdbcType="VARCHAR" property="srcIp" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="service" jdbcType="VARCHAR" property="service" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="rule_list_uuid" jdbcType="VARCHAR" property="ruleListUuid" />
+    <result column="src_zone" jdbcType="VARCHAR" property="srcZone" />
+    <result column="dst_zone" jdbcType="VARCHAR" property="dstZone" />
+    <result column="in_dev_if" jdbcType="VARCHAR" property="inDevIf" />
+    <result column="out_dev_if" jdbcType="VARCHAR" property="outDevIf" />
+    <result column="create_object" jdbcType="INTEGER" property="createObject" />
+    <result column="create_policy" jdbcType="INTEGER" property="createPolicy" />
+    <result column="merge_policy_name" jdbcType="VARCHAR" property="mergePolicyName" />
+    <result column="move_policy" jdbcType="INTEGER" property="movePolicy" />
+    <result column="specific_position" jdbcType="VARCHAR" property="specificPosition" />
+    <result column="specify_zone" jdbcType="INTEGER" property="specifyZone" />
+    <result column="acl_direction" jdbcType="INTEGER" property="aclDirection" />
+    <result column="idle_timeout" jdbcType="INTEGER" property="idleTimeout" />
+    <result column="rule_list_name" jdbcType="VARCHAR" property="ruleListName" />
+    <result column="match_rule_id" jdbcType="VARCHAR" property="matchRuleId" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, task_id, path_info_id, src_ip, dst_ip,
+    service, start_time, end_time, device_uuid, rule_list_uuid,
+    src_zone, dst_zone, in_dev_if, out_dev_if, create_object,
+    create_policy, merge_policy_name, move_policy, specific_position, specify_zone,
+    acl_direction, idle_timeout,rule_list_name,match_rule_id
+  </sql>
+
+  <!-- 根据路径信息id获取生成策略数据 -->
+  <select id="selectByTaskId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_merged_policy
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据路径信息id获取生成策略数据 -->
+  <select id="selectPathInfoAndDevice" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_merged_policy
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+    and device_uuid = #{deviceUuid, jdbcType=VARCHAR}
+  </select>
+
+  <!-- 根据路径信息id删除策略数据 -->
+  <delete id="deleteByTaskId" parameterType="java.lang.Integer">
+    delete from push_merged_policy
+    where task_id = #{taskId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据路径信息id删除策略数据 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_merged_policy
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+
+  <!-- 插入策略数据 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.RecommendPolicyEntity">
+    insert into push_merged_policy (task_id, path_info_id, src_ip,
+      dst_ip, service, start_time, 
+      end_time, device_uuid, rule_list_uuid, 
+      src_zone, dst_zone, in_dev_if,
+      out_dev_if,  create_object, create_policy,
+      merge_policy_name, move_policy, specific_position,
+      specify_zone, acl_direction, idle_timeout)
+    values (#{taskId, jdbcType=INTEGER}, #{pathInfoId,jdbcType=INTEGER}, #{srcIp,jdbcType=VARCHAR},
+      #{dstIp,jdbcType=VARCHAR}, #{service,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{deviceUuid,jdbcType=VARCHAR}, #{ruleListUuid,jdbcType=VARCHAR}, 
+      #{srcZone,jdbcType=VARCHAR}, #{dstZone,jdbcType=VARCHAR}, #{inDevIf,jdbcType=VARCHAR}, 
+      #{outDevIf,jdbcType=VARCHAR}, #{createObject, jdbcType=INTEGER}, #{createPolicy, jdbcType=INTEGER},
+      #{mergePolicyName, jdbcType=VARCHAR}, #{movePolicy, jdbcType=INTEGER}, #{specificPosition, jdbcType=VARCHAR},
+      #{specifyZone, jdbcType=INTEGER}, #{aclDirection, jdbcType=INTEGER}, #{idleTimeout, jdbcType=INTEGER})
+  </insert>
+
+  <!-- 更新数据 -->
+  <!-- <update id="updateMergeRuleName" parameterType="com.abtnetworks.totems.recommend.entity.RecommendPolicyEntity">
+    update push_merged_policy
+    set merge_policy_name = #{mergePolicyName,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=INTEGER}
+  </update> -->
+
+  <!--批量添加生成策略-->
+  <insert id="insertRecommendPolicyList" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+    insert into push_merged_policy (task_id, path_info_id, src_ip,
+    dst_ip, service, start_time,
+    end_time, device_uuid, rule_list_uuid,
+    src_zone, dst_zone, in_dev_if,
+    out_dev_if,  create_object, create_policy,
+    merge_policy_name, move_policy, specific_position,
+    specify_zone, acl_direction, idle_timeout,rule_list_name,match_rule_id)
+    values
+    <foreach collection="list" item="entity" index="index" separator=",">
+      (#{entity.taskId, jdbcType=INTEGER}, #{entity.pathInfoId,jdbcType=INTEGER}, #{entity.srcIp,jdbcType=VARCHAR},
+      #{entity.dstIp,jdbcType=VARCHAR}, #{entity.service,jdbcType=VARCHAR}, #{entity.startTime,jdbcType=TIMESTAMP},
+      #{entity.endTime,jdbcType=TIMESTAMP}, #{entity.deviceUuid,jdbcType=VARCHAR}, #{entity.ruleListUuid,jdbcType=VARCHAR},
+      #{entity.srcZone,jdbcType=VARCHAR}, #{entity.dstZone,jdbcType=VARCHAR}, #{entity.inDevIf,jdbcType=VARCHAR},
+      #{entity.outDevIf,jdbcType=VARCHAR}, #{entity.createObject, jdbcType=INTEGER}, #{entity.createPolicy, jdbcType=INTEGER},
+      #{entity.mergePolicyName, jdbcType=VARCHAR}, #{entity.movePolicy, jdbcType=INTEGER}, #{entity.specificPosition, jdbcType=VARCHAR},
+      #{entity.specifyZone, jdbcType=INTEGER}, #{entity.aclDirection, jdbcType=INTEGER}, #{entity.idleTimeout, jdbcType=INTEGER},
+      #{entity.ruleListName, jdbcType=VARCHAR},#{entity.matchRuleId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+</mapper>

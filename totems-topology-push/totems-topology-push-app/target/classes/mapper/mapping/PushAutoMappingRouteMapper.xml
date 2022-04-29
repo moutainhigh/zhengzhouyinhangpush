@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.mapping.dao.mysql.PushAutoMappingRouteMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="dst_ip" jdbcType="VARCHAR" property="dstIp" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+    <result column="src_virtual_router" jdbcType="VARCHAR" property="srcVirtualRouter" />
+    <result column="dst_virtual_router" jdbcType="VARCHAR" property="dstVirtualRouter" />
+    <result column="out_interface" jdbcType="VARCHAR" property="outInterface" />
+    <result column="subnet_mask" jdbcType="INTEGER" property="subnetMask" />
+    <result column="next_hop" jdbcType="VARCHAR" property="nextHop" />
+    <result column="priority" jdbcType="VARCHAR" property="priority" />
+    <result column="management_distance" jdbcType="VARCHAR" property="managementDistance" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_user" jdbcType="VARCHAR" property="updateUser" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uuid, description, dst_ip, device_uuid,device_name,src_virtual_router,dst_virtual_router,out_interface,subnet_mask,next_hop,priority,management_distance
+    create_user, create_time, update_user, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_auto_mapping_route
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from push_auto_mapping_route
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    insert into push_auto_mapping_route (id, uuid,description, dst_ip, device_uuid,device_name,src_virtual_router,dst_virtual_router,
+    out_interface,subnet_mask,next_hop,priority,management_distance,
+    create_user, create_time, update_user, update_time)
+    values (#{id,jdbcType=INTEGER}, #{uuid,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{dstIp,jdbcType=VARCHAR}, #{deviceUuid,jdbcType=VARCHAR},
+       #{deviceName,jdbcType=VARCHAR}, #{srcVirtualRouter,jdbcType=VARCHAR},#{dstVirtualRouter,jdbcType=VARCHAR},#{outInterface,jdbcType=VARCHAR},
+       #{subnetMask,jdbcType=INTEGER},#{nextHop,jdbcType=VARCHAR},#{priority,jdbcType=VARCHAR},#{managementDistance,jdbcType=VARCHAR},#{createUser,jdbcType=VARCHAR},
+       #{createTime,jdbcType=TIMESTAMP},#{updateUser,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    insert into push_auto_mapping_route
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+      <if test="dstIp != null">
+        dst_ip,
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid,
+      </if>
+      <if test="deviceName != null">
+        device_name,
+      </if>
+      <if test="srcVirtualRouter != null">
+        src_virtual_router,
+      </if>
+      <if test="dstVirtualRouter != null">
+        dst_virtual_router,
+      </if>
+      <if test="outInterface != null">
+        out_interface,
+      </if>
+      <if test="subnetMask != null">
+        subnet_mask,
+      </if>
+      <if test="nextHop != null">
+        next_hop,
+      </if>
+      <if test="priority != null">
+        priority,
+      </if>
+      <if test="managementDistance != null">
+        management_distance,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateUser != null">
+        update_user,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcVirtualRouter != null">
+        #{srcVirtualRouter,jdbcType=VARCHAR},
+      </if>
+      <if test="dstVirtualRouter != null">
+        #{dstVirtualRouter,jdbcType=VARCHAR},
+      </if>
+      <if test="outInterface != null">
+        #{outInterface,jdbcType=VARCHAR},
+      </if>
+      <if test="subnetMask != null">
+        #{subnetMask,jdbcType=INTEGER},
+      </if>
+      <if test="nextHop != null">
+        #{nextHop,jdbcType=VARCHAR},
+      </if>
+      <if test="priority != null">
+        #{priority,jdbcType=VARCHAR},
+      </if>
+      <if test="managementDistance != null">
+        #{managementDistance,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    update push_auto_mapping_route
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="dstIp != null">
+        dst_ip = #{dstIp,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        device_name = #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="srcVirtualRouter != null">
+        src_virtual_router = #{srcVirtualRouter,jdbcType=VARCHAR},
+      </if>
+      <if test="dstVirtualRouter != null">
+        dst_virtual_router = #{dstVirtualRouter,jdbcType=VARCHAR},
+      </if>
+      <if test="outInterface != null">
+        out_interface = #{outInterface,jdbcType=VARCHAR},
+      </if>
+      <if test="subnetMask != null">
+        subnet_mask = #{subnetMask,jdbcType=INTEGER},
+      </if>
+      <if test="nextHop != null">
+        next_hop = #{nextHop,jdbcType=VARCHAR},
+      </if>
+      <if test="priority != null">
+        priority = #{priority,jdbcType=VARCHAR},
+      </if>
+      <if test="managementDistance != null">
+        management_distance = #{managementDistance,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUser != null">
+        update_user = #{updateUser,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    update push_auto_mapping_route
+    set uuid = #{uuid,jdbcType=VARCHAR},
+      dst_ip = #{dstIp,jdbcType=VARCHAR},
+      device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      device_name = #{deviceName,jdbcType=VARCHAR},
+      src_virtual_router = #{srcVirtualRouter,jdbcType=VARCHAR},
+      dst_virtual_router = #{dstVirtualRouter,jdbcType=VARCHAR},
+      out_interface = #{outInterface,jdbcType=VARCHAR},
+      subnet_mask = #{subnetMask,jdbcType=INTEGER},
+      next_hop = #{nextHop,jdbcType=VARCHAR},
+      priority = #{priority,jdbcType=VARCHAR},
+      management_distance = #{managementDistance,jdbcType=VARCHAR},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_user = #{updateUser,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectByEntity" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.mapping.entity.PushAutoMappingRouteEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_auto_mapping_route
+    <where>
+      1=1
+      <if test="description != null">
+        AND description=#{description,jdbcType=VARCHAR}
+      </if>
+      <if test="dstIp != null">
+        AND dst_ip=#{dstIp,jdbcType=VARCHAR}
+      </if>
+      <if test="deviceName != null">
+        AND device_name=#{deviceName,jdbcType=VARCHAR}
+      </if>
+      <if test="srcVirtualRouter != null">
+        AND src_virtual_router=#{srcVirtualRouter,jdbcType=VARCHAR}
+      </if>
+      <if test="dstVirtualRouter != null">
+        AND dst_virtual_router=#{dstVirtualRouter,jdbcType=VARCHAR}
+      </if>
+      <if test="outInterface != null">
+        AND out_interface=#{outInterface,jdbcType=VARCHAR}
+      </if>
+      <if test="subnetMask != null">
+        AND subnet_mask=#{subnetMask,jdbcType=INTEGER}
+      </if>
+      <if test="nextHop != null">
+        AND next_hop=#{nextHop,jdbcType=VARCHAR}
+      </if>
+      <if test="priority != null">
+        AND priority=#{priority,jdbcType=VARCHAR}
+      </if>
+      <if test="managementDistance != null">
+        AND management_distance=#{managementDistance,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+
+  <delete id="deleteIdList" >
+    delete from push_auto_mapping_route
+    where id in
+    <foreach collection="idList" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </delete>
+</mapper>

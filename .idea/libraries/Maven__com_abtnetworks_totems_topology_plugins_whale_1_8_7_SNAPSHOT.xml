@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.abtnetworks:totems-topology-plugins-whale:1.8.7-SNAPSHOT">
+    <CLASSES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-whale/1.8.7-SNAPSHOT/totems-topology-plugins-whale-1.8.7-20220323.091826-343.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-whale/1.8.7-SNAPSHOT/totems-topology-plugins-whale-1.8.7-20220323.091826-343-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar:///software/maven_repository/com/abtnetworks/totems-topology-plugins-whale/1.8.7-SNAPSHOT/totems-topology-plugins-whale-1.8.7-20220323.091826-343-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

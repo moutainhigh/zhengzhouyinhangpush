@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalDeleteCommandLineRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalDeleteCommandLineRecordEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="create_uuid" property="createUuid" />
+        <result column="task_editable_id" property="taskEditableId" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="order_no" property="orderNo" />
+        <result column="type" property="type" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="ip_type" property="ipType" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="vsys" property="vsys" />
+        <result column="p_device_uuid" property="pDeviceUuid" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.abtnetworks.totems.disposal.dto.DisposalNodeCommandLineRecordDTO" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="task_editable_id" property="taskEditableId" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="order_no" property="orderNo" />
+        <result column="type" property="type" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="ip_type" property="ipType" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="vsys" property="vsys" />
+        <result column="p_device_uuid" property="pDeviceUuid" />
+        <result column="device_ip" property="deviceIp" />
+        <result column="device_type" property="deviceType" />
+        <result column="device_name" property="deviceName" />
+        <result column="vendor_name" property="vendorName" />
+        <result column="vendor_id" property="vendorId" />
+        <result column="origin" property="origin" />
+        <result column="state" property="state" />
+        <result column="model_number" property="modelNumber" />
+        <result column="task_id" property="taskId" />
+        <result column="theme" property="theme" />
+        <result column="user_name" property="userName" />
+        <result column="edit_user_name" property="editUserName" />
+        <result column="task_type" property="taskType" />
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="create_time" property="createTime" />
+        <result column="push_time" property="pushTime" />
+        <result column="modified_time" property="modifiedTime" />
+        <result column="auto_push" property="autoPush" />
+        <result column="status" property="status" />
+        <result column="push_result" property="pushResult" />
+        <result column="commandline" property="commandline" />
+        <result column="commandline_revert" property="commandlineRevert" />
+        <result column="commandline_echo" property="commandlineEcho" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `create_uuid`,
+        `task_editable_id`,
+        `center_uuid`,
+        `order_no`,
+        `type`,
+        `src_ip`,
+        `dst_ip`,
+        `ip_type`,
+        `service_list`,
+        `routing_ip`,
+        `vsys`,
+        `p_device_uuid`,
+        `create_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_delete_command_line_record (
+            `uuid`,
+            `create_uuid`,
+            `task_editable_id`,
+            `center_uuid`,
+            `order_no`,
+            `type`,
+            `src_ip`,
+            `dst_ip`,
+            `ip_type`,
+            `service_list`,
+            `routing_ip`,
+            `vsys`,
+            `p_device_uuid`,
+            `create_time`
+        )
+        VALUES(
+            #{uuid},
+            #{createUuid},
+            #{taskEditableId},
+            #{centerUuid},
+            #{orderNo},
+            #{type},
+            #{srcIp},
+            #{dstIp},
+            #{ipType},
+            #{serviceList},
+            #{routingIp},
+            #{vsys},
+            #{pDeviceUuid},
+            #{createTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_delete_command_line_record
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_delete_command_line_record
+        SET
+            id = #{id},
+            uuid = #{uuid},
+            create_uuid = #{createUuid},
+            task_editable_id = #{taskEditableId},
+            center_uuid = #{centerUuid},
+            order_no = #{orderNo},
+            type = #{type},
+            src_ip = #{srcIp},
+            dst_ip = #{dstIp},
+            ip_type = #{ipType},
+            service_list = #{serviceList},
+            routing_ip = #{routingIp},
+            vsys = #{vsys},
+            p_device_uuid = #{pDeviceUuid},
+            create_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_delete_command_line_record
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="findListByCenterUuidOrOrderNo" resultMap="DtoResultMap">
+        SELECT
+        ddclr.`id`,
+        ddclr.`uuid`,
+        ddclr.`create_uuid`,
+        ddclr.`task_editable_id`,
+        ddclr.`center_uuid`,
+        ddclr.`order_no`,
+        ddclr.`type`,
+        ddclr.`src_ip`,
+        ddclr.`dst_ip`,
+        ddclr.`ip_type`,
+        ddclr.`service_list`,
+        ddclr.`routing_ip`,
+        ddclr.`vsys`,
+        ddclr.`p_device_uuid`,
+        tn.`ip` AS device_ip,
+        tn.`type` AS device_type,
+        tn.`device_name`,
+        tn.`vendor_name`,
+        tn.`vendor_id`,
+        tn.`origin`,
+        tn.`state`,
+        tn.`model_number`,
+        pcte.`task_id`,
+        pcte.`theme`,
+        pcte.`user_name`,
+        pcte.`edit_user_name`,
+        pcte.`task_type`,
+        pcte.`device_uuid`,
+        pcte.`create_time`,
+        pcte.`push_time`,
+        pcte.`modified_time`,
+        pcte.`auto_push`,
+        pcte.`status`,
+        pcte.`push_result`,
+        pcte.`commandline`,
+        pcte.`commandline_revert`,
+        pcte.`commandline_echo`
+        FROM disposal_delete_command_line_record ddclr
+        INNER JOIN push_command_task_editable pcte ON pcte.id = ddclr.task_editable_id
+        LEFT JOIN topo_node tn ON tn.uuid = pcte.device_uuid
+        <where>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND ddclr.center_uuid = #{centerUuid}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND ddclr.order_no = #{orderNo}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_delete_command_line_record
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="createUuid != null and createUuid != ''">
+                AND create_uuid = #{createUuid}
+            </if>
+            <if test="taskEditableId != null and taskEditableId != ''">
+                AND task_editable_id = #{taskEditableId}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND order_no = #{orderNo}
+            </if>
+            <if test="type != null and type != ''">
+                AND type = #{type}
+            </if>
+            <if test="srcIp != null and srcIp != ''">
+                AND src_ip = #{srcIp}
+            </if>
+            <if test="dstIp != null and dstIp != ''">
+                AND dst_ip = #{dstIp}
+            </if>
+            <if test="ipType != null and ipType != ''">
+                AND ip_type = #{ipType}
+            </if>
+            <if test="serviceList != null and serviceList != ''">
+                AND service_list = #{serviceList}
+            </if>
+            <if test="routingIp != null and routingIp != ''">
+                AND routing_ip = #{routingIp}
+            </if>
+            <if test="vsys != null and vsys != ''">
+                AND vsys = #{vsys}
+            </if>
+            <if test="pDeviceUuid != null and pDeviceUuid != ''">
+                AND p_device_uuid = #{pDeviceUuid}
+            </if>
+        </where>
+        order by order_no, create_time
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_delete_command_line_record
+    </select>
+
+</mapper>

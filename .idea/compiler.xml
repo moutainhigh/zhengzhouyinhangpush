@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="totems-topology-push-plugin-cli (1)" />
+        <module name="totems-topology-push-plugin-cli (3)" />
+        <module name="totems-topology-push-plugin-cli (5)" />
+        <module name="totems-topology-push-plugin-cli (7)" />
+        <module name="totems-topology-push-plugin-cli (9)" />
+        <module name="totems-topology-push-plugin-cli (10)" />
+        <module name="totems-topology-push-plugin-cli (20)" />
+        <module name="totems-topology-push-plugin-cli (22)" />
+        <module name="totems-topology-push-plugin-cli (14)" />
+        <module name="totems-topology-push-plugin-cli (24)" />
+        <module name="totems-topology-push-plugin-cli (16)" />
+        <module name="totems-topology-push-plugin-cli (18)" />
+        <module name="totems-topology-push-command-line" />
+        <module name="totems-topology-push-common" />
+        <module name="totems-topology-push-app" />
+        <module name="totems-topology-push-plugin-cli (2)" />
+        <module name="totems-topology-push-plugin-cli (4)" />
+        <module name="totems-topology-push-plugin-cli (6)" />
+        <module name="totems-topology-push-plugin-cli (8)" />
+        <module name="totems-topology-push-plugin-cli (21)" />
+        <module name="totems-topology-push-plugin-cli (23)" />
+        <module name="totems-topology-push-plugin-cli (11)" />
+        <module name="totems-topology-push-plugin-cli (13)" />
+        <module name="totems-topology-push-plugin-cli (15)" />
+        <module name="totems-topology-push-plugin-cli (17)" />
+        <module name="totems-topology-push-plugin-cli" />
+        <module name="totems-topology-push-plugin-cli (19)" />
+      </profile>
+      <profile name="Annotation profile for totems-topology-push-plugin-cli (12)" enabled="true">
+        <sourceOutputDir name="../totems-topology-push-plugin-sdnx/target/generated-sources/annotations" />
+        <sourceTestOutputDir name="../totems-topology-push-plugin-sdnx/target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="totems-topology-push-plugin-cli (12)" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="totems-topology-parent" target="1.8" />
+      <module name="totems-topology-push" target="1.8" />
+      <module name="totems-topology-push-app" target="1.8" />
+      <module name="totems-topology-push-command-line" target="1.8" />
+      <module name="totems-topology-push-common" target="1.8" />
+      <module name="totems-topology-push-plugin-cli" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (1)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (10)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (11)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (12)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (13)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (14)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (15)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (16)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (17)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (18)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (19)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (2)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (20)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (21)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (22)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (23)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (24)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (3)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (4)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (5)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (6)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (7)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (8)" target="1.8" />
+      <module name="totems-topology-push-plugin-cli (9)" target="1.8" />
+      <module name="totems-topology-push-plugin-zhengzhouyinhang" target="8" />
+      <module name="totems-topology-push-plugins" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="totems-topology-push-app" options="-parameters" />
+      <module name="totems-topology-push-command-line" options="-parameters" />
+      <module name="totems-topology-push-common" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (10)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (11)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (12)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (15)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (22)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (23)" options="-parameters" />
+      <module name="totems-topology-push-plugin-cli (9)" options="-parameters" />
+      <module name="totems-topology-push-plugin-zhengzhouyinhang" options="-parameters" />
+    </option>
+  </component>
+</project>

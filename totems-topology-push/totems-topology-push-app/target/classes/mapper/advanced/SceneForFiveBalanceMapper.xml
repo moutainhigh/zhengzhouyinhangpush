@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.advanced.dao.mysql.SceneForFiveBalanceMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.advanced.entity.SceneForFiveBalanceEntity">
+    <id column="ID" jdbcType="BIGINT" property="id" />
+    <result column="SCENE_UUID" jdbcType="VARCHAR" property="sceneUuid" />
+    <result column="SCENE_NAME" jdbcType="VARCHAR" property="sceneName" />
+    <result column="APPLY_TYPE" jdbcType="VARCHAR" property="applyType" />
+    <result column="LOAD_BLANACE_MODE" jdbcType="VARCHAR" property="loadBlanaceMode" />
+    <result column="PERSIST" jdbcType="VARCHAR" property="persist" />
+    <result column="MONITOR" jdbcType="VARCHAR" property="monitor" />
+    <result column="MARK" jdbcType="VARCHAR" property="mark" />
+    <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser" />
+    <result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+    <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  <!-- 基本列 -->
+  <sql id="Base_Column_List">
+    ID,SCENE_UUID,SCENE_NAME,APPLY_TYPE,LOAD_BLANACE_MODE,PERSIST,MONITOR,MARK,CREATE_USER,DESCRIPTION,CREATE_TIME,UPDATE_TIME
+  </sql>
+  
+  <!-- 单个插入 -->
+  <insert id="add" parameterType="com.abtnetworks.totems.advanced.entity.SceneForFiveBalanceEntity" useGeneratedKeys="true" keyProperty="id">
+    insert into push_recommend_scene_for_five_balance
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="sceneUuid != null">
+        SCENE_UUID,
+      </if>
+      <if test="sceneName != null">
+        SCENE_NAME,
+      </if>
+      <if test="applyType != null">
+        APPLY_TYPE,
+      </if>
+      <if test="loadBlanaceMode != null">
+        LOAD_BLANACE_MODE,
+      </if>
+      <if test="persist != null">
+        PERSIST,
+      </if>
+      <if test="monitor != null">
+        MONITOR,
+      </if>
+      <if test="mark != null">
+        MARK,
+      </if>
+      <if test="createUser != null">
+        create_user,
+      </if>
+      <if test="description != null">
+        DESCRIPTION,
+      </if>
+      <if test="createTime != null">
+        CREATE_TIME,
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="sceneUuid != null">
+        #{sceneUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="sceneName != null">
+        #{sceneName,jdbcType=VARCHAR},
+      </if>
+      <if test="applyType != null">
+        #{applyType,jdbcType=VARCHAR},
+      </if>
+      <if test="loadBlanaceMode != null">
+        #{loadBlanaceMode,jdbcType=VARCHAR},
+      </if>
+      <if test="persist != null">
+        #{persist,jdbcType=VARCHAR},
+      </if>
+      <if test="monitor != null">
+        #{monitor,jdbcType=VARCHAR},
+      </if>
+      <if test="mark != null">
+        #{mark,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <!-- 单个更新 -->
+  <update id="update" parameterType="com.abtnetworks.totems.advanced.entity.SceneForFiveBalanceEntity">
+    update push_recommend_scene_for_five_balance
+    <set>
+      <if test="applyType != null">
+        APPLY_TYPE=#{applyType,jdbcType=VARCHAR},
+      </if>
+      <if test="loadBlanaceMode != null">
+        LOAD_BLANACE_MODE=#{loadBlanaceMode,jdbcType=VARCHAR},
+      </if>
+      <if test="persist != null">
+        PERSIST=#{persist,jdbcType=VARCHAR},
+      </if>
+      <if test="monitor != null">
+        MONITOR=#{monitor,jdbcType=VARCHAR},
+      </if>
+      <if test="mark != null">
+        MARK = #{mark,jdbcType=VARCHAR},
+      </if>
+      <if test="createUser != null">
+        CREATE_USER = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null">
+        DESCRIPTION = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="updateTime != null">
+        UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=BIGINT}
+  </update>
+  
+  <!-- 删除 -->
+  <delete id="delete" parameterType="java.lang.String" >
+    delete from push_recommend_scene_for_five_balance
+    where id in
+    <foreach item="id" index="index" collection="ids.split(',')" open="("
+             separator="," close=")">
+        #{id}
+    </foreach>
+  </delete>
+  
+  <!-- 查询所有 -->
+  <select id="queryList" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.advanced.entity.SceneForFiveBalanceEntity">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_scene_for_five_balance
+    <where>
+      <if test="sceneUuid != null">
+        AND SCENE_UUID=#{sceneUuid,jdbcType=VARCHAR}
+      </if>
+      <if test="sceneName != null">
+        AND SCENE_NAME like #{sceneName,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="applyType != null">
+        AND APPLY_TYPE=#{applyType,jdbcType=VARCHAR}
+      </if>
+      <if test="loadBlanaceMode != null">
+        AND LOAD_BLANACE_MODE=#{loadBlanaceMode,jdbcType=VARCHAR}
+      </if>
+      <if test="persist != null">
+        AND PERSIST=#{persist,jdbcType=VARCHAR}
+      </if>
+      <if test="monitor != null">
+        AND MONITOR=#{monitor,jdbcType=VARCHAR}
+      </if>
+      <if test="createTime != null">
+        AND CREATE_TIME=#{createTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="updateTime != null">
+        AND UPDATE_TIME=#{updateTime,jdbcType=TIMESTAMP}
+      </if>
+      <if test="createUser != null">
+        AND CREATE_USER=#{createUser,jdbcType=VARCHAR}
+      </if>
+    </where>
+    order by id DESC
+  </select>
+  
+  <!-- 单个查询 -->
+  <select id="getByEntity" parameterType="com.abtnetworks.totems.advanced.entity.SceneForFiveBalanceEntity" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM push_recommend_scene_for_five_balance
+    <where>
+      <if test="sceneUuid != null and sceneUuid != ''">
+        and SCENE_UUID =#{sceneUuid,jdbcType=VARCHAR}
+      </if>
+      <if test="id != null and id != ''">
+        and ID =#{id,jdbcType=BIGINT}
+      </if>
+      <if test="sceneName != null">
+        and SCENE_NAME = #{sceneName,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </select>
+</mapper>

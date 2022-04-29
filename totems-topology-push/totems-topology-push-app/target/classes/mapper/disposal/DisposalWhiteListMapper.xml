@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalWhiteListMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalWhiteListEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="name" property="name" />
+        <result column="type" property="type" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="remarks" property="remarks" />
+        <result column="deleted" property="deleted" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="modified_user" property="modifiedUser" />
+        <result column="modified_time" property="modifiedTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `name`,
+        `type`,
+        `src_ip`,
+        `dst_ip`,
+        `service_list`,
+        `routing_ip`,
+        `remarks`,
+        `deleted`,
+        `create_user`,
+        `create_time`,
+        `modified_user`,
+        `modified_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_white_list (
+            `id`,
+            `uuid`,
+            `name`,
+            `type`,
+            `src_ip`,
+            `dst_ip`,
+            `service_list`,
+            `routing_ip`,
+            `remarks`,
+            `deleted`,
+            `create_user`,
+            `create_time`,
+            `modified_user`,
+            `modified_time`
+        )
+        VALUES(
+            #{id},
+            #{uuid},
+            #{name},
+            #{type},
+            #{srcIp},
+            #{dstIp},
+            #{serviceList},
+            #{routingIp},
+            #{remarks},
+            #{deleted},
+            #{createUser},
+            #{createTime},
+            #{modifiedUser},
+            #{modifiedTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_white_list
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_white_list
+        SET
+            id = #{id},
+            uuid = #{uuid},
+            name = #{name},
+            type = #{type},
+            src_ip = #{srcIp},
+            dst_ip = #{dstIp},
+            service_list = #{serviceList},
+            routing_ip = #{routingIp},
+            remarks = #{remarks},
+            deleted = #{deleted},
+            create_user = #{createUser},
+            create_time = #{createTime},
+            modified_user = #{modifiedUser},
+            modified_time = #{modifiedTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_white_list
+        WHERE `id` = #{id} and deleted = 0
+    </select>
+
+    <select id="getByName" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_white_list
+        WHERE `name` = #{name} and deleted = 0
+        limit 0,1
+    </select>
+
+    <select id="getByNameNotId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_white_list
+        WHERE `name` = #{name} and deleted = 0
+        and id <![CDATA[ <> ]]> #{id}
+        limit 0,1
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_white_list
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+            <if test="name != null and name != ''">
+                AND `name` = #{name}
+            </if>
+            <if test="type != null">
+                AND `type` = #{type}
+            </if>
+            <if test="srcIp != null and srcIp != ''">
+                AND src_ip = #{srcIp}
+            </if>
+            <if test="dstIp != null and dstIp != ''">
+                AND dst_ip = #{dstIp}
+            </if>
+            <if test="serviceList != null and serviceList != ''">
+                AND service_list = #{serviceList}
+            </if>
+            <if test="routingIp != null and routingIp != ''">
+                AND routing_ip = #{routingIp}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND remarks = #{remarks}
+            </if>
+            <if test="deleted != null">
+                AND deleted = #{deleted}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                AND create_time = #{createTime}
+            </if>
+            <if test="modifiedUser != null and modifiedUser != ''">
+                AND modified_user = #{modifiedUser}
+            </if>
+            <if test="modifiedTime != null and modifiedTime != ''">
+                AND modified_time = #{modifiedTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_white_list
+        where deleted = 0
+        <if test="type != null ">
+            AND type = #{type}
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE concat('%', #{name}, '%')
+        </if>
+        <if test="content != null and content != ''">
+            AND (src_ip LIKE concat('%', #{content}, '%')
+                or dst_ip LIKE concat('%', #{content}, '%')
+                or service_list LIKE concat('%', #{content}, '%')
+                or routing_ip LIKE concat('%', #{content}, '%') )
+        </if>
+        order by id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_white_list
+    </select>
+
+</mapper>

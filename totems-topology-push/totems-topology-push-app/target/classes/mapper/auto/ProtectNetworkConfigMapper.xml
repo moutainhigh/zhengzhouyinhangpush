@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.auto.dao.mysql.ProtectNetworkConfigMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigEntity">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="uuid" jdbcType="VARCHAR" property="uuid" />
+    <result column="device_ip" jdbcType="VARCHAR" property="deviceIp" />
+    <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+    <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+    <result column="protect_network" jdbcType="VARCHAR" property="protectNetwork" />
+    <result column="nat_flag" jdbcType="VARCHAR" property="natFlag" />
+    <result column="same_zone_flag" jdbcType="VARCHAR" property="sameZoneFlag" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id,uuid, device_ip, device_uuid, device_name, protect_network, nat_flag,same_zone_flag
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_protect_network_config
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from push_protect_network_config
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigEntity">
+    insert into push_protect_network_config (id, uuid,device_ip, device_uuid,
+      device_name, protect_network, nat_flag,same_zone_flag
+      )
+    values (#{id,jdbcType=BIGINT}, #{uuid,jdbcType=VARCHAR}, #{deviceIp,jdbcType=VARCHAR}, #{deviceUuid,jdbcType=VARCHAR},
+      #{deviceName,jdbcType=VARCHAR}, #{protectNetwork,jdbcType=VARCHAR}, #{natFlag,jdbcType=VARCHAR}, #{sameZoneFlag,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigEntity">
+    insert into push_protect_network_config
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uuid != null">
+        uuid,
+      </if>
+      <if test="deviceIp != null">
+        device_ip,
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid,
+      </if>
+      <if test="deviceName != null">
+        device_name,
+      </if>
+      <if test="protectNetwork != null">
+        protect_network,
+      </if>
+      <if test="natFlag != null">
+        nat_flag,
+      </if>
+      <if test="sameZoneFlag != null">
+        same_zone_flag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="uuid != null">
+        #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceIp != null">
+        #{deviceIp,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="protectNetwork != null">
+        #{protectNetwork,jdbcType=VARCHAR},
+      </if>
+      <if test="natFlag != null">
+        #{natFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sameZoneFlag != null">
+        #{sameZoneFlag,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigEntity">
+    update push_protect_network_config
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceIp != null">
+        device_ip = #{deviceIp,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceUuid != null">
+        device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      </if>
+      <if test="deviceName != null">
+        device_name = #{deviceName,jdbcType=VARCHAR},
+      </if>
+      <if test="protectNetwork != null">
+        protect_network = #{protectNetwork,jdbcType=VARCHAR},
+      </if>
+      <if test="natFlag != null">
+        nat_flag = #{natFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sameZoneFlag != null">
+        same_zone_flag = #{sameZoneFlag,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.auto.entity.ProtectNetworkConfigEntity">
+    update push_protect_network_config
+    set uuid = #{uuid,jdbcType=VARCHAR},
+       device_ip = #{deviceIp,jdbcType=VARCHAR},
+      device_uuid = #{deviceUuid,jdbcType=VARCHAR},
+      device_name = #{deviceName,jdbcType=VARCHAR},
+      protect_network = #{protectNetwork,jdbcType=VARCHAR},
+      nat_flag = #{natFlag,jdbcType=VARCHAR},
+      same_zone_flag = #{sameZoneFlag,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+  <select id="findList" resultMap="BaseResultMap">
+    select a.* from push_protect_network_config a LEFT JOIN push_protect_network_nat_mapping b on b.config_id = a.id
+    LEFT JOIN push_protect_network_config_detail c on c.config_id = a.id
+    <where>
+      <choose>
+        <when test="ipType == 0">
+          c.ipv4_start &lt;= #{ipv4End,jdbcType=BIGINT} and c.ipv4_end &gt;= #{ipv4Start,jdbcType=BIGINT}
+        </when>
+        <when test="ipType == 1">
+          c.ipv6_start &lt;= HEX( INET6_ATON ( #{ipv6End,jdbcType=VARCHAR} ) ) and
+          c.ipv6_end &gt;= HEX( INET6_ATON ( #{ipv6Start,jdbcType=VARCHAR} ))
+        </when>
+      </choose>
+      <if test="deviceIp !=null and deviceIp !='' ">
+        and device_ip like "%"#{deviceIp,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="deviceName !=null and deviceName !='' ">
+        and device_name like "%"#{deviceName,jdbcType=VARCHAR}"%"
+      </if>
+      <if test="natType !=null and natType !='' ">
+        and b.nat_type = #{natType,jdbcType=VARCHAR}
+      </if>
+      <if test="outsideIp !=null and outsideIp !='' ">
+        and b.outside_ip = #{outsideIp,jdbcType=VARCHAR}
+      </if>
+      <if test="insideIp !=null and insideIp !='' ">
+        and b.inside_ip = #{insideIp,jdbcType=VARCHAR}
+      </if>
+    </where>
+    GROUP BY a.id order by a.id DESC
+  </select>
+
+  <select id="getByUuid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_protect_network_config
+    where uuid = #{uuid}
+  </select>
+
+  <select id="selectByDeviceUuid" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_protect_network_config
+    where device_uuid = #{deviceUuid}
+  </select>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from push_protect_network_config
+  </select>
+
+</mapper>

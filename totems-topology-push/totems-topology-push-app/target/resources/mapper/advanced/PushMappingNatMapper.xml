@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.advanced.dao.mysql.PushMappingNatMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.advanced.entity.PushMappingNatEntity">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <result column="device_uuid" jdbcType="VARCHAR" property="deviceUuid" />
+        <result column="device_name" jdbcType="VARCHAR" property="deviceName" />
+        <result column="device_vendor_name" jdbcType="VARCHAR" property="deviceVendorName" />
+        <result column="pre_standard_desc" jdbcType="VARCHAR" property="preStandardDesc" />
+        <result column="pre_ip" jdbcType="VARCHAR" property="preIp" />
+        <result column="post_standard_desc" jdbcType="VARCHAR" property="postStandardDesc" />
+        <result column="post_ip" jdbcType="VARCHAR" property="postIp" />
+        <result column="src_zone" jdbcType="VARCHAR" property="srcZone" />
+        <result column="in_dev_if" jdbcType="VARCHAR" property="inDevIf" />
+        <result column="dst_zone" jdbcType="VARCHAR" property="dstZone" />
+        <result column="out_dev_if" jdbcType="VARCHAR" property="outDevIf" />
+        <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+        <result column="remark" jdbcType="VARCHAR" property="remark" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, device_uuid,device_name,device_vendor_name, pre_standard_desc,pre_ip,post_standard_desc,post_ip,src_zone,in_dev_if,dst_zone,out_dev_if,create_user,remark,create_time,update_time
+    </sql>
+
+    <select id="listPushMappingNatInfo" parameterType="java.util.Map" resultMap="BaseResultMap" >
+        select
+        <include refid="Base_Column_List" />
+        from push_mapping_nat
+        <where>
+            <if test="deviceName != null and deviceName != ''">
+                and device_name like #{deviceName,jdbcType=VARCHAR}"%"
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.abtnetworks.totems.advanced.entity.PushMappingNatEntity">
+        update push_mapping_nat
+        set device_uuid = #{deviceUuid,jdbcType=VARCHAR},device_name = #{deviceName,jdbcType=VARCHAR},
+        device_vendor_name = #{deviceVendorName,jdbcType=VARCHAR},pre_standard_desc = #{preStandardDesc,jdbcType=VARCHAR},
+        pre_ip = #{preIp,jdbcType=VARCHAR},post_standard_desc = #{postStandardDesc,jdbcType=VARCHAR},
+        post_ip = #{postIp,jdbcType=VARCHAR},src_zone = #{srcZone,jdbcType=VARCHAR},
+        in_dev_if = #{inDevIf,jdbcType=VARCHAR},dst_zone = #{dstZone,jdbcType=VARCHAR},out_dev_if = #{outDevIf,jdbcType=VARCHAR},
+        create_user = #{createUser,jdbcType=VARCHAR},remark = #{remark,jdbcType=VARCHAR}, update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insert" parameterType="com.abtnetworks.totems.advanced.entity.PushMappingNatEntity"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into push_mapping_nat  (device_uuid,device_name,device_vendor_name, pre_standard_desc,pre_ip,post_standard_desc,post_ip,src_zone,in_dev_if,dst_zone,out_dev_if,create_user,remark,create_time)
+        values (#{deviceUuid, jdbcType=VARCHAR},#{deviceName, jdbcType=VARCHAR},#{deviceVendorName, jdbcType=VARCHAR}, #{preStandardDesc, jdbcType=VARCHAR},
+        #{preIp, jdbcType=VARCHAR},#{postStandardDesc, jdbcType=VARCHAR},#{postIp, jdbcType=VARCHAR},#{srcZone, jdbcType=VARCHAR},
+        #{inDevIf, jdbcType=VARCHAR},#{dstZone, jdbcType=VARCHAR},#{outDevIf, jdbcType=VARCHAR},#{createUser, jdbcType=VARCHAR},#{remark, jdbcType=VARCHAR}
+        ,#{createTime, jdbcType=TIMESTAMP})
+    </insert>
+
+    <delete id="deletePushMappingNatInfo" parameterType="java.lang.String">
+        delete from push_mapping_nat where id in
+        <foreach item="id" index="index" collection="ids.split(',')" open="("
+                 separator="," close=")">#{id}
+        </foreach>
+    </delete>
+</mapper>

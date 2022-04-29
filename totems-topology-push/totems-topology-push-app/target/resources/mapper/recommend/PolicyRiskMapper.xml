@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.recommend.dao.mysql.PolicyRiskMapper">
+  <resultMap id="BaseResultMap" type="com.abtnetworks.totems.recommend.entity.PolicyRiskEntity">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="path_info_id" jdbcType="INTEGER" property="pathInfoId" />
+    <result column="policy_id" jdbcType="INTEGER" property="policyId" />
+    <result column="rule_id" jdbcType="VARCHAR" property="ruleId" />
+    <result column="obj_json" jdbcType="VARCHAR" property="objJson" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    id, path_info_id, policy_id, rule_id, obj_json
+  </sql>
+
+  <!-- 根据路径信息id查询风险分析数据 -->
+  <select id="selectByPathInfoId" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from push_policy_risk
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </select>
+
+  <!-- 根据路径信息id删除风险分析数据 -->
+  <delete id="deleteByPathInfoId" parameterType="java.lang.Integer">
+    delete from push_policy_risk
+    where path_info_id = #{pathInfoId,jdbcType=INTEGER}
+  </delete>
+
+  <!-- 根据路径信息id删除风险分析数据 -->
+  <delete id="deleteByTaskList" parameterType="java.util.Map">
+    delete from push_policy_risk
+    where path_info_id in (select id
+    from push_path_info
+    where task_id in
+    <foreach collection="ids" index="index" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>)
+  </delete>
+
+  <!-- 插入风险分析数据 -->
+  <insert id="insert" parameterType="com.abtnetworks.totems.recommend.entity.PolicyRiskEntity">
+    insert into push_policy_risk ( path_info_id, policy_id,
+      rule_id, obj_json)
+    values (#{pathInfoId,jdbcType=INTEGER}, #{policyId,jdbcType=INTEGER},
+      #{ruleId,jdbcType=VARCHAR}, #{objJson,jdbcType=VARCHAR})
+  </insert>
+</mapper>

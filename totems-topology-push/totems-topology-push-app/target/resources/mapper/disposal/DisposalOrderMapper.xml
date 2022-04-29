@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalOrderEntity" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="remarks" property="remarks" />
+        <result column="status" property="status" />
+        <result column="error_message" property="errorMessage" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <resultMap id="DtoResultMap" type="com.abtnetworks.totems.disposal.dto.DisposalOrderDTO" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="remarks" property="remarks" />
+        <result column="status" property="status" />
+        <result column="error_message" property="errorMessage" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+
+        <result column="order_name" property="orderName" />
+        <result column="order_no" property="orderNo" />
+        <result column="category" property="category" />
+        <result column="type" property="type" />
+        <result column="send_type" property="sendType" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="action" property="action" />
+        <result column="origin" property="origin" />
+        <result column="reason" property="reason" />
+        <result column="source_classification" property="sourceClassification" />
+
+        <result column="callbackCenterUuid" property="callbackCenterUuid" />
+
+        <result column="scenesUuids" property="scenesUuids" />
+        <result column="scenesNames" property="scenesNames" />
+
+        <result column="branchUuids" property="branchUuids" />
+        <result column="branchNames" property="branchNames" />
+        <result column="branchNamesHandleStatus" property="branchNamesHandleStatus" />
+
+        <result column="impl_details" property="implDetails" />
+    </resultMap>
+
+    <resultMap id="AttackChainDtoResultMap" type="com.abtnetworks.totems.disposal.dto.AttackChainDisposalOrderDTO" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="remarks" property="remarks" />
+        <result column="status" property="status" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+
+        <result column="order_name" property="orderName" />
+        <result column="order_no" property="orderNo" />
+        <result column="category" property="category" />
+        <result column="type" property="type" />
+        <result column="send_type" property="sendType" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="action" property="action" />
+        <result column="origin" property="origin" />
+        <result column="reason" property="reason" />
+        <result column="source_classification" property="sourceClassification" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `center_uuid`,
+        `remarks`,
+        `status`,
+        `error_message`,
+        `create_user`,
+        `create_time`
+    </sql>
+
+    <sql id="Dto_Column_List">
+        o.`id`,
+        o.`center_uuid`,
+        o.`remarks`,
+        o.`status`,
+        o.`error_message`,
+        o.`create_user`,
+        o.`create_time`,
+        oc.`order_name`,
+        oc.`order_no`,
+        oc.`category`,
+        oc.`type`,
+        oc.`send_type`,
+        oc.`src_ip`,
+        oc.`dst_ip`,
+        oc.`service_list`,
+        oc.`routing_ip`,
+        oc.`action`,
+        oc.`origin`,
+        oc.`reason`,
+        oc.`source_classification`,
+        r.`p_center_uuid` AS callbackCenterUuid,
+        GROUP_CONCAT(DISTINCT s.`uuid`) AS scenesUuids,
+        GROUP_CONCAT(DISTINCT s.`name`) AS scenesNames,
+        GROUP_CONCAT(DISTINCT tb.`branch_uuid`) AS branchUuids,
+        GROUP_CONCAT(DISTINCT tb.`branch_name`) AS branchNames,
+        GROUP_CONCAT(DISTINCT tb.`branch_name`, ' （', tb.`branch_ip`, '）：', IF(tb.handle_status = 1, "已处置 ", "未处置 "),
+            IF(DATE_FORMAT(tb.handle_time, '%Y-%m-%d %H:%i:%s') IS NULL,'',DATE_FORMAT(tb.handle_time, '%Y-%m-%d %H:%i:%s'))) AS branchNamesHandleStatus,
+        (SELECT GROUP_CONCAT(DISTINCT tmp_tn.device_name, '(', tmp_tn.ip, ')：', IF(tmp_pcte.`status`=1,'成功','失败') SEPARATOR '@@@')
+            FROM disposal_create_command_line_record tmp_dcclr
+            INNER JOIN push_command_task_editable tmp_pcte ON tmp_dcclr.task_editable_id = tmp_pcte.id
+            LEFT JOIN topo_node tmp_tn ON tmp_tn.uuid = tmp_pcte.device_uuid
+            WHERE tmp_dcclr.center_uuid = o.`center_uuid`
+            GROUP BY tmp_dcclr.center_uuid) AS impl_details
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO disposal_order (
+            `center_uuid`,
+            `remarks`,
+            `status`,
+            `error_message`,
+            `create_user`,
+            `create_time`
+        )
+        VALUES(
+            #{centerUuid},
+            #{remarks},
+            #{status},
+            #{errorMessage},
+            #{createUser},
+            #{createTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_order
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_order
+        SET
+            id = #{id},
+            center_uuid = #{centerUuid},
+            remarks = #{remarks},
+            status = #{status},
+            error_message = #{errorMessage},
+            create_user = #{createUser},
+            create_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateStatusByCenterUuid">
+        UPDATE disposal_order
+        <set>
+            status = #{status}
+            <if test="errorMessage != null and errorMessage != ''">
+                , error_message = #{errorMessage}
+            </if>
+        </set>
+        WHERE `center_uuid` = #{centerUuid}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_order
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getOrderEntityByCenterUuid" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_order
+        WHERE `center_uuid` = #{centerUuid}
+    </select>
+
+    <select id="getByCenterUuid" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_order o
+        INNER JOIN disposal_order_center oc ON o.center_uuid = oc.uuid
+        LEFT JOIN disposal_order_scenes os ON os.center_uuid = oc.uuid
+        LEFT JOIN disposal_scenes s ON s.uuid = os.scenes_uuid
+        LEFT JOIN disposal_team_branch tb ON tb.center_uuid = o.center_uuid
+        LEFT JOIN disposal_rollback r ON r.p_center_uuid = o.center_uuid
+        <where>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND o.center_uuid = #{centerUuid}
+            </if>
+        </where>
+        GROUP BY o.center_uuid
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_order
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND remarks = #{remarks}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                AND create_time = #{createTime}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="findDtoList" resultMap="DtoResultMap">
+        SELECT
+        <include refid="Dto_Column_List" />
+        FROM disposal_order o
+        INNER JOIN disposal_order_center oc ON o.center_uuid = oc.uuid
+        LEFT JOIN disposal_order_scenes os ON os.center_uuid = oc.uuid
+        LEFT JOIN disposal_scenes s ON s.uuid = os.scenes_uuid
+        LEFT JOIN disposal_team_branch tb ON tb.center_uuid = o.center_uuid
+        LEFT JOIN disposal_rollback r ON r.p_center_uuid = o.center_uuid
+        <where>
+            <if test="startTime != null">
+                AND o.create_time &gt; FROM_UNIXTIME(#{startTime})
+            </if>
+            <if test="endTime != null">
+                AND o.create_time &lt;= FROM_UNIXTIME(#{endTime})
+            </if>
+            <if test="id != null">
+                AND o.id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND o.center_uuid = #{centerUuid}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND o.remarks LIKE concat('%', #{remarks}, '%')
+            </if>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND o.create_user LIKE concat('%', #{createUser}, '%')
+            </if>
+            <if test="sourceClassification != null">
+                AND oc.source_classification = #{sourceClassification}
+            </if>
+            <if test="orderName != null and orderName != ''">
+                AND oc.order_name LIKE concat('%', #{orderName}, '%')
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                AND oc.order_no LIKE concat('%', #{orderNo}, '%')
+            </if>
+            <if test="category != null">
+                AND oc.category = #{category}
+            </if>
+            <if test="type != null">
+                AND oc.type = #{type}
+            </if>
+            <if test="sendType != null">
+                AND oc.send_type = #{sendType}
+            </if>
+            <if test="srcIp != null and srcIp != ''">
+                AND oc.src_ip LIKE concat('%', #{srcIp}, '%')
+            </if>
+            <if test="dstIp != null and dstIp != ''">
+                AND oc.dst_ip LIKE concat('%', #{dstIp}, '%')
+            </if>
+            <if test="serviceList != null and serviceList != ''">
+                AND oc.service_list LIKE concat('%', #{serviceList}, '%')
+            </if>
+            <if test="routingIp != null and routingIp != ''">
+                AND oc.routing_ip LIKE concat('%', #{routingIp}, '%')
+            </if>
+            <if test="action != null and action != ''">
+                AND oc.action = #{action}
+            </if>
+            <if test="origin != null and origin != ''">
+                AND oc.origin LIKE concat('%', #{origin}, '%')
+            </if>
+            <if test="reason != null and reason != ''">
+                AND oc.reason LIKE concat('%', #{reason}, '%')
+            </if>
+        </where>
+        GROUP BY o.center_uuid
+        order by o.id DESC
+    </select>
+
+    <select id="findAttackChainDtoList" resultMap="AttackChainDtoResultMap">
+        SELECT
+            o.`id`,
+            o.`center_uuid`,
+            o.`remarks`,
+            o.`status`,
+            o.`create_user`,
+            o.`create_time`,
+            oc.`order_name`,
+            oc.`order_no`,
+            oc.`category`,
+            oc.`type`,
+            oc.`send_type`,
+            oc.`src_ip`,
+            oc.`dst_ip`,
+            oc.`service_list`,
+            oc.`routing_ip`,
+            oc.`action`,
+            oc.`origin`,
+            oc.`reason`,
+            oc.`source_classification`
+        FROM disposal_order o
+        INNER JOIN disposal_order_center oc ON o.center_uuid = oc.uuid
+        <where>
+            <if test="status != null">
+                AND o.status = #{status}
+            </if>
+            <if test="category != null">
+                AND oc.category = #{category}
+            </if>
+            <if test="type != null">
+                AND oc.type = #{type}
+            </if>
+            <if test="action != null and action != ''">
+                AND oc.action = #{action}
+            </if>
+        </where>
+        order by o.id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_order
+    </select>
+
+</mapper>

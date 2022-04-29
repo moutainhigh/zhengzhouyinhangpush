@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.disposal.dao.mysql.DisposalHandleMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.disposal.entity.DisposalHandleEntity" >
+        <result column="id" property="id" />
+        <result column="center_uuid" property="centerUuid" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="status" property="status" />
+        <result column="need_audit_flag" property="needAuditFlag" />
+        <result column="audit_user" property="auditUser" />
+        <result column="callback_flag" property="callbackFlag" />
+        <result column="audit_time" property="auditTime" />
+    </resultMap>
+
+    <resultMap id="BaseListResultMap" type="com.abtnetworks.totems.disposal.dto.DisposalHandleListDTO" >
+        <result column="center_uuid" property="centerUuid" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="status" property="status" />
+        <result column="need_audit_flag" property="needAuditFlag" />
+        <result column="audit_user" property="auditUser" />
+        <result column="callback_flag" property="callbackFlag" />
+        <result column="audit_time" property="auditTime" />
+        <result column="order_no" property="orderNo" />
+        <result column="order_name" property="orderName" />
+        <result column="category" property="category" />
+        <result column="type" property="type" />
+        <result column="send_type" property="sendType" />
+        <result column="src_ip" property="srcIp" />
+        <result column="dst_ip" property="dstIp" />
+        <result column="service_list" property="serviceList" />
+        <result column="routing_ip" property="routingIp" />
+        <result column="action" property="action" />
+        <result column="origin" property="origin" />
+        <result column="reason" property="reason" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `center_uuid`,
+        `create_user`,
+        `create_time`,
+        `status`,
+        `need_audit_flag`,
+        `audit_user`,
+        `callback_flag`,
+        `audit_time`
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true"  keyProperty="id">
+        INSERT INTO disposal_handle (
+            `center_uuid`,
+            `create_user`,
+            `create_time`,
+            `status`,
+            `need_audit_flag`,
+            `audit_user`,
+            `callback_flag`,
+            `audit_time`
+        )
+        VALUES(
+            #{centerUuid},
+            #{createUser},
+            #{createTime},
+            #{status},
+            #{needAuditFlag},
+            #{auditUser},
+            #{callbackFlag},
+            #{auditTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM disposal_handle
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE disposal_handle
+        SET
+            id = #{id},
+            center_uuid = #{centerUuid},
+            create_user = #{createUser},
+            create_time = NOW(),
+            status = #{status},
+            need_audit_flag = #{needAuditFlag},
+            audit_user = #{auditUser},
+            callback_flag = #{callbackFlag},
+            audit_time = #{auditTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM disposal_handle
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="get" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_handle
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                AND create_time = #{createTime}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="needAuditFlag != null and needAuditFlag != ''">
+                AND need_audit_flag = #{needAuditFlag}
+            </if>
+            <if test="auditUser != null and auditUser != ''">
+                AND audit_user = #{auditUser}
+            </if>
+            <if test="callbackFlag != null and callbackFlag != ''">
+                AND callback_flag = #{callbackFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM disposal_handle
+        <where>
+            <if test="id != null and id != ''">
+                AND id = #{id}
+            </if>
+            <if test="centerUuid != null and centerUuid != ''">
+                AND center_uuid = #{centerUuid}
+            </if>
+            <if test="createUser != null and createUser != ''">
+                AND create_user = #{createUser}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="needAuditFlag != null and needAuditFlag != ''">
+                AND need_audit_flag = #{needAuditFlag}
+            </if>
+            <if test="auditUser != null and auditUser != ''">
+                AND audit_user = #{auditUser}
+            </if>
+            <if test="callbackFlag != null and callbackFlag != ''">
+                AND callback_flag = #{callbackFlag}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM disposal_handle
+    </select>
+
+    <sql id="common_findByCondition">
+        <if test="status != null">
+            AND a.status = #{status}
+        </if>
+        <if test="category != null">
+            AND b.category = #{category}
+        </if>
+        <if test="type != null">
+            AND b.type = #{type}
+        </if>
+        <if test="callbackFlag != null">
+            AND a.callback_flag = #{callbackFlag}
+        </if>
+        <if test="content != null and content != ''">
+            AND (b.src_ip LIKE concat('%', #{content}, '%')
+            or b.dst_ip LIKE concat('%', #{content}, '%')
+            or b.protocol LIKE concat('%', #{content}, '%')
+            or b.dst_port LIKE concat('%', #{content}, '%')
+            or b.routing_ip LIKE concat('%', #{content}, '%')
+            or b.order_no LIKE concat('%', #{content}, '%') )
+        </if>
+    </sql>
+
+    <select id="findByCondition" resultMap="BaseListResultMap">
+        select a.id, a.center_uuid, a.create_user, a.create_time, a.status, a.need_audit_flag, a.audit_user, a.callback_flag, a.audit_time,
+        b.order_no, b.order_name, b.category, b.type, b.send_type, b.src_ip, b.dst_ip, b.service_list,
+        b.routing_ip, b.action, b.origin, b.reason, a.callback_flag, a.audit_time
+        from disposal_handle a
+        inner join disposal_order_center b  on a.center_uuid = b.uuid
+        where 1=1
+        <include refid="common_findByCondition"/>
+        order by id DESC
+    </select>
+
+    <select id="findByConditionCount" resultType="int">
+        select count(1)
+        from disposal_handle a
+        inner join disposal_order_center b  on a.center_uuid = b.uuid
+        where 1=1
+        <include refid="common_findByCondition"/>
+    </select>
+
+</mapper>

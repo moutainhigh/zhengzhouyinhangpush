@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.translation.dao.TranslationTaskMappingMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.translation.entity.TranslationTaskMappingEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="task_uuid" property="taskUuid" />
+        <result column="source_value" property="sourceValue" />
+        <result column="source_type" property="sourceType" />
+        <result column="target_value" property="targetValue" />
+        <result column="target_type" property="targetType" />
+        <result column="remarks" property="remarks" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `task_uuid`,
+        `source_value`,
+        `source_type`,
+        `target_value`,
+        `target_type`,
+        `remarks`,
+        `create_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO push_translation_task_mapping (
+            `id`,
+            `uuid`,
+            `task_uuid`,
+            `source_value`,
+            `source_type`,
+            `target_value`,
+            `target_type`,
+            `remarks`,
+            `create_time`
+        )
+        VALUES(
+            #{id},
+            #{uuid},
+            #{taskUuid},
+            #{sourceValue},
+            #{sourceType},
+            #{targetValue},
+            #{targetType},
+            #{remarks},
+            NOW()
+        )
+    </insert>
+    <insert id="insertList">
+        INSERT INTO push_translation_task_mapping (
+            `id`,
+            `uuid`,
+            `task_uuid`,
+            `source_value`,
+            `source_type`,
+            `target_value`,
+            `target_type`,
+            `remarks`,
+            `create_time`
+        )
+        VALUES
+        <foreach collection="list" item="tmp" separator="," >
+            (
+            #{tmp.id},
+            #{tmp.uuid},
+            #{tmp.taskUuid},
+            #{tmp.sourceValue},
+            #{tmp.sourceType},
+            #{tmp.targetValue},
+            #{tmp.targetType},
+            #{tmp.remarks},
+            NOW()
+            )
+        </foreach>
+
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM push_translation_task_mapping
+        WHERE `id` = #{id}
+    </delete>
+
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_translation_task_mapping
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM push_translation_task_mapping
+    </select>
+
+    <delete id="deleteByTaskId">
+        DELETE FROM push_translation_task_mapping
+        WHERE `task_uuid` = #{taskUuid}
+    </delete>
+
+    <select id="findVOListByTaskUuid" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_translation_task_mapping
+        WHERE `task_uuid` = #{taskUuid}
+        order by id DESC
+    </select>
+
+</mapper>

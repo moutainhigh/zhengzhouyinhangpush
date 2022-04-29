@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.issued.business.dao.mysql.CommandRegularParamMapper">
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.issued.business.entity.PushCommandRegularParamEntity">
+        <id column="id" jdbcType="INTEGER" property="id" />
+        <id column="model_number" jdbcType="INTEGER" property="modelNumber" />
+        <id column="prompt_reg_command" jdbcType="VARCHAR" property="promptRegCommand" />
+        <id column="prompt_error_info" jdbcType="VARCHAR" property="promptErrorInfo" />
+        <id column="create_emp" jdbcType="VARCHAR" property="createEmp" />
+        <id column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <id column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <id column="update_emp" jdbcType="VARCHAR" property="updateEmp" />
+        <id column="vendor_name" jdbcType="VARCHAR" property="vendorName" />
+        <id column="type" jdbcType="VARCHAR" property="type" />
+        <id column="time_out" jdbcType="INTEGER" property="timeOut" />
+        <id column="interval_time" jdbcType="INTEGER" property="intervalTime" />
+        <id column="prompt_reg_ex_command" jdbcType="VARCHAR" property="promptRegExCommand" />
+        <id column="prompt_error_reg_info" jdbcType="VARCHAR" property="promptErrorRegInfo" />
+    </resultMap>
+
+
+
+    <sql id="BaseColumnList" >
+        id, model_number, prompt_reg_command, prompt_error_info, create_emp, update_time, create_time, update_emp,vendor_name,type,time_out,interval_time,prompt_reg_ex_command,prompt_error_reg_info
+    </sql>
+
+    <select id="getCommandRegularParamList" resultMap="BaseResultMap" parameterType="com.abtnetworks.totems.issued.dto.CommandRegularParamPageDTO">
+        select
+        p.id,p.model_number,p.prompt_reg_command,p.prompt_error_info,p.update_time,p.update_emp,
+        p.vendor_name,p.type,p.time_out,p.interval_time,p.prompt_reg_ex_command,p.prompt_error_reg_info
+        from push_command_regular_param p
+        where 1=1
+        <if test="searchName!= null  and searchName != ''" >
+            and ( p.model_number like    concat('%',#{searchName},'%')
+            or p.vendor_name like    concat('%',#{searchName},'%'))
+        </if>
+        <if test="type!= null">
+            and  p.type =  #{type}
+        </if>
+        <if test="updateEmp!= null">
+            and  p.update_emp =  #{updateEmp}
+        </if>
+        order by p.update_time desc
+    </select>
+
+
+    <select id="getCommandRegularParamByModelNumber" resultMap="BaseResultMap" resultType="java.lang.String">
+        select
+        prompt_reg_command,prompt_error_info,time_out,interval_time,prompt_reg_ex_command,prompt_error_reg_info
+        from push_command_regular_param where model_number = #{modelNumber, jdbcType=VARCHAR}
+    </select>
+
+    <insert id="addCommandRegularParam" parameterType="com.abtnetworks.totems.issued.business.entity.PushCommandRegularParamEntity" >
+        insert into push_command_regular_param
+        (model_number,  prompt_reg_command, prompt_error_info, create_emp, update_emp,vendor_name,type,time_out, interval_time,prompt_reg_ex_command,prompt_error_reg_info)
+        values
+        (#{modelNumber, jdbcType=VARCHAR}, #{promptRegCommand, jdbcType=VARCHAR}, #{promptErrorInfo, jdbcType=VARCHAR},
+        #{createEmp, jdbcType=VARCHAR}, #{updateEmp, jdbcType=VARCHAR},#{vendorName, jdbcType=VARCHAR},#{type, jdbcType=VARCHAR},
+        #{timeOut, jdbcType=INTEGER},#{intervalTime, jdbcType=INTEGER}, #{promptRegExCommand, jdbcType=VARCHAR}, #{promptErrorRegInfo, jdbcType=VARCHAR})
+    </insert>
+
+    <delete id="deleteCommandRegularParam" >
+        delete from push_command_regular_param where id in
+        <foreach item="id" index="index" collection="ids" open="("
+          separator="," close=")"> #{id}
+    </foreach>
+    </delete>
+
+    <update id="updateCommandRegularParamById" parameterType="com.abtnetworks.totems.issued.business.entity.PushCommandRegularParamEntity" >
+        update push_command_regular_param <set> model_number=#{modelNumber, jdbcType=VARCHAR} ,
+        prompt_reg_command = #{promptRegCommand, jdbcType=VARCHAR},
+        prompt_error_info = #{promptErrorInfo, jdbcType=VARCHAR},
+        update_emp = #{updateEmp, jdbcType=VARCHAR},
+
+        time_out = #{timeOut, jdbcType=INTEGER},
+
+        <if test="intervalTime !=null">
+            interval_time = #{intervalTime, jdbcType=INTEGER},
+        </if>
+
+
+        prompt_reg_ex_command = #{promptRegExCommand, jdbcType=VARCHAR},
+        prompt_error_reg_info = #{promptErrorRegInfo, jdbcType=VARCHAR}
+    </set>
+        where id=#{id, jdbcType=INTEGER};
+    </update>
+
+
+</mapper>

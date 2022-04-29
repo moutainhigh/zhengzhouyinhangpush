@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abtnetworks.totems.translation.dao.TranslationTaskRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.abtnetworks.totems.translation.entity.TranslationTaskRecordEntity" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="title_name" property="titleName" />
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="device_name" property="deviceName" />
+        <result column="device_vendor_id" property="deviceVendorId" />
+        <result column="device_vendor_name" property="deviceVendorName" />
+        <result column="device_model_number" property="deviceModelNumber" />
+        <result column="target_device_uuid" property="targetDeviceUuid" />
+        <result column="target_device_name" property="targetDeviceName" />
+        <result column="target_device_vendor_id" property="targetDeviceVendorId" />
+        <result column="target_device_vendor_name" property="targetDeviceVendorName" />
+        <result column="target_device_model_number" property="targetDeviceModelNumber" />
+        <result column="remarks" property="remarks" />
+        <result column="command_line_config_status" property="commandLineConfigStatus" />
+        <result column="status" property="status" />
+        <result column="warning" property="warning" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <resultMap id="VOResultMap" type="com.abtnetworks.totems.translation.vo.TranslationTaskRecordVO" >
+        <result column="id" property="id" />
+        <result column="uuid" property="uuid" />
+        <result column="title_name" property="titleName" />
+        <result column="device_uuid" property="deviceUuid" />
+        <result column="device_name" property="deviceName" />
+        <result column="device_vendor_id" property="deviceVendorId" />
+        <result column="device_vendor_name" property="deviceVendorName" />
+        <result column="device_model_number" property="deviceModelNumber" />
+        <result column="target_device_uuid" property="targetDeviceUuid" />
+        <result column="target_device_name" property="targetDeviceName" />
+        <result column="target_device_vendor_id" property="targetDeviceVendorId" />
+        <result column="target_device_vendor_name" property="targetDeviceVendorName" />
+        <result column="target_device_model_number" property="targetDeviceModelNumber" />
+        <result column="remarks" property="remarks" />
+        <result column="command_line_config_status" property="commandLineConfigStatus" />
+        <result column="status" property="status" />
+        <result column="migration_type" property="migrationType" />
+        <result column="warning" property="warning" />
+        <result column="create_user" property="createUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`,
+        `uuid`,
+        `title_name`,
+        `device_uuid`,
+        `device_name`,
+        `device_vendor_id`,
+        `device_vendor_name`,
+        `device_model_number`,
+        `target_device_uuid`,
+        `target_device_name`,
+        `target_device_vendor_id`,
+        `target_device_vendor_name`,
+        `target_device_model_number`,
+        `remarks`,
+        `status`,
+        `migration_type`,
+        `warning`,
+        IF(ISNULL(command_line_config) || LENGTH(trim(command_line_config))=0,'失败','成功') AS command_line_config_status,
+        `create_user`,
+        `create_time`,
+        `update_time`
+    </sql>
+
+    <insert id="insert">
+        INSERT INTO push_translation_task_record (
+            `id`,
+            `uuid`,
+            `title_name`,
+            `device_uuid`,
+            `device_name`,
+            `device_vendor_id`,
+            `device_vendor_name`,
+            `device_model_number`,
+            `target_device_uuid`,
+            `target_device_name`,
+            `target_device_vendor_id`,
+            `target_device_vendor_name`,
+            `target_device_model_number`,
+            `remarks`,
+            `status`,
+            `migration_type`,
+            `create_user`,
+            `create_time`,
+            `update_time`
+        )
+        VALUES(
+            #{id},
+            #{uuid},
+            #{titleName},
+            #{deviceUuid},
+            #{deviceName},
+            #{deviceVendorId},
+            #{deviceVendorName},
+            #{deviceModelNumber},
+            #{targetDeviceUuid},
+            #{targetDeviceName},
+            #{targetDeviceVendorId},
+            #{targetDeviceVendorName},
+            #{targetDeviceModelNumber},
+            #{remarks},
+            #{status},
+            #{migrationType},
+            #{createUser},
+            NOW(),
+            #{updateTime}
+        )
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM push_translation_task_record
+        WHERE `id` = #{id}
+    </delete>
+
+    <update id="update">
+        UPDATE push_translation_task_record
+        SET
+            title_name = #{titleName},
+            device_uuid = #{deviceUuid},
+            device_name = #{deviceName},
+            device_vendor_id = #{deviceVendorId},
+            device_vendor_name = #{deviceVendorName},
+            device_model_number = #{deviceModelNumber},
+            target_device_uuid = #{targetDeviceUuid},
+            target_device_name = #{targetDeviceName},
+            target_device_vendor_id = #{targetDeviceVendorId},
+            target_device_vendor_name = #{targetDeviceVendorName},
+            target_device_model_number = #{targetDeviceModelNumber},
+            migration_type = #{migrationType},
+            remarks = #{remarks},
+            update_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateCommandLineConfigById">
+        UPDATE push_translation_task_record
+        SET
+            command_line_config = #{commandLineConfig},
+            status = #{status},
+            update_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateCommandLineConfigAndWarningById">
+        UPDATE push_translation_task_record
+        SET
+            command_line_config = #{commandLineConfig},
+            warning = #{warning},
+            status = #{status},
+            update_time = NOW()
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateStatusById">
+        UPDATE push_translation_task_record
+        SET
+            status = #{status}
+        WHERE `id` = #{id}
+    </update>
+    <update id="updateStatusAndWarningById">
+        UPDATE push_translation_task_record
+        SET
+            status = #{status},
+            warning = #{warning}
+        WHERE `id` = #{id}
+    </update>
+
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        WHERE `id` = #{id}
+    </select>
+
+    <select id="getByIdList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        WHERE `id` in
+        <foreach item="id" index="index" collection="idList" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getByUUID" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        <where>
+            <if test="uuid != null and uuid != ''">
+                AND uuid = #{uuid}
+            </if>
+        </where>
+    </select>
+
+    <select id="getCommandLineConfigByUUID" resultType="string">
+        SELECT
+        `command_line_config`
+        FROM push_translation_task_record
+        WHERE uuid = #{uuid}
+    </select>
+
+    <select id="findVOList" resultMap="VOResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        <where>
+            <if test="titleName != null and titleName != ''">
+                AND title_name = #{titleName}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="deviceVendorId != null and deviceVendorId != ''">
+                AND device_vendor_id = #{deviceVendorId}
+            </if>
+            <if test="targetDeviceUuid != null and targetDeviceUuid != ''">
+                AND target_device_uuid = #{targetDeviceUuid}
+            </if>
+            <if test="targetDeviceName != null and targetDeviceName != ''">
+                AND target_device_name = #{targetDeviceName}
+            </if>
+            <if test="deviceVendorName != null and deviceVendorName != ''">
+                AND device_vendor_name = #{deviceVendorName}
+            </if>
+            <if test="deviceModelNumber != null and deviceModelNumber != ''">
+                AND device_model_number = #{deviceModelNumber}
+            </if>
+            <if test="targetDeviceVendorId != null and targetDeviceVendorId != ''">
+                AND target_device_vendor_id = #{targetDeviceVendorId}
+            </if>
+            <if test="targetDeviceVendorName != null and targetDeviceVendorName != ''">
+                AND target_device_vendor_name = #{targetDeviceVendorName}
+            </if>
+            <if test="targetDeviceModelNumber != null and targetDeviceModelNumber != ''">
+                AND target_device_model_number = #{targetDeviceModelNumber}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND remarks = #{remarks}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="migrationType != null">
+                AND migration_type = #{migrationType}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="findList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        <where>
+            <if test="titleName != null and titleName != ''">
+                AND title_name = #{titleName}
+            </if>
+            <if test="deviceUuid != null and deviceUuid != ''">
+                AND device_uuid = #{deviceUuid}
+            </if>
+            <if test="deviceName != null and deviceName != ''">
+                AND device_name = #{deviceName}
+            </if>
+            <if test="deviceVendorId != null and deviceVendorId != ''">
+                AND device_vendor_id = #{deviceVendorId}
+            </if>
+            <if test="deviceVendorName != null and deviceVendorName != ''">
+                AND device_vendor_name = #{deviceVendorName}
+            </if>
+            <if test="deviceModelNumber != null and deviceModelNumber != ''">
+                AND device_model_number = #{deviceModelNumber}
+            </if>
+            <if test="targetDeviceUuid != null and targetDeviceUuid != ''">
+                AND target_device_uuid = #{targetDeviceUuid}
+            </if>
+            <if test="targetDeviceName != null and targetDeviceName != ''">
+                AND target_device_name = #{targetDeviceName}
+            </if>
+            <if test="targetDeviceVendorId != null and targetDeviceVendorId != ''">
+                AND target_device_vendor_id = #{targetDeviceVendorId}
+            </if>
+            <if test="targetDeviceVendorName != null and targetDeviceVendorName != ''">
+                AND target_device_vendor_name = #{targetDeviceVendorName}
+            </if>
+            <if test="targetDeviceModelNumber != null and targetDeviceModelNumber != ''">
+                AND target_device_model_number = #{targetDeviceModelNumber}
+            </if>
+            <if test="remarks != null and remarks != ''">
+                AND remarks = #{remarks}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+            <if test="migrationType != nul">
+                AND migration_type = #{migrationType}
+            </if>
+        </where>
+        order by id DESC
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(1)
+        FROM push_translation_task_record
+    </select>
+
+    <select id="getByStatus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM push_translation_task_record
+        <where>
+            status = #{status}
+        </where>
+    </select>
+
+</mapper>
